@@ -6,10 +6,10 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 
 function MovementTrayGenerator() {
     const [circularDiameter, setCircularDiameter] = useState(25);
-    const [ovalLength, setOvalLength] = useState(35.5);
-    const [ovalWidth, setOvalWidth] = useState(60);
+    const [ovalLength, setOvalLength] = useState(60);
+    const [ovalWidth, setOvalWidth] = useState(35.5);
 
-    const [magnetWidth, setMagnetWidth] = useState(5);
+    const [magnetWidth, setMagnetWidth] = useState(2);
     const [magnetDepth, setMagnetDepth] = useState(2);
 
     const [gap, setGap] = useState(0);

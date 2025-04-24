@@ -25,6 +25,8 @@ function Oval({ position, length, width, outerThickness = 2, mainColor, outerCol
     const extrudeSettings = {
         depth: 4,
         bevelEnabled: true,
+        curveSegments: 128,
+
     };
 
     const outerOvalGeometry = new ExtrudeGeometry(outerShape, extrudeSettings);
@@ -46,6 +48,7 @@ function Oval({ position, length, width, outerThickness = 2, mainColor, outerCol
     const extrudeSettings2 = {
         depth: 2,
         bevelEnabled: true,
+        curveSegments: 128,
     };
 
     const innerOvalGeometry = new ExtrudeGeometry(innerShape, extrudeSettings2);

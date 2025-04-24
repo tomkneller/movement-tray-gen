@@ -9,7 +9,6 @@ import concaveman from 'concaveman';
 
 function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot }) {
     const [circlesData, setCirclesData] = useState([]);
-    const [ovalData, setOvalData] = useState(null);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
@@ -19,19 +18,22 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
     const yOffset = circleOuterRadius + insetRadius + gap;
     const [baseFillGeometry, setBaseFillGeometry] = useState(null);
 
-    function areInsetAreasOverlapping(pos1, pos2, radius1, radius2) {
+
+    // Check if the purple areas (inner circles) of two circles overlap
+    function areInsetAreasOverlapping(pos1, pos2, purpleRadius1, purpleRadius2) {
         const dx = pos1.x - pos2.x;
         const dy = pos1.y - pos2.y;
         const distanceSq = dx * dx + dy * dy;
-        const minAllowed = radius1 + radius2;
+        const minAllowed = purpleRadius1 + purpleRadius2;  // Sum of purple radii
         return distanceSq < minAllowed * minAllowed;
     }
 
-    function doesInsetIntersectOval(circlePos, ovalPos, circleRadius, ovalLength, ovalWidth) {
+    // Check if the purple area (inner circle) intersects with the oval
+    function doesInsetAreaIntersectOval(circlePos, ovalPos, purpleRadius, ovalLength, ovalWidth) {
         const dx = circlePos.x - ovalPos.x;
         const dy = circlePos.y - ovalPos.y;
-        const rx = ovalLength / 2 + circleRadius;
-        const ry = ovalWidth / 2 + circleRadius;
+        const rx = ovalLength / 2 + purpleRadius; // Use the purple radius for this check
+        const ry = ovalWidth / 2 + purpleRadius; // Use the purple radius for this check
         return (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) < 1;
     }
 
@@ -49,15 +51,25 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             const position = { x, y };
 
             // Check intersection with oval
-            if (supportSlot.enabled && ovalData) {
-                const intersectsOval = doesInsetIntersectOval(position, ovalData.position, insetRadius, supportSlot.length, supportSlot.width);
-                if (intersectsOval) return; // Skip this circle
+            if (supportSlot.enabled) {
+                const intersectsOval = doesInsetAreaIntersectOval(position, { x: 0, y: 0 }, insetRadius, supportSlot.length, supportSlot.width);
+                if (intersectsOval) {
+                    // Move the circle further away until no intersection
+                    const angle = Math.atan2(y, x); // Get the angle of the current position relative to the center
+                    x += Math.cos(angle) * gap; // Move the circle along the radial direction
+                    y += Math.sin(angle) * gap;
+                    return addCircle(x, y, row, col); // Try again with the new position
+                }
             }
 
             // Check intersection with existing circles
             for (const existing of circles) {
                 if (areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius)) {
-                    return; // Skip this circle
+                    // Move the circle further away from the other circle (since green areas can intersect)
+                    const angle = Math.atan2(y - existing.position.y, x - existing.position.x); // Get angle to existing circle
+                    x += Math.cos(angle) * gap; // Move the circle along the radial direction
+                    y += Math.sin(angle) * gap;
+                    return addCircle(x, y, row, col); // Try again with the new position
                 }
             }
 
@@ -70,22 +82,30 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             maxy = Math.max(maxy, y + circleOuterRadius);
         };
 
+        console.log("CHECK THIS");
+        console.log(supportSlot.enabled);
+
+
+
 
         if (supportSlot.enabled) {
+
+
+
             // Circular layout around oval
             const numCircles = supportSlot.count;
             const radius = (supportSlot.width + supportSlot.length) / 4 + insetRadius + gap;
             const centerX = 0;
             const centerY = 0;
 
-            setOvalData({
-                position: { x: centerX, y: centerY },
-                length: supportSlot.length,
-                width: supportSlot.width,
-            });
+            // setOvalData({
+            //     position: { x: centerX, y: centerY },
+            //     length: supportSlot.length,
+            //     width: supportSlot.width,
+            // });
 
-            const a = (supportSlot.length / 2) + insetRadius + gap;
-            const b = (supportSlot.width / 2) + insetRadius + gap;
+            const a = (supportSlot.length / 2) + insetRadius + gap + 2;
+            const b = (supportSlot.width / 2) + insetRadius + gap + 2;
 
             for (let i = 0; i < numCircles; i++) {
                 const angle = (i / numCircles) * 2 * Math.PI;
@@ -93,7 +113,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                 const y = centerY + b * Math.sin(angle);
                 addCircle(x, y, 0, i);
             }
-
 
             points.push(new Vector2(centerX, centerY));
         } else {
@@ -165,11 +184,11 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             }
         }
 
-        if (supportSlot.enabled && ovalData) {
-            const { x, y } = ovalData.position;
+        if (supportSlot.enabled) {
+            const { x, y } = { x: 0, y: 0 };
             const a = supportSlot.width / 2;
             const b = supportSlot.length / 2;
-            const segments = 32;
+            const segments = 128;
 
             for (let i = 0; i < segments; i++) {
                 const angle = (i / segments) * Math.PI * 2;
@@ -183,7 +202,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         // Holes: Circle insets
         for (const circle of circles) {
             const path = new THREE.Path();
-            const segments = 32;
+            const segments = 128;
             const r = circle.insetRadius;
             for (let i = 0; i <= segments; i++) {
                 const angle = (i / segments) * 2 * Math.PI;
@@ -195,13 +214,23 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             shape.holes.push(path);
         }
 
+
+        // setOvalData({
+        //     position: { x: centerX, y: centerY },
+        //     length: supportSlot.length,
+        //     width: supportSlot.width,
+        // });
+
+
         // Hole: Oval inset
-        if (supportSlot.enabled && ovalData) {
-            const { x, y } = ovalData.position;
+        if (supportSlot.enabled) {
+
+
+            const { x, y } = { x: 0, y: 0 };
             const a = supportSlot.width / 2;
             const b = supportSlot.length / 2;
             const path = new THREE.Path();
-            const segments = 64;
+            const segments = 128;
             for (let i = 0; i <= segments; i++) {
                 const angle = (i / segments) * 2 * Math.PI;
                 const px = x + b * Math.cos(angle);
@@ -226,7 +255,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
 
         setBaseFillGeometry(geometry);
 
-    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot]);
+    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth]);
 
     return (
         <>
@@ -244,9 +273,11 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     borderColor="green"
                 />
             ))}
-            {supportSlot.enabled && ovalData && (
+            {supportSlot.enabled && (
                 <Oval
-                    {...ovalData}
+                    position={{ x: 0, y: 0 }}
+                    length={supportSlot.length}
+                    width={supportSlot.width}
                     outerThickness={1}
                     mainColor="lightgreen"
                     outerColor="green"

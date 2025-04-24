@@ -16,6 +16,7 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
     const extrudeSettings3 = {
         depth: 2,
         bevelEnabled: true,
+        curveSegments: 128,
     };
 
 
@@ -31,6 +32,7 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
     const extrudeSettings = {
         depth: 2,
         bevelEnabled: true,
+        curveSegments: 128,
     };
 
 
@@ -46,6 +48,7 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
     const extrudeSettings2 = {
         depth: 4,
         bevelEnabled: true,
+        curveSegments: 128,
     };
 
 
