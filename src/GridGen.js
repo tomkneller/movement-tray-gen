@@ -82,27 +82,11 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             maxy = Math.max(maxy, y + circleOuterRadius);
         };
 
-        console.log("CHECK THIS");
-        console.log(supportSlot.enabled);
-
-
-
-
         if (supportSlot.enabled) {
-
-
-
             // Circular layout around oval
             const numCircles = supportSlot.count;
-            const radius = (supportSlot.width + supportSlot.length) / 4 + insetRadius + gap;
             const centerX = 0;
             const centerY = 0;
-
-            // setOvalData({
-            //     position: { x: centerX, y: centerY },
-            //     length: supportSlot.length,
-            //     width: supportSlot.width,
-            // });
 
             const a = (supportSlot.length / 2) + insetRadius + gap + 2;
             const b = (supportSlot.width / 2) + insetRadius + gap + 2;
@@ -134,12 +118,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     addCircle(x, y, row, col);
                 }
             }
-
-            // // Position oval below the layout
-            // const centerX = (minx + maxx) / 2;
-            // const centerY = maxy + gap + ovalWidth / 2;
-
-            // points.push(new Vector2(centerX, centerY));
         }
 
         setCirclesData(circles);
@@ -213,14 +191,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             }
             shape.holes.push(path);
         }
-
-
-        // setOvalData({
-        //     position: { x: centerX, y: centerY },
-        //     length: supportSlot.length,
-        //     width: supportSlot.width,
-        // });
-
 
         // Hole: Oval inset
         if (supportSlot.enabled) {
