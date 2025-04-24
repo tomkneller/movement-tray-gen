@@ -20,10 +20,15 @@ function MovementTrayGenerator() {
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
     const [hasMagnetSlot, setHasMagnetSlot] = useState(true);
 
+    const [supportMode, setSupportMode] = useState('wrap');
+    const [supportCount, setSupportCount] = useState(6);
+
     const [formationCols, setFormationCols] = useState(3);
     const [formationRows, setFormationRows] = useState(4);
 
     const [bounds, setBounds] = useState(null);
+
+    const [hasStraySlot, setHasStraySlot] = useState(false);
 
 
     useEffect(() => {
@@ -61,6 +66,12 @@ function MovementTrayGenerator() {
             case 'supportSlot':
                 setHasSupportSlot(!hasSupportSlot);
                 break;
+            case 'supportMode':
+                setSupportMode(value);
+                break;
+            case 'supportCount':
+                setSupportCount(parseFloat(value));
+                break;
             case 'magnetSlot':
                 setHasMagnetSlot(!hasMagnetSlot);
                 break;
@@ -75,6 +86,9 @@ function MovementTrayGenerator() {
                 break;
             case 'formationRows':
                 setFormationRows(parseFloat(value));
+                break;
+            case 'straySlot':
+                setHasStraySlot(!hasStraySlot);
                 break;
             default:
                 break;
@@ -102,7 +116,7 @@ function MovementTrayGenerator() {
                 <OrbitControls />
 
                 <pointLight position={[10, 10, 10]} />
-                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} />
+                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} />
             </Canvas>
         </div>);
     };
@@ -155,6 +169,19 @@ function MovementTrayGenerator() {
                         <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
                     </div>
                     <div>
+                        <label>Support Mode:</label>
+                        {/* <input type="number" name="supportMode" value={supportMode} onChange={handleInputChange} /> */}
+                        <select name='supportMode' value={supportMode} onChange={handleInputChange}>
+                            <option value={'wrap'}>Wrap</option>
+                            <option value={'ranked'}>Ranked</option>
+                        </select>
+                        Not Yet Implemented
+                    </div>
+                    <div>
+                        <label>Support Slots Count:</label>
+                        <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} />
+                    </div>
+                    <div>
                         <label>Oval Length:</label>
                         <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
                     </div>
@@ -195,10 +222,6 @@ function MovementTrayGenerator() {
                         <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} />
                     </div>
                     <div>
-                        <label>Stagger Formation:</label>
-                        <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
-                    </div>
-                    <div>
                         <label>Columns:</label>
                         <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
                     </div>
@@ -206,13 +229,22 @@ function MovementTrayGenerator() {
                         <label>Rows:</label>
                         <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
                     </div>
+                    <p>--------------------------</p>
+                    <div>
+                        <label>Stagger Formation:</label>
+                        <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                        <label>Remove Stray Slots:</label>
+                        <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                    </div>
                     <div>
                         <button onClick={generateVisualization}>Visualize</button>
                         <button onClick={handleDownloadSTL}>Download STL</button>
                     </div>
                 </div>
                 <div style={{ flex: '0 0 500px', background: 'gray' }}>
-                    {generateVisualization()} {/* Placeholder for the 3D visualization */}
+                    {generateVisualization()}
                 </div>
             </div >
         </div>

@@ -7,61 +7,126 @@ import concaveman from 'concaveman';
 
 // import { CSG } from 'three-csg-ts';
 
-function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot }) {
+function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot }) {
     const [circlesData, setCirclesData] = useState([]);
     const [ovalData, setOvalData] = useState(null);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
-    const ovalLength = 35.5;
-    const ovalWidth = 60;
 
     const circleOuterRadius = insetRadius + borderWidth;
     const xOffset = circleOuterRadius + insetRadius + gap;
     const yOffset = circleOuterRadius + insetRadius + gap;
-    const baseFillGeometry = useRef(null);
+    const [baseFillGeometry, setBaseFillGeometry] = useState(null);
+
+    function areInsetAreasOverlapping(pos1, pos2, radius1, radius2) {
+        const dx = pos1.x - pos2.x;
+        const dy = pos1.y - pos2.y;
+        const distanceSq = dx * dx + dy * dy;
+        const minAllowed = radius1 + radius2;
+        return distanceSq < minAllowed * minAllowed;
+    }
+
+    function doesInsetIntersectOval(circlePos, ovalPos, circleRadius, ovalLength, ovalWidth) {
+        const dx = circlePos.x - ovalPos.x;
+        const dy = circlePos.y - ovalPos.y;
+        const rx = ovalLength / 2 + circleRadius;
+        const ry = ovalWidth / 2 + circleRadius;
+        return (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) < 1;
+    }
 
     useEffect(() => {
         const circles = [];
-        let minx = Infinity;
-        let miny = Infinity;
-        let maxx = -Infinity;
-        let maxy = -Infinity;
         const points = [];
 
         const circleOuterRadius = insetRadius + borderWidth;
         const xOffset = circleOuterRadius + insetRadius + gap;
         const yOffset = circleOuterRadius + insetRadius + gap;
 
-        // Generate circle positions
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let xShift = col * xOffset;
-                if (stagger && row % 2 === 1) {
-                    xShift += xOffset / 2;
-                }
-                const yShift = row * yOffset;
-                const position = { x: xShift, y: yShift };
-                circles.push({ position, insetRadius, borderWidth, row, col });
-                points.push(new Vector2(position.x, position.y));
+        let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
 
-                minx = Math.min(minx, position.x - circleOuterRadius);
-                miny = Math.min(miny, position.y - circleOuterRadius);
-                maxx = Math.max(maxx, position.x + circleOuterRadius);
-                maxy = Math.max(maxy, position.y + circleOuterRadius);
+        const addCircle = (x, y, row = 0, col = 0) => {
+            const position = { x, y };
+
+            // Check intersection with oval
+            if (supportSlot.enabled && ovalData) {
+                const intersectsOval = doesInsetIntersectOval(position, ovalData.position, insetRadius, supportSlot.length, supportSlot.width);
+                if (intersectsOval) return; // Skip this circle
             }
+
+            // Check intersection with existing circles
+            for (const existing of circles) {
+                if (areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius)) {
+                    return; // Skip this circle
+                }
+            }
+
+            circles.push({ position, insetRadius, borderWidth, row, col });
+            points.push(new Vector2(x, y));
+
+            minx = Math.min(minx, x - circleOuterRadius);
+            miny = Math.min(miny, y - circleOuterRadius);
+            maxx = Math.max(maxx, x + circleOuterRadius);
+            maxy = Math.max(maxy, y + circleOuterRadius);
+        };
+
+
+        if (supportSlot.enabled) {
+            // Circular layout around oval
+            const numCircles = supportSlot.count;
+            const radius = (supportSlot.width + supportSlot.length) / 4 + insetRadius + gap;
+            const centerX = 0;
+            const centerY = 0;
+
+            setOvalData({
+                position: { x: centerX, y: centerY },
+                length: supportSlot.length,
+                width: supportSlot.width,
+            });
+
+            const a = (supportSlot.length / 2) + insetRadius + gap;
+            const b = (supportSlot.width / 2) + insetRadius + gap;
+
+            for (let i = 0; i < numCircles; i++) {
+                const angle = (i / numCircles) * 2 * Math.PI;
+                const x = centerX + a * Math.cos(angle);
+                const y = centerY + b * Math.sin(angle);
+                addCircle(x, y, 0, i);
+            }
+
+
+            points.push(new Vector2(centerX, centerY));
+        } else {
+            // Standard grid layout
+            for (let row = 0; row < rows; row++) {
+                const isStaggeredRow = stagger && row % 2 === 1;
+                let effectiveCols = cols;
+
+                if (straySlot) {
+                    effectiveCols = isStaggeredRow ? cols - 1 : cols;
+                }
+
+                for (let col = 0; col < effectiveCols; col++) {
+                    let x = col * xOffset;
+                    if (isStaggeredRow) {
+                        x += xOffset / 2;
+                    }
+                    const y = row * yOffset;
+                    addCircle(x, y, row, col);
+                }
+            }
+
+            // // Position oval below the layout
+            // const centerX = (minx + maxx) / 2;
+            // const centerY = maxy + gap + ovalWidth / 2;
+
+            // points.push(new Vector2(centerX, centerY));
         }
 
         setCirclesData(circles);
 
-        // Set oval data
-        const ovalCenterX = (minx + maxx) / 2;
-        const ovalCenterY = maxy + gap + ovalWidth / 2;
-        setOvalData({ position: { x: ovalCenterX, y: ovalCenterY }, length: supportSlot.length, width: supportSlot.width });
-        points.push(new Vector2(ovalCenterX, ovalCenterY));
-
-        // Set bounds for camera framing
-        const bounds = new THREE.Box3().setFromPoints(points.map(v => new THREE.Vector3(v.x, v.y, 0)));
+        // Set bounds
+        const bounds = new THREE.Box3().setFromPoints(points.map(p => new THREE.Vector3(p.x, p.y, 0)));
         setBounds(bounds);
 
         // Build concave hull from edge circle perimeter samples
@@ -100,28 +165,52 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             }
         }
 
+        if (supportSlot.enabled && ovalData) {
+            const { x, y } = ovalData.position;
+            const a = supportSlot.width / 2;
+            const b = supportSlot.length / 2;
+            const segments = 32;
+
+            for (let i = 0; i < segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                perimeterPoints.push([x + b * Math.cos(angle), y + a * Math.sin(angle)]);
+            }
+        }
+
         const hullPoints = concaveman(perimeterPoints, 1);
         const shape = new THREE.Shape(hullPoints.map(([x, y]) => new Vector2(x, y)));
 
-        // Add circular insets as holes
-        circles.forEach(circle => {
+        // Holes: Circle insets
+        for (const circle of circles) {
             const path = new THREE.Path();
             const segments = 32;
-            const radius = circle.insetRadius;
-
+            const r = circle.insetRadius;
             for (let i = 0; i <= segments; i++) {
-                const angle = (i / segments) * Math.PI * 2;
-                const x = circle.position.x + Math.cos(angle) * radius;
-                const y = circle.position.y + Math.sin(angle) * radius;
-                if (i === 0) {
-                    path.moveTo(x, y);
-                } else {
-                    path.lineTo(x, y);
-                }
+                const angle = (i / segments) * 2 * Math.PI;
+                const x = circle.position.x + Math.cos(angle) * r;
+                const y = circle.position.y + Math.sin(angle) * r;
+                if (i === 0) path.moveTo(x, y);
+                else path.lineTo(x, y);
             }
-
             shape.holes.push(path);
-        });
+        }
+
+        // Hole: Oval inset
+        if (supportSlot.enabled && ovalData) {
+            const { x, y } = ovalData.position;
+            const a = supportSlot.width / 2;
+            const b = supportSlot.length / 2;
+            const path = new THREE.Path();
+            const segments = 64;
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * 2 * Math.PI;
+                const px = x + b * Math.cos(angle);
+                const py = y + a * Math.sin(angle);
+                if (i === 0) path.moveTo(px, py);
+                else path.lineTo(px, py);
+            }
+            shape.holes.push(path);
+        }
 
         // Extrude base
         const extrudeSettings = {
@@ -134,15 +223,15 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         };
 
         const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        baseFillGeometry.current = geometry;
 
-    }, [baseWidth, stagger, rows, cols, gap, supportSlot.length, supportSlot.width]);
+        setBaseFillGeometry(geometry);
 
+    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot]);
 
     return (
         <>
-            {baseFillGeometry.current && (
-                <mesh geometry={baseFillGeometry.current} material={new MeshBasicMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, -0.01]} />
+            {baseFillGeometry && (
+                <mesh geometry={baseFillGeometry} material={new MeshBasicMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, -0.01]} />
             )}
             {circlesData.map((circle, index) => (
                 <Circle
