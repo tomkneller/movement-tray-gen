@@ -1,6 +1,6 @@
 import React, { } from 'react';
 
-import { MeshBasicMaterial } from 'three';
+import { MeshStandardMaterial } from 'three';
 import { CylinderGeometry, ExtrudeGeometry, Shape, Path } from 'three';
 
 const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, borderColor }) => {
@@ -52,16 +52,19 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
     };
 
 
+    const bordersGeom = new ExtrudeGeometry(shape2, extrudeSettings2)
 
     return (
         <group position={[position.x, position.y, 0]}>
             {magnetSlot.enabled ? (
-                <mesh geometry={new ExtrudeGeometry(shape, extrudeSettings)} material={new MeshBasicMaterial({ color: 'purple' })} />) :
-                <mesh geometry={new ExtrudeGeometry(shape3, extrudeSettings3)} material={new MeshBasicMaterial({ color: 'white' })} />
+                <mesh geometry={new ExtrudeGeometry(shape, extrudeSettings)} material={new MeshStandardMaterial({ color: 'purple' })} />
+            ) :
+                <mesh geometry={new ExtrudeGeometry(shape3, extrudeSettings3)} material={new MeshStandardMaterial({ color: 'white' })} />
             }
-            <mesh geometry={new ExtrudeGeometry(shape2, extrudeSettings2)} material={new MeshBasicMaterial({ color: 'green' })} />
+            <mesh geometry={bordersGeom} material={new MeshStandardMaterial({ color: 'green', roughness: 0.7, metalness: 0.1, })} />
+
             {magnetSlot.enabled ? (
-                <mesh geometry={new CylinderGeometry(magnetSlotDiameter, magnetSlotDiameter, 0, 32)} material={new MeshBasicMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
+                <mesh geometry={new CylinderGeometry(magnetSlotDiameter, magnetSlotDiameter, 0, 32)} material={new MeshStandardMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
             ) : null}
 
 

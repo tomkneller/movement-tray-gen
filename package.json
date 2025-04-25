@@ -15,6 +15,9 @@
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
     "three": "^0.175.0",
+    "three-csg": "^1.0.0",
+    "three-csg-ts": "^3.2.0",
+    "three-js-csg": "^72.0.0",
     "three-stdlib": "^2.35.15",
     "web-vitals": "^2.1.4"
   },

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { MeshBasicMaterial, DoubleSide, Vector2 } from 'three';
+import { MeshStandardMaterial, DoubleSide, Vector2 } from 'three';
 import * as THREE from 'three';
 import Circle from './Circle';
 import Oval from './Oval';
 import concaveman from 'concaveman';
+import { CSG } from 'three-csg-ts';
 
 function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached }) {
     const [circlesData, setCirclesData] = useState([]);
@@ -59,7 +60,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
 
 
 
-        const circleOuterRadius = insetRadius + borderWidth;
         const xOffset = circleOuterRadius + insetRadius + gap;
         const yOffset = circleOuterRadius + insetRadius + gap;
 
@@ -67,9 +67,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
 
         const addCircle = (x, y, row = 0, col = 0) => {
             const position = { x, y };
-
-            console.log(canAddCircle(x, y, row, col, circles));
-
 
             if (!canAddCircle(x, y, row, col, circles)) {
 
@@ -131,13 +128,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                 }
             }
 
-            console.log("number");
-
-            console.log(numCircles);
-            console.log("number");
-
-            console.log(numCircles);
-
             if (added < numCircles) {
                 onMaxReached(added);
             }
@@ -169,105 +159,48 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         const bounds = new THREE.Box3().setFromPoints(points.map(p => new THREE.Vector3(p.x, p.y, 0)));
         setBounds(bounds);
 
-        const numSegments = 16;
-        const edgeCircles = new Set();
+        // Base height and rectangle size
+        const depth = 2;
 
-        const groupedByRow = {};
-        const groupedByCol = {};
+        // Compute rectangular base dimensions
+        const minX = bounds.min.x;
+        const maxX = bounds.max.x;
+        const minY = bounds.min.y;
+        const maxY = bounds.max.y;
+        const width = maxX - minX;
+        const height = maxY - minY;
 
-        for (const c of circles) {
-            if (!groupedByRow[c.row]) groupedByRow[c.row] = [];
-            if (!groupedByCol[c.col]) groupedByCol[c.col] = [];
-            groupedByRow[c.row].push(c);
-            groupedByCol[c.col].push(c);
-        }
+        // Create base box geometry
+        const baseGeom = new THREE.BoxGeometry(width, height, depth);
+        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, -depth / 2);
+        const baseMesh = new THREE.Mesh(baseGeom);
 
-        Object.values(groupedByRow).forEach(row => {
-            const sorted = [...row].sort((a, b) => a.position.x - b.position.x);
-            edgeCircles.add(sorted[0]);
-            edgeCircles.add(sorted[sorted.length - 1]);
+        // Prepare hole meshes
+        const holeMeshes = circles.map(circle => {
+            const holeGeom = new THREE.CylinderGeometry(insetRadius, insetRadius, depth * 2, 64);
+            holeGeom.rotateX(Math.PI / 2);
+            holeGeom.translate(circle.position.x, circle.position.y, -depth / 2);
+            return new THREE.Mesh(holeGeom);
         });
 
-        Object.values(groupedByCol).forEach(col => {
-            const sorted = [...col].sort((a, b) => a.position.y - b.position.y);
-            edgeCircles.add(sorted[0]);
-            edgeCircles.add(sorted[sorted.length - 1]);
+        // Subtract holes from base
+        let csgResult = CSG.fromMesh(baseMesh);
+
+        holeMeshes.forEach(hole => {
+            const holeCSG = CSG.fromMesh(hole);
+            csgResult = csgResult.subtract(holeCSG);
         });
 
-        const perimeterPoints = [];
-        for (const circle of edgeCircles) {
-            for (let i = 0; i < numSegments; i++) {
-                const angle = (i / numSegments) * 2 * Math.PI;
-                const x = circle.position.x + Math.cos(angle) * circleOuterRadius;
-                const y = circle.position.y + Math.sin(angle) * circleOuterRadius;
-                perimeterPoints.push([x, y]);
-            }
-        }
-
-        if (supportSlot.enabled) {
-            const { x, y } = { x: 0, y: 0 };
-            const a = supportSlot.width / 2;
-            const b = supportSlot.length / 2;
-            const segments = 128;
-
-            for (let i = 0; i < segments; i++) {
-                const angle = (i / segments) * Math.PI * 2;
-                perimeterPoints.push([x + b * Math.cos(angle), y + a * Math.sin(angle)]);
-            }
-        }
-
-        const hullPoints = concaveman(perimeterPoints, 1);
-        const shape = new THREE.Shape(hullPoints.map(([x, y]) => new Vector2(x, y)));
-
-        for (const circle of circles) {
-            const path = new THREE.Path();
-            const segments = 128;
-            const r = circle.insetRadius;
-            for (let i = 0; i <= segments; i++) {
-                const angle = (i / segments) * 2 * Math.PI;
-                const x = circle.position.x + Math.cos(angle) * r;
-                const y = circle.position.y + Math.sin(angle) * r;
-                if (i === 0) path.moveTo(x, y);
-                else path.lineTo(x, y);
-            }
-            shape.holes.push(path);
-        }
-
-        if (supportSlot.enabled) {
-            const { x, y } = { x: 0, y: 0 };
-            const a = supportSlot.width / 2;
-            const b = supportSlot.length / 2;
-            const path = new THREE.Path();
-            const segments = 128;
-            for (let i = 0; i <= segments; i++) {
-                const angle = (i / segments) * 2 * Math.PI;
-                const px = x + b * Math.cos(angle);
-                const py = y + a * Math.sin(angle);
-                if (i === 0) path.moveTo(px, py);
-                else path.lineTo(px, py);
-            }
-            shape.holes.push(path);
-        }
-
-        const extrudeSettings = {
-            depth: 2,
-            bevelEnabled: true,
-            bevelSegments: 1,
-            steps: 1,
-            bevelSize: 0.5,
-            bevelThickness: 0.5,
-        };
-
-        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-        setBaseFillGeometry(geometry);
+        // Convert back to geometry
+        const finalMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
+        setBaseFillGeometry(finalMesh.geometry);
 
     }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth]);
 
     return (
         <>
             {baseFillGeometry && (
-                <mesh geometry={baseFillGeometry} material={new MeshBasicMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, -0.01]} />
+                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, -0.01]} />
             )}
             {circlesData.map((circle, index) => (
                 <Circle
@@ -278,6 +211,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"
                     borderColor="green"
+
                 />
             ))}
             {supportSlot.enabled && (

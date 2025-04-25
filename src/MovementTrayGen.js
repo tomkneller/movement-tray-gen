@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
-import CameraControls from './CameraControls';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 
 function MovementTrayGenerator() {
@@ -130,13 +129,21 @@ function MovementTrayGenerator() {
             hasSupportSlot,
         });
         return (<div style={{ flex: 1 }}>
-            <Canvas style={{ width: '100vw', height: '100vh' }}>
+            <Canvas style={{ width: '100%', height: '100vh' }}>
                 {/* <CameraControls bounds={bounds} /> */}
-                <PerspectiveCamera makeDefault position={[0, -100, 100]} fov={50} />
-                <ambientLight intensity={0.2} />
-                <directionalLight position={[0, 0, 100]} intensity={0.5} />
+                <PerspectiveCamera makeDefault position={[0, -45, 45]} fov={90} />
+                <ambientLight intensity={0.5} />
+                <directionalLight castShadow
+                    position={[0, 0, 5]}
+                    intensity={1}
+                    shadow-mapSize-width={1024}
+                    shadow-mapSize-height={1024}
+                    shadow-camera-far={50}
+                    shadow-camera-left={-10}
+                    shadow-camera-right={10}
+                    shadow-camera-top={10}
+                    shadow-camera-bottom={-10} />
                 <OrbitControls />
-                <pointLight position={[10, 10, 10]} />
                 <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} />
             </Canvas>
         </div>);
@@ -177,8 +184,8 @@ function MovementTrayGenerator() {
     return (
         <div>
             <h2>Movement Tray Generator</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <div style={{ flex: '0 0 500px', display: 'flex', flexDirection: 'column', backgroundColor: 'purple' }} >
+            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                <div style={{ display: 'flex', flex: 'grow', flexDirection: 'column', backgroundColor: 'purple' }} >
                     <h3>Base Size</h3>
                     <div>
                         <label>Circular Diameter:</label>
@@ -273,7 +280,7 @@ function MovementTrayGenerator() {
                         <button onClick={handleDownloadSTL}>Download STL</button>
                     </div>
                 </div>
-                <div style={{ flex: '0 0 500px', background: 'gray' }}>
+                <div style={{ background: 'gray', display: 'flex', flex: 1 }}>
                     {generateVisualization()}
                 </div>
             </div >

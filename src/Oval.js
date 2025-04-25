@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shape, ShapeGeometry, MeshBasicMaterial, DoubleSide, ExtrudeGeometry, Path, CylinderGeometry } from 'three';
+import { Shape, ShapeGeometry, MeshStandardMaterial, DoubleSide, ExtrudeGeometry, Path, CylinderGeometry } from 'three';
 
 function Oval({ position, length, width, outerThickness = 2, mainColor, outerColor }) {
     const innerLengthRadius = length / 2;
@@ -13,7 +13,7 @@ function Oval({ position, length, width, outerThickness = 2, mainColor, outerCol
     const outerShape = new Shape();
     outerShape.ellipse(0, 0, outerLengthRadius, outerWidthRadius, 0, 2 * Math.PI, false, 0);
     const outerGeometry = new ShapeGeometry(outerShape);
-    const outerMaterial = new MeshBasicMaterial({ color: 'green', side: DoubleSide });
+    const outerMaterial = new MeshStandardMaterial({ color: 'green', side: DoubleSide });
 
     const hole1 = new Path();
     // hole1.absarc(0, 0, 5, 0, Math.PI * 2, true);
@@ -38,7 +38,7 @@ function Oval({ position, length, width, outerThickness = 2, mainColor, outerCol
     innerShape.ellipse(0, 0, innerLengthRadius, innerWidthRadius, 0, 2 * Math.PI, false, 0);
 
     const innerGeometry = new ShapeGeometry(innerShape);
-    const innerMaterial = new MeshBasicMaterial({ color: 'purple', side: DoubleSide });
+    const innerMaterial = new MeshStandardMaterial({ color: 'purple', side: DoubleSide });
 
     const hole = new Path();
     hole.absarc(0, 0, magnetSlotDiameter, 0, Math.PI * 2, true);
@@ -61,7 +61,7 @@ function Oval({ position, length, width, outerThickness = 2, mainColor, outerCol
         <group position={[position.x, position.y, 0]}>
             <mesh geometry={outerOvalGeometry} material={outerMaterial} />
             <mesh geometry={innerOvalGeometry} material={innerMaterial} />
-            <mesh geometry={magnet} material={new MeshBasicMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
+            <mesh geometry={magnet} material={new MeshStandardMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
         </group>
     );
 }
