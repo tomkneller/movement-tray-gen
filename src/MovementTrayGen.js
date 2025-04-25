@@ -30,6 +30,25 @@ function MovementTrayGenerator() {
 
     const [hasStraySlot, setHasStraySlot] = useState(false);
 
+    const [maxSlots, setMaxSlots] = useState(100);
+
+
+    const [maxReached, setMaxReached] = useState(false);
+
+    const handleMaxReached = (value) => {
+        setMaxReached(true);
+
+        setMaxSlots(value);
+
+        setSupportCount(value)
+        console.log("Maximum value reached in the counter!");
+        // Potentially disable increment button or show a message
+    };
+
+    const resetMaxSlots = () => {
+        setMaxReached(false);
+        setMaxSlots(100);
+    }
 
     useEffect(() => {
         console.log("Bounds updated:", bounds);
@@ -41,12 +60,15 @@ function MovementTrayGenerator() {
         switch (name) {
             case 'circularDiameter':
                 setCircularDiameter(parseFloat(value));
+                resetMaxSlots();
                 break;
             case 'ovalLength':
                 setOvalLength(parseFloat(value));
+                resetMaxSlots();
                 break;
             case 'ovalWidth':
                 setOvalWidth(parseFloat(value));
+                resetMaxSlots();
                 break;
             case 'gap':
                 setGap(parseFloat(value));
@@ -114,9 +136,8 @@ function MovementTrayGenerator() {
                 <ambientLight intensity={0.2} />
                 <directionalLight position={[0, 0, 100]} intensity={0.5} />
                 <OrbitControls />
-
                 <pointLight position={[10, 10, 10]} />
-                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} />
+                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} />
             </Canvas>
         </div>);
     };
@@ -157,7 +178,8 @@ function MovementTrayGenerator() {
         <div>
             <h2>Movement Tray Generator</h2>
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <div style={{ flex: '0 0 500px', display: 'flex', flexDirection: 'column' }} >
+                <div style={{ flex: '0 0 500px', display: 'flex', flexDirection: 'column', backgroundColor: 'purple' }} >
+                    <h3>Base Size</h3>
                     <div>
                         <label>Circular Diameter:</label>
                         <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} />
@@ -168,26 +190,27 @@ function MovementTrayGenerator() {
                         <label>Support Slot:</label>
                         <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
                     </div>
-                    <div>
-                        <label>Support Mode:</label>
-                        {/* <input type="number" name="supportMode" value={supportMode} onChange={handleInputChange} /> */}
-                        <select name='supportMode' value={supportMode} onChange={handleInputChange}>
-                            <option value={'wrap'}>Wrap</option>
-                            <option value={'ranked'}>Ranked</option>
-                        </select>
-                        Not Yet Implemented
-                    </div>
-                    <div>
-                        <label>Support Slots Count:</label>
-                        <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <label>Oval Length:</label>
-                        <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <label>Oval Width:</label>
-                        <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} />
+                    <div inert={!hasSupportSlot}>
+                        <div>
+                            <label>Support Mode:</label>
+                            <select name='supportMode' value={supportMode} onChange={handleInputChange}>
+                                <option value={'wrap'}>Wrap</option>
+                                <option value={'ranked'}>Ranked</option>
+                            </select>
+                            Not Yet Implemented
+                        </div>
+                        <div>
+                            <label>Support Slots Count:</label>
+                            <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} />
+                        </div>
+                        <div>
+                            <label>Oval Length:</label>
+                            <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label>Oval Width:</label>
+                            <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} />
+                        </div>
                     </div>
                     <p>--------------------------</p>
                     <h3>Add Magnet slots</h3>
@@ -195,20 +218,33 @@ function MovementTrayGenerator() {
                         <label>Magnet Slots:</label>
                         <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange} />
                     </div>
-                    <div>
-                        <label>Magnet Width:</label>
-                        <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <label>Magnet Depth:</label>
-                        <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} />
-                        Not yet Implemented
+                    <div inert={!hasMagnetSlot}>
+                        <div>
+                            <label>Magnet Width:</label>
+                            <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label>Magnet Depth:</label>
+                            <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} />
+                            Not yet Implemented
+                        </div>
                     </div>
                     <p>--------------------------</p>
-                    <div>
-                        <label>Gap:</label>
-                        <input type="number" name="gap" value={gap} onChange={handleInputChange} />
+                    <div inert={hasSupportSlot}>
+                        <div>
+                            <label>Gap:</label>
+                            <input type="number" name="gap" value={gap} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label>Columns:</label>
+                            <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label>Rows:</label>
+                            <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
+                        </div>
                     </div>
+                    <p>--------------------------</p>
                     <div>
                         <label>Base Thickness:</label>
                         <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} />
@@ -221,22 +257,16 @@ function MovementTrayGenerator() {
                         <label>Edge Thickness:</label>
                         <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} />
                     </div>
-                    <div>
-                        <label>Columns:</label>
-                        <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <label>Rows:</label>
-                        <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
-                    </div>
                     <p>--------------------------</p>
-                    <div>
-                        <label>Stagger Formation:</label>
-                        <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <label>Remove Stray Slots:</label>
-                        <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                    <div inert={hasSupportSlot}>
+                        <div>
+                            <label>Stagger Formation:</label>
+                            <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
+                        </div>
+                        <div inert={!staggerFormation}>
+                            <label>Remove Stray Slots:</label>
+                            <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                        </div>
                     </div>
                     <div>
                         <button onClick={generateVisualization}>Visualize</button>
@@ -250,5 +280,7 @@ function MovementTrayGenerator() {
         </div>
     );
 }
+
+
 
 export default MovementTrayGenerator;
