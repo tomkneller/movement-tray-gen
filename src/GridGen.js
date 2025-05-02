@@ -102,7 +102,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
 
         const xOffset = circleOuterRadius + insetRadius + gap;
         const yOffset = stagger
-            ? Math.sqrt((2 * circleOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98 // slight fudge factor
+            ? Math.sqrt((2 * circleOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98
             : circleOuterRadius + insetRadius + gap;
 
         let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
@@ -135,7 +135,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             let added = 0;
             let angle = 0;
             const maxAngle = Math.PI * 2;
-            const minSpacing = (2 * insetRadius) * 0.99; // slight fudge for packing
+            const minSpacing = (2 * insetRadius) * 0.99;
 
             while (added < numCircles && angle < maxAngle + 0.2) {
                 const x = centerX + a * Math.cos(angle);
@@ -164,7 +164,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     const dTheta = minSpacing / speed;
                     angle += dTheta;
                 } else {
-                    angle += 0.01; // step slowly until we can place
+                    angle += 0.01;
                 }
             }
 
@@ -257,7 +257,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         //Subtract Support Slot hole
         if (supportSlot.enabled) {
             const supportSlotShape = new THREE.Shape();
-            supportSlotShape.absellipse(0, 0, supportSlot.length / 2, supportSlot.width / 2, 0, Math.PI * 2, false, 0);
+            supportSlotShape.absellipse(0, 0, (supportSlot.length / 2) + borderWidth, (supportSlot.width / 2) + borderWidth, 0, Math.PI * 2, false, 0);
             const extrudeSettings = {
                 depth: 2,
                 bevelEnabled: true,
@@ -275,11 +275,6 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         setBaseFillGeometry(finalMesh.geometry);
 
     }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth]);
-
-
-
-
-
 
     return (
         <>
@@ -304,7 +299,8 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     position={{ x: 0, y: 0 }}
                     length={supportSlot.length}
                     width={supportSlot.width}
-                    outerThickness={1}
+                    borderWidth={borderWidth}
+                    magnetSlot={magnetSlot}
                     mainColor="lightgreen"
                     outerColor="green"
                 />

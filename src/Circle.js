@@ -52,7 +52,13 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
     };
 
 
-    const bordersGeom = new ExtrudeGeometry(shape2, extrudeSettings2)
+    const bordersGeom = new ExtrudeGeometry(shape2, extrudeSettings2);
+
+
+    const magnetDepth = magnetSlotDepth / 2;
+
+    const magnetSlotGeom = new CylinderGeometry(magnetSlotDiameter, magnetSlotDiameter, magnetDepth, 32);
+    magnetSlotGeom.translate(0, magnetDepth / 2 - 0.2, 0);
 
     return (
         <group position={[position.x, position.y, 0]}>
@@ -62,9 +68,8 @@ const Circle = ({ position, insetRadius, borderWidth, magnetSlot, mainColor, bor
                 <mesh geometry={new ExtrudeGeometry(shape3, extrudeSettings3)} material={new MeshStandardMaterial({ color: 'white' })} />
             }
             <mesh geometry={bordersGeom} material={new MeshStandardMaterial({ color: 'green', roughness: 0.7, metalness: 0.1, })} />
-
             {magnetSlot.enabled ? (
-                <mesh geometry={new CylinderGeometry(magnetSlotDiameter, magnetSlotDiameter, 0, 32)} material={new MeshStandardMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
+                <mesh geometry={magnetSlotGeom} material={new MeshStandardMaterial({ color: 'teal' })} rotation={[Math.PI / 2, 0, 0]} />
             ) : null}
 
 
