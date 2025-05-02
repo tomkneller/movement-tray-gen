@@ -172,14 +172,14 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
 
         // Create base box geometry
         const baseGeom = new THREE.BoxGeometry(width, height, depth);
-        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, -depth / 2);
+        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, 1);
         const baseMesh = new THREE.Mesh(baseGeom);
 
         // Prepare hole meshes
         const holeMeshes = circles.map(circle => {
             const holeGeom = new THREE.CylinderGeometry(insetRadius, insetRadius, depth * 2, 64);
             holeGeom.rotateX(Math.PI / 2);
-            holeGeom.translate(circle.position.x, circle.position.y, -depth / 2);
+            holeGeom.translate(circle.position.x, circle.position.y, 1);
             return new THREE.Mesh(holeGeom);
         });
 
