@@ -68,3 +68,57 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+# Movement Forge
+[![GitHub release](https://img.shields.io/github/release/tomkneller/movement-tray-gen.svg?style=for-the-badge&logo=movement-forge)](https://github.com/tomkneller/movement-tray-gen/releases/)
+[![GitHub license](https://img.shields.io/github/license/tomkneller/movement-tray-gen.svg?style=for-the-badge)](https://github.com/tomkneller/movement-tray-gen/blob/master/license)
+[![eslint code style](https://img.shields.io/badge/code_style-eslint-5ed9c7.svg?style=for-the-badge)](https://github.com/tomkneller/movement-tray-gen/blob/master/eslint.config.mjs)
+[![Build status](https://img.shields.io/github/actions/workflow/status/tomkneller/movement-tray-gen/build.yml?branch=master&style=for-the-badge&logo=movement-forge)](https://GitHub.com/tomkneller/movement-tray-gen/releases/)
+[![GitHub All Releases](https://img.shields.io/github/downloads/tomkneller/movement-tray-gen/total?style=for-the-badge&logo=movement-forge)](https://GitHub.com/tomkneller/movement-tray-gen/releases/)
+[![Known Vulnerabilities](https://snyk.io/test/github/tomkneller/movement-tray-gen/badge.svg)](https://snyk.io/test/github/tomkneller/movement-tray-gen)
+
+<div align="center">
+	<a href="https://github.com/tomkneller/movement-tray-gen/releases/latest">
+		<img src="public/logo512.png" width="256" height="256" alt="Movement Forge PNG">
+	</a>
+</div>
+
+## Demo Image
+![Screenshot](preview/screenshot.png "Screenshot")
+
+## Contents
+- [Features](#features)
+- [Download](#download)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [MacOS](#macos)
+- [Run](#run)
+- [License](#license)
+- [FAQ](#faq)
+
+## Features
+- Customisable base sizes and counts
+- Customisable support slots including support for oval shaped bases
+- Customisable magnet slots
+- Different formations including Grid and Staggered
+- Exports to STL format for easy 3D printing
+
+
+## Download
+### Windows
+### Linux
+### macos
+
+## Run
+1. Clone the repo
+2. Install `npm` [using this guide](https://nodejs.org/en/learn/getting-started/an-introduction-to-the-npm-package-manager)
+3. Run `npm i` to install dependencies
+4. run `npm start`
+
+## License
+[Add license type]
+
+## FAQ
+### Can I request a feature?
+Sure! if theres a feature or special base style combination that you use in your tabletop games you can contact me and i'll do my best to implement popular requests
+
