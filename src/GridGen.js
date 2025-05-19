@@ -4,8 +4,10 @@ import * as THREE from 'three';
 import Circle from './Circle';
 import Oval from './Oval';
 import { CSG } from 'three-csg-ts';
+import { createCircleGroup } from './circleUtils';
+import { createOvalMesh } from './ovalUtils';
 
-function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached }) {
+function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
@@ -217,6 +219,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         let baseMesh = new THREE.Mesh(baseGeom);
 
 
+
         const outerPath = buildPerimeter(circles, rows, cols, straySlot, supportSlot.enabled);
         if (outerPath.length > 2) {
             const shape = new THREE.Shape();
@@ -270,9 +273,45 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             csgResult = csgResult.subtract(supportSlotHoleCSG)
         }
 
-        // Convert back to geometry
-        const finalMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
-        setBaseFillGeometry(finalMesh.geometry);
+        let allExportMeshes = [];
+
+        circles.forEach(circle => {
+            const group = createCircleGroup(
+                insetDiameter / 2,
+                borderWidth,
+                magnetSlot,
+                circle.mainColor || 'lightgreen',
+                circle.borderColor || 'green'
+            );
+            group.position.set(circle.position.x, circle.position.y, 0); // Ensure it's placed
+
+            group.updateMatrixWorld(true); // Ensure world matrices are correct
+
+            // Push all meshes in the group to allExportMeshes
+            group.children.forEach(child => {
+                if (child.isMesh) {
+                    allExportMeshes.push(child);
+                }
+            });
+        });
+
+
+        //TODO: Update this with helper similar to circle component
+        if (supportSlot.enabled) {
+            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, magnetSlot);
+            allExportMeshes.push(ovalGroup);
+        }
+
+        const group = new THREE.Group();
+        allExportMeshes.forEach(mesh => group.add(mesh));
+
+        const finalBaseMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
+        setBaseFillGeometry(finalBaseMesh.geometry);
+
+        if (onBaseMeshReady) {
+            onBaseMeshReady(group);
+        }
+
 
     }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth]);
 
@@ -293,10 +332,10 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     borderColor="green"
 
                 />
+
             ))}
             {supportSlot.enabled && (
                 <Oval
-                    position={{ x: 0, y: 0 }}
                     length={supportSlot.length}
                     width={supportSlot.width}
                     borderWidth={borderWidth}

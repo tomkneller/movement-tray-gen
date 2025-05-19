@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 
 function MovementTrayGenerator() {
     const [circularDiameter, setCircularDiameter] = useState(25);
@@ -31,6 +32,7 @@ function MovementTrayGenerator() {
 
     const [maxSlots, setMaxSlots] = useState(100);
 
+    const [exportMesh, setExportMesh] = useState(null);
 
     const [maxReached, setMaxReached] = useState(false);
 
@@ -144,7 +146,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls />
-                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} />
+                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} />
             </Canvas>
         </div>);
     };
@@ -154,31 +156,22 @@ function MovementTrayGenerator() {
      */
     const handleDownloadSTL = () => {
         console.log('Requesting STL download with current parameters...');
-        // fetch('/api/generate_stl', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     circularDiameter,
-        //     ovalLength,
-        //     ovalWidth,
-        //     gap,
-        //     baseThickness,
-        //     edgeHeight,
-        //     edgeThickness,
-        //   }),
-        // })
-        // .then(response => response.blob())
-        // .then(blob => {
-        //   const url = window.URL.createObjectURL(blob);
-        //   const a = document.createElement('a');
-        //   a.href = url;
-        //   a.download = 'movement_tray.stl';
-        //   document.body.appendChild(a);
-        //   a.click();
-        //   window.URL.revokeObjectURL(url);
-        // });
+        if (!exportMesh) {
+            console.warn('No mesh to export.');
+            return;
+        }
+
+        const exporter = new STLExporter();
+        const stlString = exporter.parse(exportMesh);
+
+        const blob = new Blob([stlString], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+
+        link.href = URL.createObjectURL(blob);
+        link.download = 'movement_tray.stl';
+        link.click();
     };
 
     return (
