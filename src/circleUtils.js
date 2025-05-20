@@ -51,7 +51,7 @@ export function createCircleGroup(insetRadius, borderWidth, magnetSlot, mainColo
     if (magnetSlot.enabled) {
         const magnetDepth = magnetSlot.depth / 2;
         const magnetSlotGeom = new CylinderGeometry(magnetSlot.width, magnetSlot.width, magnetDepth, 32);
-        magnetSlotGeom.translate(0, magnetDepth / 2 - 0.2, magnetDepth / 2);
+        magnetSlotGeom.translate(0, magnetDepth / 2 - 0.2, 0);
 
         const magnetMesh = new Mesh(magnetSlotGeom, magnetMaterial);
         magnetMesh.rotation.x = Math.PI / 2;

@@ -295,18 +295,22 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             });
         });
 
-
-        //TODO: Update this with helper similar to circle component
         if (supportSlot.enabled) {
             const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, magnetSlot);
             allExportMeshes.push(ovalGroup);
         }
 
-        const group = new THREE.Group();
-        allExportMeshes.forEach(mesh => group.add(mesh));
+
 
         const finalBaseMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
+
         setBaseFillGeometry(finalBaseMesh.geometry);
+
+        allExportMeshes.push(finalBaseMesh);
+
+
+        const group = new THREE.Group();
+        allExportMeshes.forEach(mesh => group.add(mesh));
 
         if (onBaseMeshReady) {
             onBaseMeshReady(group);
@@ -319,7 +323,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         <>
             {debugHullLine && <primitive object={debugHullLine} />}
             {baseFillGeometry && (
-                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, -0.01]} />
+                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, 1]} />
             )}
             {circlesData.map((circle, index) => (
                 <Circle
@@ -344,6 +348,8 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     outerColor="green"
                 />
             )}
+
+            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({ color: 0x999999, roughness: 1 })} receiveShadow />
         </>
     );
 }
