@@ -176,13 +176,28 @@ function MovementTrayGenerator() {
 
     return (
         <div>
-            <h2>Movement Tray Generator</h2>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <img src='logo192.png' width={'50'} height={'50'} display={'block'} alt='logo png' ></img>
+                <h2 style={{ paddingLeft: 10 }}> Movement Tray Forge</h2>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <div style={{ display: 'flex', flex: 'grow', flexDirection: 'column', backgroundColor: 'purple' }} >
+                <div style={{ display: 'flex', flex: 'grow', flexDirection: 'column', backgroundColor: '#7b4b1e' }} >
                     <h3>Base Size</h3>
                     <div>
                         <label>Circular Diameter:</label>
                         <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} />
+                    </div>
+                    <p>--------------------------</p>
+
+                    <div inert={hasSupportSlot}>
+                        <div>
+                            <label>Columns:</label>
+                            <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label>Rows:</label>
+                            <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
+                        </div>
                     </div>
                     <p>--------------------------</p>
                     <h3>Add support slot</h3>
@@ -235,14 +250,6 @@ function MovementTrayGenerator() {
                             <label>Gap:</label>
                             <input type="number" name="gap" value={gap} onChange={handleInputChange} />
                         </div>
-                        <div>
-                            <label>Columns:</label>
-                            <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
-                        </div>
-                        <div>
-                            <label>Rows:</label>
-                            <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
-                        </div>
                     </div>
                     <p>--------------------------</p>
                     <div>
@@ -258,6 +265,7 @@ function MovementTrayGenerator() {
                         <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} />
                     </div>
                     <p>--------------------------</p>
+                    <h3>Formation</h3>
                     <div inert={hasSupportSlot}>
                         <div>
                             <label>Stagger Formation:</label>
@@ -277,7 +285,7 @@ function MovementTrayGenerator() {
                     {generateVisualization()}
                 </div>
             </div >
-        </div>
+        </div >
     );
 }
 
