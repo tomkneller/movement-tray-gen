@@ -28,6 +28,7 @@
     "start": "electron-forge start",
     "electron": "electron .",
     "build": "react-scripts build",
+    "react-start": "react-scripts start",
     "dist": "electron-builder",
     "package": "electron-forge package",
     "make": "electron-forge make"

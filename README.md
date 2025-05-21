@@ -37,7 +37,7 @@
 1. Clone the repo
 2. Install `npm` [using this guide](https://nodejs.org/en/learn/getting-started/an-introduction-to-the-npm-package-manager)
 3. Run `npm i` to install dependencies
-4. Run `npm start`
+4. Run `npm run react-start`
 5. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## Electron Build
