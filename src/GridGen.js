@@ -298,7 +298,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
         });
 
         if (supportSlot.enabled) {
-            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, magnetSlot);
+            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, borderHeight, magnetSlot);
             allExportMeshes.push(ovalGroup);
         }
 
@@ -346,6 +346,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
                     length={supportSlot.length}
                     width={supportSlot.width}
                     borderWidth={borderWidth}
+                    borderHeight={borderHeight}
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"
                     outerColor="green"

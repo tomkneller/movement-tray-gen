@@ -14,7 +14,7 @@ function MovementTrayGenerator() {
 
     const [gap, setGap] = useState(0);
     const [baseThickness, setBaseThickness] = useState(2);
-    const [edgeHeight, setEdgeHeight] = useState(3);
+    const [edgeHeight, setEdgeHeight] = useState(4);
     const [edgeThickness, setEdgeThickness] = useState(2);
     const [staggerFormation, setStaggerFomation] = useState(false);
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
