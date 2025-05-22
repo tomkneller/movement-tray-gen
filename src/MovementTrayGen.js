@@ -236,7 +236,7 @@ function MovementTrayGenerator() {
                     <div inert={!hasMagnetSlot}>
                         <div>
                             <label>Magnet Width:</label>
-                            <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} />
+                            <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2} />
                         </div>
                         <div>
                             <label>Magnet Depth:</label>
