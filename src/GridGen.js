@@ -7,11 +7,12 @@ import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
 
-function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
+function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
+    const borderHeight = edgeHeight;
 
     const circleOuterRadius = insetRadius + borderWidth;
     const [baseFillGeometry, setBaseFillGeometry] = useState(null);
@@ -117,7 +118,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                 return;
             }
 
-            circles.push({ position, insetRadius, borderWidth, row, col });
+            circles.push({ position, insetRadius, borderWidth, borderHeight, row, col });
             points.push(new Vector2(x, y));
 
             minx = Math.min(minx, x - circleOuterRadius);
@@ -279,6 +280,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
             const group = createCircleGroup(
                 insetDiameter / 2,
                 borderWidth,
+                borderHeight,
                 magnetSlot,
                 circle.mainColor || 'lightgreen',
                 circle.borderColor || 'green'
@@ -317,7 +319,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         }
 
 
-    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth]);
+    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight]);
 
     return (
         <>
@@ -331,6 +333,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     {...circle}
                     insetDiameter={insetDiameter}
                     borderWidth={borderWidth}
+                    borderHeight={borderHeight}
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"
                     borderColor="green"

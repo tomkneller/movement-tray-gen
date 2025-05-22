@@ -1,6 +1,6 @@
 import { Shape, Path, ExtrudeGeometry, CylinderGeometry, Mesh, MeshStandardMaterial, Group } from 'three';
 
-export function createCircleGroup(insetRadius, borderWidth, magnetSlot, mainColor, borderColor) {
+export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnetSlot, mainColor, borderColor) {
     const group = new Group();
 
     const outerRadius = insetRadius + borderWidth;
@@ -38,7 +38,7 @@ export function createCircleGroup(insetRadius, borderWidth, magnetSlot, mainColo
     shapeBorder.holes.push(holeBorder);
 
     const extrudeBorder = new ExtrudeGeometry(shapeBorder, {
-        depth: 4,
+        depth: borderHeight,
         bevelEnabled: true,
         curveSegments: 128,
     });
