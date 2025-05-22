@@ -16,7 +16,7 @@ export function createCircleGroup(insetRadius, borderWidth, magnetSlot, mainColo
 
     if (magnetSlot.enabled) {
         const hole = new Path();
-        hole.absarc(0, 0, magnetSlot.width, 0, Math.PI * 2, true);
+        hole.absarc(0, 0, magnetSlot.width / 2, 0, Math.PI * 2, true);
         shapeInner.holes.push(hole);
     }
 
