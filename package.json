@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-three/drei": "^10.0.8",
     "@react-three/fiber": "^9.1.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -48,8 +49,8 @@
     "@electron/fuses": "^1.8.0",
     "concurrently": "^9.1.2",
     "electron": "^36.2.1",
-    "wait-on": "^8.0.3",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "wait-on": "^8.0.3"
   },
   "build": {
     "appId": "com.tomkneller.movementforge",
