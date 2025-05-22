@@ -2,13 +2,12 @@ import {
     Shape,
     Path,
     ExtrudeGeometry,
-    CylinderGeometry,
     MeshStandardMaterial,
     Mesh,
     Group,
 } from 'three';
 
-export function createOvalMesh(position, length, width, borderWidth, borderHeight, magnetSlot) {
+export function createOvalMesh(position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot) {
     const group = new Group();
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
@@ -16,9 +15,6 @@ export function createOvalMesh(position, length, width, borderWidth, borderHeigh
     const innerWidthRadius = width / 2;
     const outerLengthRadius = innerLengthRadius + borderWidth;
     const outerWidthRadius = innerWidthRadius + borderWidth;
-    const magnetSlotDiameter = magnetSlot.width;
-
-    const baseThickness = 2;
 
     // Outer shape
     const outerShape = new Shape();

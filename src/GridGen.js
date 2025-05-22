@@ -7,7 +7,7 @@ import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
 
-function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
@@ -279,6 +279,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
         circles.forEach(circle => {
             const group = createCircleGroup(
                 insetDiameter / 2,
+                baseThickness,
                 borderWidth,
                 borderHeight,
                 magnetSlot,
@@ -298,7 +299,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
         });
 
         if (supportSlot.enabled) {
-            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, borderHeight, magnetSlot);
+            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot);
             allExportMeshes.push(ovalGroup);
         }
 
@@ -332,6 +333,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
                     key={index}
                     {...circle}
                     insetDiameter={insetDiameter}
+                    baseThickness={baseThickness}
                     borderWidth={borderWidth}
                     borderHeight={borderHeight}
                     magnetSlot={magnetSlot}
@@ -345,6 +347,7 @@ function GridGen({ setBounds, baseWidth, edgeHeight, edgeThickness, stagger, row
                 <Oval
                     length={supportSlot.length}
                     width={supportSlot.width}
+                    baseThickness={baseThickness}
                     borderWidth={borderWidth}
                     borderHeight={borderHeight}
                     magnetSlot={magnetSlot}

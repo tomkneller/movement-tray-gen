@@ -1,6 +1,6 @@
-import { Shape, Path, ExtrudeGeometry, CylinderGeometry, Mesh, MeshStandardMaterial, Group } from 'three';
+import { Shape, Path, ExtrudeGeometry, Mesh, MeshStandardMaterial, Group } from 'three';
 
-export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnetSlot, mainColor, borderColor) {
+export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor) {
     const group = new Group();
 
     const outerRadius = insetRadius + borderWidth;
@@ -9,8 +9,6 @@ export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnet
     const baseMaterial = new MeshStandardMaterial({ color: mainColor });
     const borderMaterial = new MeshStandardMaterial({ color: borderColor });
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
-
-    const baseThickness = 2;
 
     // Inner circle shape
     const shapeInner = new Shape();
