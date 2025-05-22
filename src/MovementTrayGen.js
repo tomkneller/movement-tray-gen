@@ -10,7 +10,7 @@ function MovementTrayGenerator() {
     const [ovalWidth, setOvalWidth] = useState(35.5);
 
     const [magnetWidth, setMagnetWidth] = useState(2);
-    const [magnetDepth, setMagnetDepth] = useState(2);
+    const [magnetDepth, setMagnetDepth] = useState(1);
 
     const [gap, setGap] = useState(0);
     const [baseThickness, setBaseThickness] = useState(2);
@@ -240,8 +240,7 @@ function MovementTrayGenerator() {
                         </div>
                         <div>
                             <label>Magnet Depth:</label>
-                            <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} />
-                            Not yet Implemented
+                            <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1} />
                         </div>
                     </div>
                     <p>--------------------------</p>
