@@ -7,7 +7,7 @@ import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
 
-function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
@@ -278,6 +278,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         circles.forEach(circle => {
             const group = createCircleGroup(
                 insetDiameter / 2,
+                baseThickness,
                 borderWidth,
                 magnetSlot,
                 circle.mainColor || 'lightgreen',
@@ -296,7 +297,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
         });
 
         if (supportSlot.enabled) {
-            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, borderWidth, magnetSlot);
+            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, magnetSlot);
             allExportMeshes.push(ovalGroup);
         }
 
@@ -330,6 +331,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                     key={index}
                     {...circle}
                     insetDiameter={insetDiameter}
+                    baseThickness={baseThickness}
                     borderWidth={borderWidth}
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"
@@ -342,6 +344,7 @@ function GridGen({ setBounds, baseWidth, edgeThickness, stagger, rows, cols, gap
                 <Oval
                     length={supportSlot.length}
                     width={supportSlot.width}
+                    baseThickness={baseThickness}
                     borderWidth={borderWidth}
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"

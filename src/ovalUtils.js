@@ -8,7 +8,7 @@ import {
     Group,
 } from 'three';
 
-export function createOvalMesh(position, length, width, borderWidth, magnetSlot) {
+export function createOvalMesh(position, length, width, baseThickness, borderWidth, magnetSlot) {
     const group = new Group();
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
@@ -17,8 +17,6 @@ export function createOvalMesh(position, length, width, borderWidth, magnetSlot)
     const outerLengthRadius = innerLengthRadius + borderWidth;
     const outerWidthRadius = innerWidthRadius + borderWidth;
     const magnetSlotDiameter = magnetSlot.width;
-
-    const baseThickness = 2;
 
     // Outer shape
     const outerShape = new Shape();
