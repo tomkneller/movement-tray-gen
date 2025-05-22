@@ -3,26 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "asar": "^3.2.0",
-    "concaveman": "^1.2.1",
-    "electron-is-dev": "^3.0.1",
-    "electron-squirrel-startup": "^1.0.1",
-    "monotone-convex-hull-2d": "^1.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
-    "three": "^0.175.0",
-    "three-csg": "^1.0.0",
+    "three": "^0.176.0",
     "three-csg-ts": "^3.2.0",
-    "three-js-csg": "^72.0.0",
-    "three-stdlib": "^2.35.15",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^5.0.1"
   },
   "scripts": {
     "start": "electron-forge start",
@@ -62,7 +48,8 @@
     "@electron/fuses": "^1.8.0",
     "concurrently": "^9.1.2",
     "electron": "^36.2.1",
-    "wait-on": "^8.0.3"
+    "wait-on": "^8.0.3",
+    "react-scripts": "5.0.1"
   },
   "build": {
     "appId": "com.tomkneller.movementforge",
