@@ -8,7 +8,7 @@ import {
     Group,
 } from 'three';
 
-export function createOvalMesh(position, length, width, borderWidth, magnetSlot) {
+export function createOvalMesh(position, length, width, borderWidth, borderHeight, magnetSlot) {
     const group = new Group();
 
     const innerLengthRadius = length / 2;
@@ -25,7 +25,7 @@ export function createOvalMesh(position, length, width, borderWidth, magnetSlot)
     outerShape.holes.push(hole1);
 
     const outerGeom = new ExtrudeGeometry(outerShape, {
-        depth: 4,
+        depth: borderHeight,
         bevelEnabled: true,
         curveSegments: 128,
     });

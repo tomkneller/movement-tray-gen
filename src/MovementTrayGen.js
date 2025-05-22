@@ -14,7 +14,7 @@ function MovementTrayGenerator() {
 
     const [gap, setGap] = useState(0);
     const [baseThickness, setBaseThickness] = useState(2);
-    const [edgeHeight, setEdgeHeight] = useState(3);
+    const [edgeHeight, setEdgeHeight] = useState(4);
     const [edgeThickness, setEdgeThickness] = useState(2);
     const [staggerFormation, setStaggerFomation] = useState(false);
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
@@ -146,7 +146,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls />
-                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} />
+                <GridGen setBounds={setBounds} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} />
             </Canvas>
         </div>);
     };
@@ -258,11 +258,11 @@ function MovementTrayGenerator() {
                     </div>
                     <div>
                         <label>Edge Height:</label>
-                        <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} />
+                        <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10} />
                     </div>
                     <div>
                         <label>Edge Thickness:</label>
-                        <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} />
+                        <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1} />
                     </div>
                     <p>--------------------------</p>
                     <h3>Formation</h3>
