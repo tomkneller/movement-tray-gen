@@ -10,6 +10,8 @@ export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnet
     const borderMaterial = new MeshStandardMaterial({ color: borderColor });
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
+    const baseThickness = 2;
+
     // Inner circle shape
     const shapeInner = new Shape();
     shapeInner.absarc(0, 0, outerRadius - borderWidth, 0, Math.PI * 2, false);
@@ -21,7 +23,7 @@ export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnet
     }
 
     const extrudeInner = new ExtrudeGeometry(shapeInner, {
-        depth: 2,
+        depth: baseThickness,
         bevelEnabled: true,
         curveSegments: 128,
     });
@@ -47,15 +49,20 @@ export function createCircleGroup(insetRadius, borderWidth, borderHeight, magnet
     borderMesh.position.z = 0;  // raise border mesh on Z axis to sit on top of inner mesh
     group.add(borderMesh);
 
-    // Magnet slot geometry (cylinder)
     if (magnetSlot.enabled) {
-        const magnetDepth = magnetSlot.depth / 2;
-        const magnetSlotGeom = new CylinderGeometry(magnetSlot.width, magnetSlot.width, magnetDepth, 32);
-        magnetSlotGeom.translate(0, magnetDepth / 2 - 0.2, 0);
+        const magnetDepth = baseThickness - magnetSlot.depth;
+        const magnetRadius = magnetSlot.width / 2;
 
-        const magnetMesh = new Mesh(magnetSlotGeom, magnetMaterial);
-        magnetMesh.rotation.x = Math.PI / 2;
-        magnetMesh.position.z = 0;  // position magnet slot above border ring
+        const shapeMagnet = new Shape();
+        shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
+
+        const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
+            depth: magnetDepth,
+            curveSegments: 128,
+        });
+
+        const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
+        magnetMesh.position.z = 0;  // center extrusion on Z axis if needed
 
         group.add(magnetMesh);
     }

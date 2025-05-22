@@ -10,12 +10,15 @@ import {
 
 export function createOvalMesh(position, length, width, borderWidth, borderHeight, magnetSlot) {
     const group = new Group();
+    const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
     const innerLengthRadius = length / 2;
     const innerWidthRadius = width / 2;
     const outerLengthRadius = innerLengthRadius + borderWidth;
     const outerWidthRadius = innerWidthRadius + borderWidth;
     const magnetSlotDiameter = magnetSlot.width;
+
+    const baseThickness = 2;
 
     // Outer shape
     const outerShape = new Shape();
@@ -40,12 +43,12 @@ export function createOvalMesh(position, length, width, borderWidth, borderHeigh
 
     if (magnetSlot.enabled) {
         const magnetHole = new Path();
-        magnetHole.absarc(0, 0, magnetSlotDiameter, 0, Math.PI * 2, true);
+        magnetHole.absarc(0, 0, magnetSlot.width / 2, 0, Math.PI * 2, true);
         innerShape.holes.push(magnetHole);
     }
 
     const innerGeom = new ExtrudeGeometry(innerShape, {
-        depth: 2,
+        depth: baseThickness,
         bevelEnabled: true,
         curveSegments: 128,
     });
@@ -59,12 +62,20 @@ export function createOvalMesh(position, length, width, borderWidth, borderHeigh
 
     // Optional magnet slot
     if (magnetSlot.enabled) {
-        const magnetDepth = magnetSlot.depth / 2;
-        const magnetSlotGeom = new CylinderGeometry(magnetSlot.width, magnetSlot.width, magnetDepth, 32);
-        magnetSlotGeom.rotateX(Math.PI / 2);
-        magnetSlotGeom.translate(0, magnetDepth / 2 - 0.2, magnetDepth / 2);
+        const magnetDepth = baseThickness - magnetSlot.depth;
+        const magnetRadius = magnetSlot.width / 2;
 
-        const magnetMesh = new Mesh(magnetSlotGeom, new MeshStandardMaterial({ color: 0x555555 }));
+        const shapeMagnet = new Shape();
+        shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
+
+        const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
+            depth: magnetDepth,
+            curveSegments: 128,
+        });
+
+        const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
+        magnetMesh.position.z = 0;  // center extrusion on Z axis if needed
+
         group.add(magnetMesh);
     }
 
