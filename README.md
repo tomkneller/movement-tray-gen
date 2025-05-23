@@ -55,6 +55,6 @@
 ### Can I request a feature?
 Sure! if theres a feature or special base style combination that you use in your tabletop games you can contact me and i'll do my best to implement popular requests
 
-## AI Transparancy
+## AI Transparency
 The current logo for the application made use of generative AI (chatGPT)
 
