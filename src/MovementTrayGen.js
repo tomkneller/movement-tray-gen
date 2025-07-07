@@ -152,8 +152,8 @@ function MovementTrayGenerator() {
     };
 
     /**
-     * TODO: Implementation of backend for downloading stl
-     */
+    * TODO: Implementation of backend for downloading stl
+    */
     const handleDownloadSTL = () => {
         console.log('Requesting STL download with current parameters...');
         if (!exportMesh) {

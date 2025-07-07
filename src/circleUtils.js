@@ -22,7 +22,7 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
 
     const extrudeInner = new ExtrudeGeometry(shapeInner, {
         depth: baseThickness,
-        bevelEnabled: true,
+        bevelEnabled: false,
         curveSegments: 128,
     });
 
@@ -57,6 +57,7 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
         const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
             depth: magnetDepth,
             curveSegments: 128,
+            bevelEnabled: false
         });
 
         const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
