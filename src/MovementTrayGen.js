@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { Vector3 } from 'three';
+
 
 function MovementTrayGenerator() {
+    const cameraRef = useRef();
+    const controlsRef = useRef();
+
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35.5);
@@ -55,6 +60,26 @@ function MovementTrayGenerator() {
 
     useEffect(() => {
         console.log("Bounds updated:", bounds);
+    }, [bounds]);
+
+    useEffect(() => {
+        if (!bounds || !cameraRef.current || !controlsRef.current) return;
+
+        const center = new Vector3();
+        bounds.getCenter(center);
+
+        const size = new Vector3();
+        bounds.getSize(size);
+
+        const maxDim = Math.max(size.x, size.y);
+        const distance = maxDim * 1.4; // adjust zoom factor
+
+        // Position camera back and above
+        cameraRef.current.position.set(center.x, center.y - distance, center.z + distance);
+        cameraRef.current.lookAt(center);
+
+        controlsRef.current.target.copy(center);
+        controlsRef.current.update();
     }, [bounds]);
 
 
@@ -133,9 +158,11 @@ function MovementTrayGenerator() {
             hasSupportSlot,
         });
         return (<div style={{ flex: 1 }}>
-            <Canvas style={{ width: '100%', height: '100vh' }}>
+            <Canvas style={{ width: '100%', height: '90vh' }}>
                 {/* <CameraControls bounds={bounds} /> */}
-                <PerspectiveCamera makeDefault position={[0, -45, 45]} fov={90} />
+                <PerspectiveCamera ref={cameraRef}
+                    makeDefault
+                    fov={70} />
                 <ambientLight intensity={0.5} />
                 <directionalLight castShadow
                     position={[0, 0, 5]}
@@ -147,7 +174,7 @@ function MovementTrayGenerator() {
                     shadow-camera-right={10}
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
-                <OrbitControls />
+                <OrbitControls ref={controlsRef} />
                 <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} />
             </Canvas>
         </div>);
