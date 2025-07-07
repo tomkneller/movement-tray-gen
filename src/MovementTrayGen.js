@@ -204,127 +204,210 @@ function MovementTrayGenerator() {
     };
 
     return (
-        <div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <img src='logo192.png' width={'50'} height={'50'} display={'block'} alt='logo png' ></img>
-                <h2 style={{ paddingLeft: 10 }}> Movement Tray Forge</h2>
+        <div style={{ fontFamily: 'Segoe UI, Arial, sans-serif', background: '#f5f6fa', minHeight: '100vh' }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: 16, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
+                <h2 style={{ paddingLeft: 16, margin: 0, color: '#2d3436', fontWeight: 600, fontSize: 28 }}>Movement Tray Forge</h2>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <div style={{ display: 'flex', flex: 'grow', flexDirection: 'column', backgroundColor: '#7b4b1e' }} >
-                    <Tabs>
-                        <TabList>
-                            <Tab>Tray Options</Tab>
-                            <Tab>Support Slots</Tab>
-                            <Tab>Magnet Slots</Tab>
-                            <Tab>Formations</Tab>
+            <div style={{ display: 'flex', flexDirection: 'row', width: '100%', marginTop: 24 }}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#fff',
+                    minHeight: 500,
+                    width: 380,
+                    borderRadius: 16,
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                    marginLeft: 32,
+                    marginRight: 32,
+                    padding: 24,
+                    position: 'relative'
+                }}>
+                    <Tabs
+                        selectedTabClassName="react-tabs__tab--selected"
+                        style={{ marginBottom: 16 }}
+                    >
+                        <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
+                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Tray Options</Tab>
+                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Support Slots</Tab>
+                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Magnet Slots</Tab>
+                            <Tab style={{ padding: '8px 20px', borderRadius: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Formations</Tab>
                         </TabList>
                         <TabPanel>
-                            <h3>Base Size</h3>
-                            <div>
-                                <label>Circular Diameter:</label>
-                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} />
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Base Size</h3>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
+                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
+                                    style={{ ...inputStyle }} />
                             </div>
-                            <div>
-                                <label>Columns:</label>
-                                <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} />
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Columns:</label>
+                                <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
+                                    style={{ ...inputStyle }} />
                             </div>
-                            <div>
-                                <label>Rows:</label>
-                                <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} />
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Rows:</label>
+                                <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
+                                    style={{ ...inputStyle }} />
                             </div>
-                            <div>
-                                <label>Base Thickness:</label>
-                                <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight} />
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Base Thickness:</label>
+                                <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
+                                    style={{ ...inputStyle }} />
                             </div>
-                            <div>
-                                <label>Edge Height:</label>
-                                <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10} />
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Edge Height:</label>
+                                <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
+                                    style={{ ...inputStyle }} />
                             </div>
-                            <div>
-                                <label>Edge Thickness:</label>
-                                <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1} />
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Edge Thickness:</label>
+                                <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1}
+                                    style={{ ...inputStyle }} />
+                            </div>
+                            <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Gap:</label>
+                                <input type="number" name="gap" value={gap} onChange={handleInputChange}
+                                    style={{ ...inputStyle }} />
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3>Add support slot</h3>
-                            <div>
-                                <label>Support Slot:</label>
-                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add support slot</h3>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Support Slot:</label>
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange}
+                                    style={{ marginLeft: 8 }} />
                             </div>
                             <div inert={!hasSupportSlot}>
-                                <div>
-                                    <label>Support Mode:</label>
-                                    <select name='supportMode' value={supportMode} onChange={handleInputChange}>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Support Mode:</label>
+                                    <select name='supportMode' value={supportMode} onChange={handleInputChange}
+                                        style={{ ...inputStyle }}>
                                         <option value={'wrap'}>Wrap</option>
                                         <option value={'ranked'}>Ranked</option>
                                     </select>
-                                    Not Yet Implemented
+                                    <span style={{ color: '#b2bec3', fontSize: 12, marginLeft: 8 }}>Not Yet Implemented</span>
                                 </div>
-                                <div>
-                                    <label>Support Slots Count:</label>
-                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
+                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots}
+                                        style={{ ...inputStyle }} />
                                 </div>
-                                <div>
-                                    <label>Oval Length:</label>
-                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Length:</label>
+                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange}
+                                        style={{ ...inputStyle }} />
                                 </div>
-                                <div>
-                                    <label>Oval Width:</label>
-                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Width:</label>
+                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange}
+                                        style={{ ...inputStyle }} />
                                 </div>
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3>Add Magnet slots</h3>
-                            <div>
-                                <label>Magnet Slots:</label>
-                                <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange} />
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add Magnet slots</h3>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
+                                <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
+                                    style={{ marginLeft: 8 }} />
                             </div>
                             <div inert={!hasMagnetSlot}>
-                                <div>
-                                    <label>Magnet Width:</label>
-                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Magnet Width:</label>
+                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
+                                        style={{ ...inputStyle }} />
                                 </div>
-                                <div>
-                                    <label>Magnet Depth:</label>
-                                    <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1} />
-                                </div>
-                            </div>
-                            <div inert={hasSupportSlot}>
-                                <div>
-                                    <label>Gap:</label>
-                                    <input type="number" name="gap" value={gap} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
+                                    <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
+                                        style={{ ...inputStyle }} />
                                 </div>
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3>Formation</h3>
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Formation</h3>
                             <div inert={hasSupportSlot}>
-                                <div>
-                                    <label>Stagger Formation:</label>
-                                    <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
+                                    <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange}
+                                        style={{ marginLeft: 8 }} />
                                 </div>
-                                <div inert={!staggerFormation}>
-                                    <label>Remove Stray Slots:</label>
-                                    <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                                <div inert={!staggerFormation} style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Remove Stray Slots:</label>
+                                    <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange}
+                                        style={{ marginLeft: 8 }} />
                                 </div>
                             </div>
                         </TabPanel>
                     </Tabs>
-                    <div>
-                        <button onClick={generateVisualization}>Visualize</button>
-                        <button onClick={handleDownloadSTL}>Download STL</button>
+
+                    {/* Download STL button fixed at the bottom */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 24,
+                        left: 24,
+                        right: 24,
+                        width: 'auto',
+                        height: 48,
+                        textAlign: 'center',
+                        zIndex: 2,
+                        background: 'linear-gradient(90deg, #00b894 0%, #00cec9 100%)',
+                        borderRadius: 12,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <button
+                            onClick={handleDownloadSTL}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#fff',
+                                fontWeight: 600,
+                                fontSize: 18,
+                                cursor: 'pointer',
+                                padding: '12px 32px',
+                                borderRadius: 8,
+                                transition: 'background 0.2s',
+                                outline: 'none'
+                            }}
+                            onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
+                            onMouseOut={e => e.currentTarget.style.background = 'none'}
+                        >
+                            Download STL
+                        </button>
                     </div>
                 </div>
-                <div style={{ background: 'gray', display: 'flex', flex: 1 }}>
+                <div style={{
+                    background: 'linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%)',
+                    display: 'flex',
+                    flex: 1,
+                    borderRadius: 16,
+                    marginRight: 32,
+                    minHeight: 600,
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)'
+                }}>
                     {generateVisualization()}
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
 
-
+// Modern input style for reuse
+const inputStyle = {
+    border: '1px solid #dfe6e9',
+    borderRadius: 6,
+    padding: '6px 12px',
+    fontSize: 16,
+    marginLeft: 8,
+    marginTop: 4,
+    marginBottom: 4,
+    outline: 'none',
+    background: '#f9f9fb',
+    transition: 'border 0.2s'
+};
 
 export default MovementTrayGenerator;

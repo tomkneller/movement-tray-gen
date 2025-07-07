@@ -356,7 +356,11 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 />
             )}
 
-            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({ color: 0x999999, roughness: 1 })} receiveShadow />
+            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
+                color: 0xf5f6fa, roughness: 1, metalness: 0.1,
+                transparent: true,
+                opacity: 0.95
+            })} receiveShadow position={[0, 0, 0]} />
         </>
     );
 }
