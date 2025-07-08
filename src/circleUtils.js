@@ -1,18 +1,16 @@
 import { Shape, Path, ExtrudeGeometry, Mesh, MeshStandardMaterial, Group } from 'three';
 
-export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor) {
+export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor, center, nearbyCircles = []) {
     const group = new Group();
 
     const outerRadius = insetRadius + borderWidth;
 
-    // Create materials — adjust as needed or pass as parameter
     const baseMaterial = new MeshStandardMaterial({ color: mainColor });
-    const borderMaterial = new MeshStandardMaterial({ color: borderColor });
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
-    // Inner circle shape
+    // Inner base
     const shapeInner = new Shape();
-    shapeInner.absarc(0, 0, outerRadius - borderWidth, 0, Math.PI * 2, false);
+    shapeInner.absarc(0, 0, insetRadius, 0, Math.PI * 2, false);
 
     if (magnetSlot.enabled) {
         const hole = new Path();
@@ -23,48 +21,103 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
     const extrudeInner = new ExtrudeGeometry(shapeInner, {
         depth: baseThickness,
         bevelEnabled: false,
-        curveSegments: 128,
+        curveSegments: 64,
     });
 
     const innerMesh = new Mesh(extrudeInner, baseMaterial);
-    innerMesh.position.z = 0;  // center extrusion on Z axis if needed
     group.add(innerMesh);
 
-    // Border ring shape
-    const shapeBorder = new Shape();
-    shapeBorder.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
-    const holeBorder = new Path();
-    holeBorder.absarc(0, 0, insetRadius, 0, Math.PI * 2, true);
-    shapeBorder.holes.push(holeBorder);
+    // Border arcs
+    const arcs = createNonIntersectingBorderSegments(center, insetRadius, outerRadius, borderHeight, nearbyCircles);
+    arcs.forEach(mesh => group.add(mesh));
 
-    const extrudeBorder = new ExtrudeGeometry(shapeBorder, {
-        depth: borderHeight,
-        bevelEnabled: true,
-        curveSegments: 128,
-    });
-
-    const borderMesh = new Mesh(extrudeBorder, borderMaterial);
-    borderMesh.position.z = 0;  // raise border mesh on Z axis to sit on top of inner mesh
-    group.add(borderMesh);
-
+    // Magnet
     if (magnetSlot.enabled) {
-        const magnetDepth = baseThickness - magnetSlot.depth;
         const magnetRadius = magnetSlot.width / 2;
+        const magnetDepth = baseThickness - magnetSlot.depth;
 
         const shapeMagnet = new Shape();
         shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
 
         const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
             depth: magnetDepth,
-            curveSegments: 128,
-            bevelEnabled: false
+            bevelEnabled: false,
+            curveSegments: 64,
         });
 
         const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
-        magnetMesh.position.z = 0;  // center extrusion on Z axis if needed
-
         group.add(magnetMesh);
     }
 
     return group;
 }
+
+
+function createNonIntersectingBorderSegments(center, insetRadius, outerRadius, borderHeight, nearbyCircles) {
+    const segments = [];
+
+    const overlapAngles = [];
+
+    for (const other of nearbyCircles) {
+        const dx = other.x - center.x;
+        const dy = other.y - center.y;
+        const dSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(dSq);
+
+        if (dist < outerRadius * 2 && dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            const overlapArc = Math.acos((dist * dist + 2 * insetRadius * insetRadius - 4 * outerRadius * outerRadius) / (2 * dist * insetRadius));
+            if (!isNaN(overlapArc)) {
+                overlapAngles.push({ start: angle - overlapArc, end: angle + overlapArc });
+            }
+        }
+    }
+
+    // Merge overlapping ranges
+    overlapAngles.sort((a, b) => a.start - b.start);
+    const merged = [];
+    for (const range of overlapAngles) {
+        if (merged.length === 0) {
+            merged.push(range);
+        } else {
+            const last = merged[merged.length - 1];
+            if (range.start <= last.end) {
+                last.end = Math.max(last.end, range.end);
+            } else {
+                merged.push(range);
+            }
+        }
+    }
+
+    // Invert to get visible arc segments
+    const visibleArcs = [];
+    let lastEnd = 0;
+    for (const { start, end } of merged) {
+        if (start > lastEnd) {
+            visibleArcs.push({ start: lastEnd, end: start });
+        }
+        lastEnd = Math.max(lastEnd, end);
+    }
+    if (lastEnd < Math.PI * 2) {
+        visibleArcs.push({ start: lastEnd, end: Math.PI * 2 });
+    }
+
+    for (const arc of visibleArcs) {
+        const shape = new Shape();
+        shape.absarc(0, 0, outerRadius, arc.start, arc.end, false);
+        const hole = new Path();
+        hole.absarc(0, 0, insetRadius, arc.end, arc.start, true);
+        shape.holes.push(hole);
+
+        const geom = new ExtrudeGeometry(shape, {
+            depth: borderHeight,
+            bevelEnabled: false,
+            curveSegments: 64,
+        });
+
+        segments.push(new Mesh(geom, new MeshStandardMaterial({ color: 'green' })));
+    }
+
+    return segments;
+}
+

@@ -277,6 +277,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         let allExportMeshes = [];
 
         circles.forEach(circle => {
+            const nearby = circles
+                .filter(c => c !== circle && areInsetAreasOverlapping(circle.position, c.position, borderWidth, borderWidth))
+                .map(c => c.position);
+
             const group = createCircleGroup(
                 insetDiameter / 2,
                 baseThickness,
@@ -284,8 +288,13 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 borderHeight,
                 magnetSlot,
                 circle.mainColor || 'lightgreen',
-                circle.borderColor || 'green'
+                circle.borderColor || 'green',
+                circle.position,
+                nearby
             );
+
+
+
             group.position.set(circle.position.x, circle.position.y, 0); // Ensure it's placed
 
             group.updateMatrixWorld(true); // Ensure world matrices are correct
