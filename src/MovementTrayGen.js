@@ -112,6 +112,10 @@ function MovementTrayGenerator() {
                 break;
             case 'staggerFormation':
                 setStaggerFomation(!staggerFormation);
+                if (staggerFormation) {
+                    // If turning off stagger, also turn off stray slot
+                    setHasStraySlot(false);
+                }
                 break;
             case 'supportSlot':
                 setHasSupportSlot(!hasSupportSlot);
