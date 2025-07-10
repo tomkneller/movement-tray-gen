@@ -233,9 +233,7 @@ function MovementTrayGenerator() {
                     >
                         <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
                             <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Tray Options</Tab>
-                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Support Slots</Tab>
                             <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Magnet Slots</Tab>
-                            <Tab style={{ padding: '8px 20px', borderRadius: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Formations</Tab>
                         </TabList>
                         <TabPanel>
                             <h3 style={{ color: '#636e72', marginTop: 0 }}>Base Size</h3>
@@ -276,40 +274,6 @@ function MovementTrayGenerator() {
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add support slot</h3>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Support Slot:</label>
-                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange}
-                                    style={{ marginLeft: 8 }} />
-                            </div>
-                            <div inert={!hasSupportSlot}>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Support Mode:</label>
-                                    <select name='supportMode' value={supportMode} onChange={handleInputChange}
-                                        style={{ ...inputStyle }}>
-                                        <option value={'wrap'}>Wrap</option>
-                                        <option value={'ranked'}>Ranked</option>
-                                    </select>
-                                    <span style={{ color: '#b2bec3', fontSize: 12, marginLeft: 8 }}>Not Yet Implemented</span>
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
-                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots}
-                                        style={{ ...inputStyle }} />
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Oval Length:</label>
-                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange}
-                                        style={{ ...inputStyle }} />
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Oval Width:</label>
-                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange}
-                                        style={{ ...inputStyle }} />
-                                </div>
-                            </div>
-                        </TabPanel>
-                        <TabPanel>
                             <h3 style={{ color: '#636e72', marginTop: 0 }}>Add Magnet slots</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
@@ -326,21 +290,6 @@ function MovementTrayGenerator() {
                                     <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
                                         style={{ ...inputStyle }} />
-                                </div>
-                            </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Formation</h3>
-                            <div inert={hasSupportSlot}>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
-                                    <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange}
-                                        style={{ marginLeft: 8 }} />
-                                </div>
-                                <div inert={!staggerFormation} style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Remove Stray Slots:</label>
-                                    <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange}
-                                        style={{ marginLeft: 8 }} />
                                 </div>
                             </div>
                         </TabPanel>
