@@ -59,7 +59,6 @@ function MovementTrayGenerator() {
     }
 
     useEffect(() => {
-        console.log("Bounds updated:", bounds);
     }, [bounds]);
 
     useEffect(() => {
@@ -150,17 +149,6 @@ function MovementTrayGenerator() {
     };
 
     const generateVisualization = () => {
-        console.log('Generating visualization with current parameters:', {
-            circularDiameter,
-            ovalLength,
-            ovalWidth,
-            gap,
-            baseThickness,
-            edgeHeight,
-            edgeThickness,
-            staggerFormation,
-            hasSupportSlot,
-        });
         return (<div style={{ flex: 1 }}>
             <Canvas style={{ width: '100%', height: '90vh' }}>
                 {/* <CameraControls bounds={bounds} /> */}
@@ -232,15 +220,16 @@ function MovementTrayGenerator() {
                         style={{ marginBottom: 16 }}
                     >
                         <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
-                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Tray Options</Tab>
-                            <Tab style={{ padding: '8px 20px', borderRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Magnet Slots</Tab>
+                            <Tab style={{ padding: '8px 20px', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Tray Options</Tab>
+                            <Tab style={{ padding: '8px 20px', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Magnet Slots</Tab>
                         </TabList>
                         <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Base Size</h3>
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Tray Options</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
                                 <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
                                     style={{ ...inputStyle }} />
+                                <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Columns:</label>
@@ -256,25 +245,31 @@ function MovementTrayGenerator() {
                                 <label style={{ fontWeight: 500 }}>Base Thickness:</label>
                                 <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
                                     style={{ ...inputStyle }} />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Edge Height:</label>
                                 <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
                                     style={{ ...inputStyle }} />
+                                <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Edge Thickness:</label>
                                 <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1}
                                     style={{ ...inputStyle }} />
+                                <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Gap:</label>
-                                <input type="number" name="gap" value={gap} onChange={handleInputChange}
+                                <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
                                     style={{ ...inputStyle }} />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add Magnet slots</h3>
+                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add Magnet Slots</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
                                 <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
@@ -282,14 +277,16 @@ function MovementTrayGenerator() {
                             </div>
                             <div inert={!hasMagnetSlot}>
                                 <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Magnet Width:</label>
+                                    <label style={{ fontWeight: 500 }}>Magnet Diameter:</label>
                                     <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
                                         style={{ ...inputStyle }} />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
                                         style={{ ...inputStyle }} />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
                             </div>
                         </TabPanel>
