@@ -6,11 +6,13 @@ import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
-
+import './index.css';
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
     const controlsRef = useRef();
+
+    const [darkMode, setDarkMode] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -60,6 +62,10 @@ function MovementTrayGenerator() {
 
     useEffect(() => {
     }, [bounds]);
+
+    useEffect(() => {
+        document.body.classList.toggle('dark-mode', darkMode);
+    }, [darkMode]);
 
     useEffect(() => {
         if (!bounds || !cameraRef.current || !controlsRef.current) return;
@@ -196,80 +202,80 @@ function MovementTrayGenerator() {
     };
 
     return (
-        <div style={{ fontFamily: 'Segoe UI, Arial, sans-serif', background: '#f5f6fa', minHeight: '100vh' }}>
-            <div style={{ display: 'flex', alignItems: 'center', padding: 16, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className='background-body'>
+            <div className='header'>
                 <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
-                <h2 style={{ paddingLeft: 16, margin: 0, color: '#2d3436', fontWeight: 600, fontSize: 28 }}>Movement Tray Forge</h2>
+                <h2 className='title'>Movement Tray Forge</h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'row', width: '100%', marginTop: 24 }}>
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: '#fff',
-                    minHeight: 500,
-                    width: 380,
-                    borderRadius: 16,
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-                    marginLeft: 32,
-                    marginRight: 32,
-                    padding: 24,
-                    position: 'relative'
-                }}>
+
+            <button
+                id='dark-mode-toggle'
+                className='dark-mode-toggle'
+                onClick={() => setDarkMode(dm => !dm)}
+            >
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <div className='container'>
+                <div className='tray-panel'>
                     <Tabs
                         selectedTabClassName="react-tabs__tab--selected"
                         style={{ marginBottom: 16 }}
                     >
                         <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
-                            <Tab style={{ padding: '8px 20px', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Tray Options</Tab>
-                            <Tab style={{ padding: '8px 20px', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginRight: 8, cursor: 'pointer', border: 'none', background: '#f1f2f6', fontWeight: 500 }}>Magnet Slots</Tab>
+                            <Tab id="tab">
+                                Tray Options
+                            </Tab>
+                            <Tab id="tab">
+                                Magnet Slots
+                            </Tab>
                         </TabList>
                         <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Tray Options</h3>
+                            <h3 className='tabTitle'>Tray Options</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
                                 <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Columns:</label>
                                 <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Rows:</label>
                                 <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Base Thickness:</label>
                                 <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
 
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Edge Height:</label>
                                 <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Edge Thickness:</label>
                                 <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
                             <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Gap:</label>
                                 <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
-                                    style={{ ...inputStyle }} />
+                                    className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
 
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3 style={{ color: '#636e72', marginTop: 0 }}>Add Magnet Slots</h3>
+                            <h3 className='tabTitle'>Add Magnet Slots</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
                                 <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
@@ -279,13 +285,13 @@ function MovementTrayGenerator() {
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Magnet Diameter:</label>
                                     <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
-                                        style={{ ...inputStyle }} />
+                                        className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
-                                        style={{ ...inputStyle }} />
+                                        className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
                             </div>
@@ -293,71 +299,22 @@ function MovementTrayGenerator() {
                     </Tabs>
 
                     {/* Download STL button fixed at the bottom */}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: 24,
-                        left: 24,
-                        right: 24,
-                        width: 'auto',
-                        height: 48,
-                        textAlign: 'center',
-                        zIndex: 2,
-                        background: 'linear-gradient(90deg, #00b894 0%, #00cec9 100%)',
-                        borderRadius: 12,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <button
-                            onClick={handleDownloadSTL}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#fff',
-                                fontWeight: 600,
-                                fontSize: 18,
-                                cursor: 'pointer',
-                                padding: '12px 32px',
-                                borderRadius: 8,
-                                transition: 'background 0.2s',
-                                outline: 'none'
-                            }}
-                            onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
-                            onMouseOut={e => e.currentTarget.style.background = 'none'}
-                        >
-                            Download STL
-                        </button>
-                    </div>
+
+                    <button
+                        onClick={handleDownloadSTL}
+                        className='download-btn'
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'none'}
+                    >
+                        Download STL
+                    </button>
                 </div>
-                <div style={{
-                    background: 'linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%)',
-                    display: 'flex',
-                    flex: 1,
-                    borderRadius: 16,
-                    marginRight: 32,
-                    minHeight: 600,
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)'
-                }}>
+                <div className='trayFrame'>
                     {generateVisualization()}
                 </div>
             </div>
         </div>
     );
 }
-
-// Modern input style for reuse
-const inputStyle = {
-    border: '1px solid #dfe6e9',
-    borderRadius: 6,
-    padding: '6px 12px',
-    fontSize: 16,
-    marginLeft: 8,
-    marginTop: 4,
-    marginBottom: 4,
-    outline: 'none',
-    background: '#f9f9fb',
-    transition: 'border 0.2s'
-};
 
 export default MovementTrayGenerator;
