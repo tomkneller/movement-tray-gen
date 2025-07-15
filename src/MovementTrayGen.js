@@ -157,7 +157,7 @@ function MovementTrayGenerator() {
 
     const generateVisualization = () => {
         return (<div style={{ flex: 1 }}>
-            <Canvas style={{ width: '100%', height: '90vh' }}>
+            <Canvas style={{ width: '100%', height: '82vh', borderRadius: '16px' }}>
                 {/* <CameraControls bounds={bounds} /> */}
                 <PerspectiveCamera ref={cameraRef}
                     makeDefault
@@ -259,7 +259,7 @@ function MovementTrayGenerator() {
             )
             }
 
-            <div className='container'>
+            <div className='container' style={{ height: '82vh' }}>
                 <div className='tray-panel'>
                     <Tabs
                         selectedTabClassName="react-tabs__tab--selected"
@@ -353,9 +353,13 @@ function MovementTrayGenerator() {
                         Download STL
                     </button>
                 </div>
-                <div className='trayFrame'>
+                <div className='trayFrame' style={{ height: '50px' }}>
                     {generateVisualization()}
                 </div>
+            </div>
+            <div className='footer'>
+                <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
+                <h2 className='title'>Movement Tray Forge</h2>
             </div>
         </div >
     );
