@@ -137,6 +137,8 @@ body.dark-mode #tab {
   padding: 8px 16px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  height: 36px;
+  width: 110px;
 }
 
 body.dark-mode .dark-mode-toggle {
@@ -240,4 +242,31 @@ body.dark-mode .tabTitle {
 
 .dark-mode .trayFrame {
   background: linear-gradient(135deg, #232946 0%, #121629 100%);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+body.dark-mode .modal-content {
+  background: #181a2a;
+  color: #f5f6fa;
 }

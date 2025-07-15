@@ -13,6 +13,7 @@ function MovementTrayGenerator() {
     const controlsRef = useRef();
 
     const [darkMode, setDarkMode] = useState(false);
+    const [showInfoPopup, setShowInfoPopup] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -173,7 +174,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} darkMode={darkMode} />
             </Canvas>
         </div>);
     };
@@ -215,6 +216,49 @@ function MovementTrayGenerator() {
             >
                 {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
+            <button
+                className='dark-mode-toggle'
+                style={{ top: 24, right: 150 }}
+                onClick={
+                    //show popup for features coming soon
+                    () => setShowInfoPopup(true)
+                }>
+                <span role="img" aria-label="info" style={{ marginRight: 6 }}>ℹ️</span>
+                Info
+            </button>
+
+            {showInfoPopup && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Upcoming Features</h2>
+                        <ul>
+                            <li>Different formations including staggered, wedge and diamond</li>
+                            <li>Support for different base shapes (oval, square)</li>
+                            <li>Customizable support slots for different models</li>
+                            <li>Export to other formats (OBJ, 3MF)</li>
+                            <li>Save and load configurations</li>
+                            <li>Mobile-friendly interface</li>
+                            <li>Improved performance for large trays</li>
+                            <li>And much more...</li>
+                        </ul>
+                        <h3>Licenses & Credits</h3>
+                        <ul>
+                            Developed using:
+                            <li>Three.js - MIT License</li>
+                            <li>React - MIT License</li>
+                            {/* Add more credits as needed */}
+                        </ul>
+
+
+                        <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
+                        <p>Copyright © 2025 Thomas Kneller</p>
+
+                        <button onClick={() => setShowInfoPopup(false)}>Close</button>
+                    </div>
+                </div>
+            )
+            }
+
             <div className='container'>
                 <div className='tray-panel'>
                     <Tabs
@@ -313,7 +357,7 @@ function MovementTrayGenerator() {
                     {generateVisualization()}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

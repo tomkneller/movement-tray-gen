@@ -5,8 +5,8 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
 
     const outerRadius = insetRadius + borderWidth;
 
-    const baseMaterial = new MeshStandardMaterial({ color: mainColor });
-    const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
+    const baseMaterial = new MeshStandardMaterial({ color: '#e0e3eb', roughness: 0.5, metalness: 0.1 });
+    const magnetMaterial = new MeshStandardMaterial({ color: '#555555' });
 
     // Inner base
     const shapeInner = new Shape();
@@ -57,6 +57,9 @@ function createNonIntersectingBorderSegments(center, insetRadius, outerRadius, b
     const segments = [];
 
     const overlapAngles = [];
+
+    const baseOuterMaterial = new MeshStandardMaterial({ color: '#333a40' });
+
 
     for (const other of nearbyCircles) {
         const dx = other.x - center.x;
@@ -115,7 +118,7 @@ function createNonIntersectingBorderSegments(center, insetRadius, outerRadius, b
             curveSegments: 64,
         });
 
-        segments.push(new Mesh(geom, new MeshStandardMaterial({ color: 'green' })));
+        segments.push(new Mesh(geom, baseOuterMaterial));
     }
 
     return segments;

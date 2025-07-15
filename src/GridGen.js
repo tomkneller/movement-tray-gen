@@ -7,7 +7,7 @@ import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
 
-function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth;
     const insetRadius = insetDiameter / 2;
@@ -331,11 +331,13 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight]);
 
+    const planeColor = darkMode ? 0x2a3550 : 0xe0e3eb;
+
     return (
         <>
             {debugHullLine && <primitive object={debugHullLine} />}
             {baseFillGeometry && (
-                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: 'brown', side: DoubleSide })} position={[0, 0, 1]} />
+                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 1]} />
             )}
             {circlesData.map((circle, index) => (
                 <Circle
@@ -366,7 +368,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             )}
 
             <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
-                color: 0x858586, roughness: 1, metalness: 0.1,
+                color: planeColor, roughness: 1, metalness: 0.1,
                 transparent: true,
                 opacity: 0.95
             })} receiveShadow position={[0, 0, 0]} />
