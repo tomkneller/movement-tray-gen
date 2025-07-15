@@ -37,11 +37,11 @@ function MovementTrayGenerator() {
 
     const [hasStraySlot, setHasStraySlot] = useState(false);
 
-    const [maxSlots, setMaxSlots] = useState(100);
+    const [, setMaxSlots] = useState(100);
 
     const [exportMesh, setExportMesh] = useState(null);
 
-    const [maxReached, setMaxReached] = useState(false);
+    const [, setMaxReached] = useState(false);
 
     const handleMaxReached = (value) => {
         setMaxReached(true);
