@@ -358,8 +358,7 @@ function MovementTrayGenerator() {
                 </div>
             </div>
             <div className='footer'>
-                <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
-                <h2 className='title'>Movement Tray Forge</h2>
+                <p>Copyright © 2025 tomkneller</p>
             </div>
         </div >
     );

@@ -8,7 +8,7 @@ const Circle = ({ position, insetDiameter, baseThickness, borderWidth, borderHei
     }, [insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor]);
 
     return (
-        <primitive object={group} position={[position.x, position.y, 1]} />
+        <primitive object={group} position={[position.x, position.y, 0]} />
     );
 }
 

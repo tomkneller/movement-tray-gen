@@ -216,7 +216,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         // Create base box geometry
         const baseGeom = new THREE.BoxGeometry(width, height, depth);
-        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, 1);
+        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, depth / 2); // Center the base on Z=0
         let baseMesh = new THREE.Mesh(baseGeom);
 
 
@@ -232,10 +232,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
             const extrudeSettings = {
                 depth: 2,
-                bevelEnabled: true,
+                bevelEnabled: false,
             };
             const baseShapeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-            baseShapeGeometry.translate(0, 0, 0);
+            baseShapeGeometry.translate(0, 0, 0); // Center the base on Z=0
 
             baseMesh = new THREE.Mesh(baseShapeGeometry);
         }
@@ -243,9 +243,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         // Prepare hole meshes
         let holeMeshes = circles.map(circle => {
-            const holeGeom = new THREE.CylinderGeometry(insetRadius + borderWidth, insetRadius + borderWidth, depth * 2, 64);
+
+            const holeGeom = new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, depth * 2, 64);
             holeGeom.rotateX(Math.PI / 2);
-            holeGeom.translate(circle.position.x, circle.position.y, 1);
+            holeGeom.translate(circle.position.x, circle.position.y, depth / 2);
             return new THREE.Mesh(holeGeom);
         });
 
@@ -264,7 +265,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             supportSlotShape.absellipse(0, 0, (supportSlot.length / 2) + borderWidth, (supportSlot.width / 2) + borderWidth, 0, Math.PI * 2, false, 0);
             const extrudeSettings = {
                 depth: 2,
-                bevelEnabled: true,
+                bevelEnabled: false,
             };
             const supportSlotGeometry = new THREE.ExtrudeGeometry(supportSlotShape, extrudeSettings);
             supportSlotGeometry.translate(0, 0, 0); // base lies flat on Z=0
@@ -337,7 +338,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         <>
             {debugHullLine && <primitive object={debugHullLine} />}
             {baseFillGeometry && (
-                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 1]} />
+                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
             )}
             {circlesData.map((circle, index) => (
                 <Circle
