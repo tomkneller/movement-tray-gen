@@ -9,7 +9,7 @@ import { createOvalMesh } from './ovalUtils';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
-    const insetDiameter = baseWidth;
+    const insetDiameter = baseWidth + 1; // Adding 1 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
     const borderHeight = edgeHeight;
