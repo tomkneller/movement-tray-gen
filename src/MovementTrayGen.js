@@ -40,7 +40,7 @@ function MovementTrayGenerator() {
 
     const [hasStraySlot, setHasStraySlot] = useState(false);
 
-    const [, setMaxSlots] = useState(100);
+    const [maxSlots, setMaxSlots] = useState(100);
 
     const [exportMesh, setExportMesh] = useState(null);
 
@@ -272,6 +272,9 @@ function MovementTrayGenerator() {
                             <Tab id="tab">
                                 Magnet Slots
                             </Tab>
+                            <Tab id="tab">
+                                Support Slots
+                            </Tab>
                         </TabList>
                         <TabPanel>
                             <h3 className='tabTitle'>Tray Options</h3>
@@ -337,6 +340,35 @@ function MovementTrayGenerator() {
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
+                                </div>
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
+                            <h3>Add support slot</h3>
+                            <div>
+                                <label>Support Slot:</label>
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
+                            </div>
+                            <div inert={!hasSupportSlot}>
+                                <div>
+                                    <label>Support Mode:</label>
+                                    <select name='supportMode' value={supportMode} onChange={handleInputChange}>
+                                        <option value={'wrap'}>Wrap</option>
+                                        <option value={'ranked'}>Ranked</option>
+                                    </select>
+                                    Not Yet Implemented
+                                </div>
+                                <div>
+                                    <label>Support Slots Count:</label>
+                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} />
+                                </div>
+                                <div>
+                                    <label>Oval Length:</label>
+                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
+                                </div>
+                                <div>
+                                    <label>Oval Width:</label>
+                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} />
                                 </div>
                             </div>
                         </TabPanel>
