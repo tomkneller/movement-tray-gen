@@ -348,7 +348,7 @@ function MovementTrayGenerator() {
                             <div inert={hasSupportSlot}>
                                 <div>
                                     <label>Stagger Formation:</label>
-                                    <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
+                                    <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
                                 </div>
                                 <div inert={!staggerFormation}>
                                     <label>Remove Stray Slots:</label>
