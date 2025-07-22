@@ -132,8 +132,8 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             const centerX = 0;
             const centerY = 0;
 
-            const a = (supportSlot.length / 2) + insetRadius + 2;
-            const b = (supportSlot.width / 2) + insetRadius + 2;
+            const a = ((supportSlot.length / 2) + insetRadius) + borderWidth + 1;
+            const b = ((supportSlot.width / 2) + insetRadius) + borderWidth + 1;
 
             let added = 0;
             let angle = 0;

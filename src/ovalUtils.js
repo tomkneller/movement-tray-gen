@@ -25,7 +25,7 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
 
     const outerGeom = new ExtrudeGeometry(outerShape, {
         depth: borderHeight,
-        bevelEnabled: true,
+        bevelEnabled: false,
         curveSegments: 128,
     });
     const outerMesh = new Mesh(outerGeom, new MeshStandardMaterial({ color: 'green' }));
@@ -45,7 +45,7 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
 
     const innerGeom = new ExtrudeGeometry(innerShape, {
         depth: baseThickness,
-        bevelEnabled: true,
+        bevelEnabled: false,
         curveSegments: 128,
     });
 
@@ -75,7 +75,7 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
         group.add(magnetMesh);
     }
 
-    group.position.z = 1;
+    group.position.z = 0;
 
     return group;
 }
