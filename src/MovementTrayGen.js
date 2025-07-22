@@ -344,31 +344,33 @@ function MovementTrayGenerator() {
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <h3>Add support slot</h3>
-                            <div>
-                                <label>Support Slot:</label>
+                            <h3 className='tabTitle'>Add support slot</h3>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Support Slot:</label>
                                 <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
                             </div>
-                            <div inert={!hasSupportSlot}>
-                                <div>
-                                    <label>Support Mode:</label>
+                            <div inert={!hasSupportSlot} >
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Support Mode:</label>
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange}>
                                         <option value={'wrap'}>Wrap</option>
                                         <option value={'ranked'}>Ranked</option>
                                     </select>
                                     Not Yet Implemented
                                 </div>
-                                <div>
-                                    <label>Support Slots Count:</label>
-                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
+                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} className="input" />
                                 </div>
-                                <div>
-                                    <label>Oval Length:</label>
-                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Length:</label>
+                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
-                                <div>
-                                    <label>Oval Width:</label>
-                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} />
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Width:</label>
+                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
                             </div>
                         </TabPanel>
