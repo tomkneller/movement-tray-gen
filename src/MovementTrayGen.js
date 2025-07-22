@@ -272,6 +272,9 @@ function MovementTrayGenerator() {
                             <Tab id="tab">
                                 Magnet Slots
                             </Tab>
+                            <Tab id="tab">
+                                Formations
+                            </Tab>
                         </TabList>
                         <TabPanel>
                             <h3 className='tabTitle'>Tray Options</h3>
@@ -337,6 +340,19 @@ function MovementTrayGenerator() {
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
+                                </div>
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
+                            <h3>Formation</h3>
+                            <div inert={hasSupportSlot}>
+                                <div>
+                                    <label>Stagger Formation:</label>
+                                    <input type='checkbox' name="staggerFormation" value={staggerFormation} onChange={handleInputChange} />
+                                </div>
+                                <div inert={!staggerFormation}>
+                                    <label>Remove Stray Slots:</label>
+                                    <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
                                 </div>
                             </div>
                         </TabPanel>
