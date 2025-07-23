@@ -61,11 +61,17 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         const perimeter = [];
         if (supportMode) {
-            //Oval position (may need changing if support slot can be moved in future)
-            perimeter.push(new Vector2(0, 0));
-
+            //start from support slot
+            if (supportSlot.mode === 'circle') {
+                //Oval position (may need changing if support slot can be moved in future)
+                perimeter.push(new Vector2(0, 0));
+            }
             for (const circle of circles) {
                 perimeter.push(new Vector2(circle.position.x, circle.position.y))
+            }
+            //connect to support slot at end
+            if (supportSlot.mode === 'circle') {
+                perimeter.push(new Vector2(0, 0));
             }
         }
         else {
