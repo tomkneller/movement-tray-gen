@@ -98,6 +98,80 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         return perimeter;
     }
 
+    function getEllipseRadiusAtAngle(a, b, angleRad) {
+        return (a * b) / Math.sqrt(
+            (b * Math.cos(angleRad)) ** 2 + (a * Math.sin(angleRad)) ** 2
+        );
+    }
+
+    function placeCirclesAroundOval(ovalCenter, ovalWidth, ovalHeight, numCircles, padding, addCircle) {
+        const a = ovalWidth / 2;
+        const b = ovalHeight / 2;
+
+        for (let i = 0; i < numCircles; i++) {
+            const angle = (i / numCircles) * Math.PI * 2; // full circle
+
+            const radius = getEllipseRadiusAtAngle(a, b, angle) + padding;
+
+            const x = ovalCenter.x + radius * Math.cos(angle);
+            const y = ovalCenter.y + radius * Math.sin(angle);
+
+            addCircle(x, y, i);
+        }
+    }
+
+    function placeEvenCirclesAlongOval(ovalCenter, a, b, numCircles, padding, addCircle) {
+        const points = [];
+        const steps = 1000;
+        const angleStep = (2 * Math.PI) / steps;
+        const arcLengths = [0];
+        let totalLength = 0;
+
+        // Step 1: Sample points along the ellipse and calculate arc length
+        for (let i = 1; i <= steps; i++) {
+            const t1 = (i - 1) * angleStep;
+            const t2 = i * angleStep;
+
+            const x1 = a * Math.cos(t1);
+            const y1 = b * Math.sin(t1);
+            const x2 = a * Math.cos(t2);
+            const y2 = b * Math.sin(t2);
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const segmentLength = Math.sqrt(dx * dx + dy * dy);
+
+            totalLength += segmentLength;
+            arcLengths.push(totalLength);
+        }
+
+        // Step 2: For each desired point, find the corresponding angle
+        for (let i = 0; i < numCircles; i++) {
+            const targetLength = (i / numCircles) * totalLength;
+
+            // Binary search to find the closest arc length index
+            let low = 0;
+            let high = arcLengths.length - 1;
+            while (low < high) {
+                const mid = Math.floor((low + high) / 2);
+                if (arcLengths[mid] < targetLength) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+
+            const t = low * angleStep;
+
+            // Position on the ellipse, add outward padding
+            const x = ovalCenter.x + (a + padding) * Math.cos(t);
+            const y = ovalCenter.y + (b + padding) * Math.sin(t);
+
+            addCircle(x, y, i);
+        }
+    }
+
+
 
     useEffect(() => {
         const circles = [];
@@ -114,6 +188,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             const position = { x, y };
 
             if (!canAddCircle(x, y, row, col, circles)) {
+                console.log("cant add any more slots, max reached");
 
                 return;
             }
@@ -181,8 +256,21 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 points.push(new Vector2(centerX, centerY));
             } else {
                 //Support slot is an oval
-                console.log("Support slot is not a circle, generate slots in a grid instead.");
+                console.log("Support slot is not a circle, generate slots around oval");
                 //TODO: Implement oval support slot generation
+
+                placeEvenCirclesAlongOval(
+                    { x: 0, y: 0 }, // center of oval
+                    supportSlot.length,             // a: horizontal radius (width / 2)
+                    supportSlot.width,             // b: vertical radius (height / 2)
+                    numCircles,             // number of slots
+                    2,              // padding from oval edge
+                    (x, y, i) => {
+                        // Your circle placement logic here
+                        addCircle(x, y, i);
+                    }
+                );
+
             }
         }
         else {
