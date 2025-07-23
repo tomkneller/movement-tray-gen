@@ -132,50 +132,58 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             const centerX = 0;
             const centerY = 0;
 
-            const a = ((supportSlot.length / 2) + insetRadius) + borderWidth + 1;
-            const b = ((supportSlot.width / 2) + insetRadius) + borderWidth + 1;
+            //Support slot is a circle
+            if (supportSlot.mode === 'circle') {
 
-            let added = 0;
-            let angle = 0;
-            const maxAngle = Math.PI * 2;
-            const minSpacing = (2 * insetRadius) * 0.99;
+                const a = ((supportSlot.length / 2) + insetRadius) + borderWidth + 1;
+                const b = ((supportSlot.width / 2) + insetRadius) + borderWidth + 1;
 
-            while (added < numCircles && angle < maxAngle + 0.2) {
-                const x = centerX + a * Math.cos(angle);
-                const y = centerY + b * Math.sin(angle);
-                const position = { x, y };
+                let added = 0;
+                let angle = 0;
+                const maxAngle = Math.PI * 2;
+                const minSpacing = (2 * insetRadius) * 0.99;
 
-                let overlaps = false;
-                for (const existing of circles) {
-                    if (areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius + borderWidth)) {
-                        overlaps = true;
+                while (added < numCircles && angle < maxAngle + 0.2) {
+                    const x = centerX + a * Math.cos(angle);
+                    const y = centerY + b * Math.sin(angle);
+                    const position = { x, y };
 
-                        break;
+                    let overlaps = false;
+                    for (const existing of circles) {
+                        if (areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius + borderWidth)) {
+                            overlaps = true;
+
+                            break;
+                        }
+                    }
+
+                    const insetIntersects = doesInsetAreaIntersectOval(position, { x: centerX, y: centerY }, insetRadius, supportSlot.length, supportSlot.width);
+                    const outerIntersects = doesInsetAreaIntersectOval(position, { x: centerX, y: centerY }, insetRadius + borderWidth, supportSlot.length, supportSlot.width);
+
+                    if (!overlaps && !insetIntersects && !outerIntersects) {
+                        addCircle(x, y, 0, added);
+                        added++;
+
+                        const dx = -a * Math.sin(angle);
+                        const dy = b * Math.cos(angle);
+                        const speed = Math.sqrt(dx * dx + dy * dy);
+                        const dTheta = minSpacing / speed;
+                        angle += dTheta;
+                    } else {
+                        angle += 0.01;
                     }
                 }
 
-                const insetIntersects = doesInsetAreaIntersectOval(position, { x: centerX, y: centerY }, insetRadius, supportSlot.length, supportSlot.width);
-                const outerIntersects = doesInsetAreaIntersectOval(position, { x: centerX, y: centerY }, insetRadius + borderWidth, supportSlot.length, supportSlot.width);
-
-                if (!overlaps && !insetIntersects && !outerIntersects) {
-                    addCircle(x, y, 0, added);
-                    added++;
-
-                    const dx = -a * Math.sin(angle);
-                    const dy = b * Math.cos(angle);
-                    const speed = Math.sqrt(dx * dx + dy * dy);
-                    const dTheta = minSpacing / speed;
-                    angle += dTheta;
-                } else {
-                    angle += 0.01;
+                if (added < numCircles) {
+                    onMaxReached(added);
                 }
-            }
 
-            if (added < numCircles) {
-                onMaxReached(added);
+                points.push(new Vector2(centerX, centerY));
+            } else {
+                //Support slot is an oval
+                console.log("Support slot is not a circle, generate slots in a grid instead.");
+                //TODO: Implement oval support slot generation
             }
-
-            points.push(new Vector2(centerX, centerY));
         }
         else {
             for (let row = 0; row < rows; row++) {

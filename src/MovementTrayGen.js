@@ -30,7 +30,7 @@ function MovementTrayGenerator() {
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
     const [hasMagnetSlot, setHasMagnetSlot] = useState(true);
 
-    const [supportMode, setSupportMode] = useState('wrap');
+    const [supportMode, setSupportMode] = useState('circle');
     const [supportCount, setSupportCount] = useState(6);
 
     const [formationCols, setFormationCols] = useState(3);
@@ -63,6 +63,12 @@ function MovementTrayGenerator() {
 
     useEffect(() => {
     }, [bounds]);
+
+    useEffect(() => {
+        if (supportMode === 'circle') {
+            setOvalLength(ovalWidth);
+        }
+    }, [supportMode, ovalWidth]);
 
     useEffect(() => {
         document.body.classList.toggle('dark-mode', darkMode);
@@ -353,24 +359,25 @@ function MovementTrayGenerator() {
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Support Mode:</label>
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange}>
-                                        <option value={'wrap'}>Wrap</option>
-                                        <option value={'ranked'}>Ranked</option>
+                                        <option value={'circle'}>Circle</option>
+                                        <option value={'oval'}>Oval</option>
                                     </select>
-                                    Not Yet Implemented
                                 </div>
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
                                     <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} className="input" />
                                 </div>
                                 <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Oval Length:</label>
-                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} className="input" />
-                                    <label style={{ fontWeight: 500 }}>mm</label>
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Oval Width:</label>
                                     <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
+                                </div>
+                                <div inert={supportMode === 'circle'}>
+                                    <div style={{ marginBottom: 12 }}>
+                                        <label style={{ fontWeight: 500 }}>Oval Length:</label>
+                                        <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </div>
                                 </div>
                             </div>
                         </TabPanel>
