@@ -254,14 +254,11 @@ function MovementTrayGenerator() {
                         <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
                         <p>Copyright © 2025 Thomas Kneller</p>
 
-                        <button onClick={() => setShowInfoPopup(false)}>Close</button>
+                        <button className='button' onClick={() => setShowInfoPopup(false)}>Close</button>
                     </div>
                 </div>
             )
             }
-
-
-
 
             <button
                 className='dark-mode-toggle'
