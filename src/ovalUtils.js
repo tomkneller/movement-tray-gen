@@ -66,7 +66,8 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
 
         const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
             depth: magnetDepth,
-            curveSegments: 128,
+            bevelEnabled: false,
+            curveSegments: 64,
         });
 
         const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
