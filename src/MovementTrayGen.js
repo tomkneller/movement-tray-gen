@@ -356,11 +356,11 @@ function MovementTrayGenerator() {
                             <h3>Formation</h3>
                             <div inert={hasSupportSlot}>
                                 <div>
-                                    <label>Stagger Formation:</label>
+                                    <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
                                     <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
                                 </div>
                                 <div inert={!staggerFormation}>
-                                    <label>Remove Stray Slots:</label>
+                                    <label style={{ fontWeight: 500 }}>Remove Stray Slots:</label>
                                     <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
                                 </div>
                             </div>
@@ -369,12 +369,12 @@ function MovementTrayGenerator() {
                             <h3 className='tabTitle'>Add support slot</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Support Slot:</label>
-                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} />
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
                             </div>
                             <div inert={!hasSupportSlot} >
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Support Mode:</label>
-                                    <select name='supportMode' value={supportMode} onChange={handleInputChange}>
+                                    <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
                                         <option value={'circle'}>Circle</option>
                                         <option value={'oval'}>Oval</option>
                                     </select>
