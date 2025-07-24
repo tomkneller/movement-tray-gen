@@ -68,7 +68,8 @@ function MovementTrayGenerator() {
         document.body.classList.toggle('dark-mode', darkMode);
     }, [darkMode]);
 
-    useEffect(() => {
+    //Center camera
+    function recenterCamera() {
         if (!bounds || !cameraRef.current || !controlsRef.current) return;
 
         const center = new Vector3();
@@ -86,6 +87,40 @@ function MovementTrayGenerator() {
 
         controlsRef.current.target.copy(center);
         controlsRef.current.update();
+    }
+
+    const setCameraView = (view) => {
+        const center = new Vector3();
+        bounds.getCenter(center);
+
+        const size = new Vector3();
+        bounds.getSize(size);
+
+        const maxDim = Math.max(size.x, size.y);
+        const distance = maxDim * 1.4; // adjust zoom factor
+
+        switch (view) {
+            case 'top':
+                cameraRef.current.position.set(30, 30, distance);
+                cameraRef.current.lookAt(center);
+                break;
+            case 'front':
+                cameraRef.current.position.set(0, distance, 0);
+                cameraRef.current.lookAt(center);
+                break;
+            case 'side':
+                cameraRef.current.position.set(distance, 0, 0);
+                cameraRef.current.lookAt(center);
+                break;
+            default:
+                break
+        }
+
+        cameraRef.current.updateProjectionMatrix();
+    };
+
+    useEffect(() => {
+        recenterCamera();
     }, [bounds]);
 
 
@@ -353,7 +388,24 @@ function MovementTrayGenerator() {
                         Download STL
                     </button>
                 </div>
+                <div style={{
+                    position: 'absolute',
+                    top: '8rem',
+                    right: '4rem',
+                    zIndex: 10,
+                    display: 'flex',
+                    gap: '0.5rem',
+                    height: '40px',
+                }}>
+                    <button onClick={() => recenterCamera()}>⌂</button>
+                    <button onClick={() => setCameraView('top')}>Top</button>
+                    <button onClick={() => setCameraView('front')}>Front</button>
+                    <button onClick={() => setCameraView('side')}>Side</button>
+                </div>
+
+
                 <div className='trayFrame' style={{ height: '50px' }}>
+
                     {generateVisualization()}
                 </div>
             </div>
