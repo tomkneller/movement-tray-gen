@@ -19,6 +19,9 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     const [debugHullLine, setDebugHullLine] = useState(null);
 
+    supportSlot.width = supportSlot.width + 1; // Adding 1 to allow model base to fit inside the oval
+    supportSlot.length = supportSlot.length + 1; // Adding 1 to allow model base to fit inside the oval
+
     function areInsetAreasOverlapping(pos1, pos2, purpleRadius1, purpleRadius2) {
         const dx = pos1.x - pos2.x;
         const dy = pos1.y - pos2.y;
