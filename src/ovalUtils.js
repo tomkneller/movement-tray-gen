@@ -9,7 +9,10 @@ import {
 
 export function createOvalMesh(position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot) {
     const group = new Group();
-    const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
+
+    const baseMaterial = new MeshStandardMaterial({ color: '#e0e3eb', roughness: 0.5, metalness: 0.1 });
+    const magnetMaterial = new MeshStandardMaterial({ color: '#555555' });
+    const baseOuterMaterial = new MeshStandardMaterial({ color: '#333a40' });
 
     const innerLengthRadius = length / 2;
     const innerWidthRadius = width / 2;
@@ -28,7 +31,7 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
         bevelEnabled: false,
         curveSegments: 128,
     });
-    const outerMesh = new Mesh(outerGeom, new MeshStandardMaterial({ color: 'green' }));
+    const outerMesh = new Mesh(outerGeom, baseOuterMaterial);
 
 
     group.add(outerMesh);
@@ -51,7 +54,7 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
 
     const innerMesh = new Mesh(
         innerGeom,
-        new MeshStandardMaterial({ color: magnetSlot.enabled ? 'lightgreen' : 'white' })
+        baseMaterial
     );
 
     group.add(innerMesh);
