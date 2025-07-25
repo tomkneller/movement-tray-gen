@@ -18,6 +18,7 @@
 
 ## Demo Image
 ![Screenshot](preview/screenshot.png "Screenshot")
+Screenshot taken of alpha 0.0.1
 
 ## Contents
 - [Features](#features)
