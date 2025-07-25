@@ -104,14 +104,6 @@ function MovementTrayGenerator() {
                 cameraRef.current.position.set(30, 30, distance);
                 cameraRef.current.lookAt(center);
                 break;
-            case 'front':
-                cameraRef.current.position.set(0, distance, 0);
-                cameraRef.current.lookAt(center);
-                break;
-            // case 'side':
-            //     cameraRef.current.position.set(distance, 0, 0);
-            //     cameraRef.current.lookAt(center);
-            //     break;
             case 'bottom':
                 cameraRef.current.position.set(30, 30, -distance);
                 cameraRef.current.lookAt(center);
@@ -403,7 +395,6 @@ function MovementTrayGenerator() {
                 }}>
                     <button onClick={() => recenterCamera()}>⌂</button>
                     <button onClick={() => setCameraView('top')}>Top</button>
-                    <button onClick={() => setCameraView('front')}>Front</button>
                     <button onClick={() => setCameraView('bottom')}>Bottom</button>
                 </div>
 
