@@ -199,7 +199,7 @@ function MovementTrayGenerator() {
                 {/* <CameraControls bounds={bounds} /> */}
                 <PerspectiveCamera ref={cameraRef}
                     makeDefault
-                    fov={70} />
+                    fov={45} />
                 <ambientLight intensity={0.6} />
                 <directionalLight castShadow
                     position={[10, 100, 100]}
