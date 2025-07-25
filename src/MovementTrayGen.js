@@ -71,6 +71,7 @@ function MovementTrayGenerator() {
 
     }, [darkMode]);
 
+
     //Center camera
     function recenterCamera() {
         if (!bounds || !cameraRef.current || !controlsRef.current) return;
@@ -194,8 +195,8 @@ function MovementTrayGenerator() {
     };
 
     const generateVisualization = () => {
-        return (<div style={{ flex: 1 }}>
-            <Canvas style={{ width: '100%', height: '82vh', borderRadius: '16px' }}>
+        return (<div style={{ width: '100%', height: '100%' }}>
+            <Canvas style={{ width: '100%', height: '100%', borderRadius: '16px' }} shadows>
                 {/* <CameraControls bounds={bounds} /> */}
                 <PerspectiveCamera ref={cameraRef}
                     makeDefault
@@ -247,7 +248,7 @@ function MovementTrayGenerator() {
                 <h2 className='title'>Movement Tray Forge</h2>
             </div>
 
-            <div style={{ gap: '1rem', position: 'fixed', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}>
+            <div style={{ gap: '1rem', position: 'absolute', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}>
                 <button
                     id='dark-mode-toggle'
                     className='dark-mode-toggle'
@@ -434,28 +435,28 @@ function MovementTrayGenerator() {
                         </div>
                     </button>
                 </div>
-                <div style={{
-                    position: 'absolute',
-                    top: '8rem',
-                    right: '4rem',
-                    zIndex: 10,
-                    display: 'flex',
-                    gap: '0.5rem',
-                    height: '40px',
-                    backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
-                    borderRadius: '8px',
-                    padding: '0.5rem',
-                    alignItems: 'center',
-                }}>
-                    <i data-feather="eye" style={{ height: 40 }}></i>
-                    <button className='button' style={{ height: 40 }} onClick={() => recenterCamera()}><i data-feather="home"></i></button>
-                    <button className='button' style={{ height: 40 }} onClick={() => setCameraView('top')}>Top</button>
-                    <button className='button' style={{ height: 40 }} onClick={() => setCameraView('bottom')}>Bottom</button>
-                </div>
 
 
-                <div className='trayFrame' style={{ height: '50px' }}>
 
+                <div className='trayFrame' style={{ height: '100%', minWidth: '300px' }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '8rem',
+                        right: '4rem',
+                        zIndex: 10,
+                        display: 'flex',
+                        gap: '0.5rem',
+                        height: '40px',
+                        backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '8px',
+                        padding: '0.5rem',
+                        alignItems: 'center',
+                    }}>
+                        <i data-feather="eye" style={{ height: 40 }}></i>
+                        <button className='button' style={{ height: 40 }} onClick={() => recenterCamera()}><i data-feather="home"></i></button>
+                        <button className='button' style={{ height: 40 }} onClick={() => setCameraView('top')}>Top</button>
+                        <button className='button' style={{ height: 40 }} onClick={() => setCameraView('bottom')}>Bottom</button>
+                    </div>
                     {generateVisualization()}
                 </div>
             </div>
