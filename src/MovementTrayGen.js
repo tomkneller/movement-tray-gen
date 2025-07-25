@@ -419,10 +419,14 @@ function MovementTrayGenerator() {
                     display: 'flex',
                     gap: '0.5rem',
                     height: '40px',
+                    backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: '8px',
+                    padding: '0.5rem',
                 }}>
-                    <button onClick={() => recenterCamera()}>⌂</button>
-                    <button onClick={() => setCameraView('top')}>Top</button>
-                    <button onClick={() => setCameraView('bottom')}>Bottom</button>
+                    <span>📷</span>
+                    <button className='button' onClick={() => recenterCamera()}>⌂</button>
+                    <button className='button' onClick={() => setCameraView('top')}>Top</button>
+                    <button className='button' onClick={() => setCameraView('bottom')}>Bottom</button>
                 </div>
 
 
