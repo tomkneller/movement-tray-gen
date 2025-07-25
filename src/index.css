@@ -126,9 +126,6 @@ body.dark-mode #tab {
 }
 
 .dark-mode-toggle {
-  position: fixed;
-  top: 24px;
-  right: 24px;
   z-index: 100;
   background: #232946;
   color: #f5f6fa;
@@ -137,8 +134,6 @@ body.dark-mode #tab {
   padding: 8px 16px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-  height: 36px;
-  width: 110px;
 }
 
 body.dark-mode .dark-mode-toggle {
@@ -295,4 +290,10 @@ body.dark-mode .tabTitle {
 body.dark-mode .modal-content {
   background: #181a2a;
   color: #f5f6fa;
+}
+
+.icon-text {
+  display: flex;
+  align-items: center; /* vertical alignment */
+  gap: 0.5rem;          /* space between icon and text */
 }
