@@ -14,6 +14,7 @@ function MovementTrayGenerator() {
 
     const [darkMode, setDarkMode] = useState(false);
     const [showInfoPopup, setShowInfoPopup] = useState(false);
+    const [showHelpPopup, setShowHelpPopup] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -284,7 +285,33 @@ function MovementTrayGenerator() {
                         <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
                         <p>Copyright © 2025 Thomas Kneller</p>
 
-                        <button onClick={() => setShowInfoPopup(false)}>Close</button>
+                        <button className='button' onClick={() => setShowInfoPopup(false)}>Close</button>
+                    </div>
+                </div>
+            )
+            }
+
+            <button
+                className='dark-mode-toggle'
+                style={{ top: 24, right: 275 }}
+                onClick={
+                    //show popup for features coming soon
+                    () => setShowHelpPopup(true)
+                }>
+                <span role="img" aria-label="info" style={{ marginRight: 6 }}></span>
+                Help
+            </button>
+
+            {showHelpPopup && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Help</h2>
+                        <h3>Controls</h3>
+                        <p>You can look around the movement tray using the mouse</p>
+                        <p><b>Hold Left Click</b> and move the mouse to change your viewing angle</p>
+                        <p><b>Hold Right Click</b> and move the mouse to pan</p>
+                        <p><b>ScrollWheel</b> to zoom in and out</p>
+                        <button className='button' onClick={() => setShowHelpPopup(false)}>Close</button>
                     </div>
                 </div>
             )

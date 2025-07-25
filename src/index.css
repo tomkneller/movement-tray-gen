@@ -159,6 +159,17 @@ body.dark-mode .dark-mode-toggle {
   transition: border 0.2s;
 }
 
+.button {
+  background: #00b894;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s, transform 0.1s;
+}
+
 .tray-panel {
   display: flex;
   flex-direction: column;
