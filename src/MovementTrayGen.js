@@ -7,6 +7,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
+const feather = require('feather-icons');
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
@@ -89,6 +90,10 @@ function MovementTrayGenerator() {
         controlsRef.current.update();
     }, [bounds]);
 
+    //Required for feather icons to work
+    useEffect(() => {
+        feather.replace();
+    }, []);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
