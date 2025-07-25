@@ -7,6 +7,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
+const feather = require('feather-icons');
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
@@ -14,6 +15,7 @@ function MovementTrayGenerator() {
 
     const [darkMode, setDarkMode] = useState(false);
     const [showInfoPopup, setShowInfoPopup] = useState(false);
+    const [showHelpPopup, setShowHelpPopup] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -72,9 +74,11 @@ function MovementTrayGenerator() {
 
     useEffect(() => {
         document.body.classList.toggle('dark-mode', darkMode);
+
     }, [darkMode]);
 
-    useEffect(() => {
+    //Center camera
+    function recenterCamera() {
         if (!bounds || !cameraRef.current || !controlsRef.current) return;
 
         const center = new Vector3();
@@ -92,8 +96,42 @@ function MovementTrayGenerator() {
 
         controlsRef.current.target.copy(center);
         controlsRef.current.update();
+    }
+
+    const setCameraView = (view) => {
+        const center = new Vector3();
+        bounds.getCenter(center);
+
+        const size = new Vector3();
+        bounds.getSize(size);
+
+        const maxDim = Math.max(size.x, size.y);
+        const distance = maxDim * 1.4; // adjust zoom factor
+
+        switch (view) {
+            case 'top':
+                cameraRef.current.position.set(30, 30, distance);
+                cameraRef.current.lookAt(center);
+                break;
+            case 'bottom':
+                cameraRef.current.position.set(30, 30, -distance);
+                cameraRef.current.lookAt(center);
+                break;
+            default:
+                break
+        }
+
+        cameraRef.current.updateProjectionMatrix();
+    };
+
+    useEffect(() => {
+        recenterCamera();
     }, [bounds]);
 
+    //Required for feather icons to work
+    useEffect(() => {
+        feather.replace();
+    }, []);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -215,55 +253,94 @@ function MovementTrayGenerator() {
                 <h2 className='title'>Movement Tray Forge</h2>
             </div>
 
-            <button
-                id='dark-mode-toggle'
-                className='dark-mode-toggle'
-                onClick={() => setDarkMode(dm => !dm)}
-            >
-                {darkMode ? 'Light Mode' : 'Dark Mode'}
-            </button>
-            <button
-                className='dark-mode-toggle'
-                style={{ top: 24, right: 150 }}
-                onClick={
-                    //show popup for features coming soon
-                    () => setShowInfoPopup(true)
-                }>
-                <span role="img" aria-label="info" style={{ marginRight: 6 }}>ℹ️</span>
-                Info
-            </button>
-
-            {showInfoPopup && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h2>Upcoming Features</h2>
-                        <ul>
-                            <li>Different formations including staggered, wedge and diamond</li>
-                            <li>Support for different base shapes (oval, square)</li>
-                            <li>Customizable support slots for different models</li>
-                            <li>Export to other formats (OBJ, 3MF)</li>
-                            <li>Save and load configurations</li>
-                            <li>Mobile-friendly interface</li>
-                            <li>Improved performance for large trays</li>
-                            <li>And much more...</li>
-                        </ul>
-                        <h3>Licenses & Credits</h3>
-                        <ul>
-                            Developed using:
-                            <li>Three.js - MIT License</li>
-                            <li>React - MIT License</li>
-                            {/* Add more credits as needed */}
-                        </ul>
-
-
-                        <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
-                        <p>Copyright © 2025 Thomas Kneller</p>
-
-                        <button onClick={() => setShowInfoPopup(false)}>Close</button>
+            <div style={{ gap: '1rem', position: 'fixed', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}>
+                <button
+                    id='dark-mode-toggle'
+                    className='dark-mode-toggle'
+                    onClick={() => setDarkMode(dm => !dm)}
+                >
+                    {/* {darkMode ? 'Light Mode' : 'Dark Mode'} */}
+                    <div className='icon-text'>
+                        <i data-feather={darkMode ? "moon" : "sun"} aria-label="dark-mode-icon" />
+                        {darkMode ? 'Light Mode' : 'Dark Mode'}
                     </div>
-                </div>
-            )
-            }
+                </button>
+                <button
+                    className='dark-mode-toggle'
+                    style={{ top: 24, right: 150 }}
+                    onClick={
+                        //show popup for features coming soon
+                        () => setShowInfoPopup(true)
+                    }>
+                    <div className='icon-text' >
+                        <i data-feather="info" aria-label="info" style={{ marginRight: 6 }} />
+                        Info
+                    </div>
+                </button >
+
+                {showInfoPopup && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <h2>Upcoming Features</h2>
+                            <ul>
+                                <li>Different formations including staggered, wedge and diamond</li>
+                                <li>Support for different base shapes (oval, square)</li>
+                                <li>Customizable support slots for different models</li>
+                                <li>Export to other formats (OBJ, 3MF)</li>
+                                <li>Save and load configurations</li>
+                                <li>Mobile-friendly interface</li>
+                                <li>Improved performance for large trays</li>
+                                <li>And much more...</li>
+                            </ul>
+                            <h3>Licenses & Credits</h3>
+                            <p>Developed using:</p>
+                            <ul>
+                                <li><a href='https://github.com/mrdoob/three.js/'>Three.js - MIT License</a></li>
+                                <li><a href="https://github.com/facebook/react">React - MIT License</a></li>
+                                <li><a href="https://github.com/feathericons/feather">Feather - MIT License </a></li>
+                                {/* Add more credits as needed */}
+                            </ul>
+
+
+                            <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
+                            <p>Copyright © 2025 Thomas Kneller</p>
+
+                            <button className='button' onClick={() => setShowInfoPopup(false)}>Close</button>
+                        </div>
+                    </div>
+                )
+                }
+
+                <button
+                    className='dark-mode-toggle'
+                    style={{ top: 24, right: 275 }}
+                    onClick={
+                        //show popup for features coming soon
+                        () => setShowHelpPopup(true)
+                    }>
+                    <div className='icon-text'>
+                        <i data-feather="help-circle" aria-label="help-icon" />
+                        Help
+                    </div>
+                </button>
+
+                {
+                    showHelpPopup && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <h2>Help</h2>
+                                <h3>Controls</h3>
+                                <p>You can look around the movement tray using the mouse</p>
+                                <p><b>Hold Left Click</b> and move the mouse to change your viewing angle</p>
+                                <p><b>Hold Right Click</b> and move the mouse to pan</p>
+                                <p><b>ScrollWheel</b> to zoom in and out</p>
+                                <button className='button' onClick={() => setShowHelpPopup(false)}>Close</button>
+                            </div>
+                        </div>
+                    )
+                }
+
+            </div>
 
             <div className='container' style={{ height: '82vh' }}>
                 <div className='tray-panel'>
@@ -407,10 +484,35 @@ function MovementTrayGenerator() {
                         onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
                         onMouseOut={e => e.currentTarget.style.background = 'none'}
                     >
-                        Download STL
+
+                        <div className='icon-text' style={{ justifyContent: 'center' }}>
+                            <i data-feather="download" aria-label="download-icon" />
+                            Download STL
+                        </div>
                     </button>
                 </div>
+                <div style={{
+                    position: 'absolute',
+                    top: '8rem',
+                    right: '4rem',
+                    zIndex: 10,
+                    display: 'flex',
+                    gap: '0.5rem',
+                    height: '40px',
+                    backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: '8px',
+                    padding: '0.5rem',
+                    alignItems: 'center',
+                }}>
+                    <i data-feather="eye" style={{ height: 40 }}></i>
+                    <button className='button' style={{ height: 40 }} onClick={() => recenterCamera()}><i data-feather="home"></i></button>
+                    <button className='button' style={{ height: 40 }} onClick={() => setCameraView('top')}>Top</button>
+                    <button className='button' style={{ height: 40 }} onClick={() => setCameraView('bottom')}>Bottom</button>
+                </div>
+
+
                 <div className='trayFrame' style={{ height: '50px' }}>
+
                     {generateVisualization()}
                 </div>
             </div>
