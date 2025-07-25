@@ -6,6 +6,7 @@ import Oval from './Oval';
 import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
+import { useTexture } from '@react-three/drei'
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
@@ -334,6 +335,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     const planeColor = darkMode ? 0x2a3550 : 0xe0e3eb;
 
+    const texture = useTexture('/wood_table_worn_diff_4k.jpg');
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(2, 2);
+
     return (
         <>
             {debugHullLine && <primitive object={debugHullLine} />}
@@ -368,11 +373,26 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 />
             )}
 
-            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
-                color: planeColor, roughness: 1, metalness: 0.1,
+
+
+            <mesh geometry={new THREE.PlaneGeometry(300, 300)} material={new MeshStandardMaterial({
+                color: 'darkgreen', roughness: 1, metalness: 0,
                 transparent: true,
                 opacity: 0.95
-            })} receiveShadow position={[0, 0, 0]} />
+            })} receiveShadow position={[30, 50, -0.2]} />
+
+            <gridHelper args={[300, 30]} rotation={[-Math.PI / 2, 0, 0]} position={[30, 50, -0.1]} />
+
+
+            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({ map: texture })} receiveShadow position={[0, 0, -0.3]} />
+
+
+            {/* <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
+
+                color: 'brown', roughness: 1, metalness: 0.1,
+                transparent: true,
+                opacity: 0.95
+            })} receiveShadow position={[0, 0, -0.3]} /> */}
         </>
     );
 }

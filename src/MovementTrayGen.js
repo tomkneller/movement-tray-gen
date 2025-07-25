@@ -200,10 +200,10 @@ function MovementTrayGenerator() {
                 <PerspectiveCamera ref={cameraRef}
                     makeDefault
                     fov={70} />
-                <ambientLight intensity={0.5} />
+                <ambientLight intensity={0.6} />
                 <directionalLight castShadow
-                    position={[0, 0, 5]}
-                    intensity={1}
+                    position={[10, 100, 100]}
+                    intensity={0.9}
                     shadow-mapSize-width={1024}
                     shadow-mapSize-height={1024}
                     shadow-camera-far={50}
