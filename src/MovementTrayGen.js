@@ -287,10 +287,11 @@ function MovementTrayGenerator() {
                                 <li>And much more...</li>
                             </ul>
                             <h3>Licenses & Credits</h3>
+                            <p>Developed using:</p>
                             <ul>
-                                Developed using:
-                                <li>Three.js - MIT License</li>
-                                <li>React - MIT License</li>
+                                <li><a href='https://github.com/mrdoob/three.js/'>Three.js - MIT License</a></li>
+                                <li><a href="https://github.com/facebook/react">React - MIT License</a></li>
+                                <li><a href="https://github.com/feathericons/feather">Feather - MIT License </a></li>
                                 {/* Add more credits as needed */}
                             </ul>
 
