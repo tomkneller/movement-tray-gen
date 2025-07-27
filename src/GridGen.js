@@ -437,7 +437,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight]);
 
-    const planeColor = darkMode ? 0x2a3550 : 0xe0e3eb;
+    const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
     return (
         <>
@@ -474,7 +474,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             )}
 
             <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
-                color: planeColor, roughness: 1, metalness: 0.1,
+                color: planeColor, roughness: 1, metalness: 0.5,
                 transparent: true,
                 opacity: 0.95
             })} receiveShadow position={[0, 0, 0]} />
