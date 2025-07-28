@@ -6,6 +6,7 @@ import Oval from './Oval';
 import { CSG } from 'three-csg-ts';
 import { createCircleGroup } from './circleUtils';
 import { createOvalMesh } from './ovalUtils';
+import { buildBase } from './BaseBuilder';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
@@ -59,78 +60,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         return true;
     }
 
-    function buildPerimeter(circles, rows, cols, straySlot, supportMode) {
-        const getIndex = (r, c) => circles.find(circ => circ.row === r && circ.col === c);
-
-        const perimeter = [];
-        if (supportMode) {
-            //start from support slot
-            if (supportSlot.mode === 'circle') {
-                //Oval position (may need changing if support slot can be moved in future)
-                perimeter.push(new Vector2(0, 0));
-            }
-            for (const circle of circles) {
-                perimeter.push(new Vector2(circle.position.x, circle.position.y))
-            }
-            //connect to support slot at end
-            if (supportSlot.mode === 'circle') {
-                perimeter.push(new Vector2(0, 0));
-            }
-        }
-        else {
-            // Top row
-            for (let c = 0; c < cols; c++) {
-                const circ = getIndex(0, c);
-                if (circ) perimeter.push(circ.position);
-            }
-
-            // Right edge
-            for (let r = 1; r < rows; r++) {
-                const isStagger = straySlot && r % 2 === 1;
-                const circ = getIndex(r, cols - (isStagger ? 2 : 1));
-                if (circ) perimeter.push(circ.position);
-            }
-
-            // Bottom row
-            for (let c = cols - 2; c >= 0; c--) {
-                const circ = getIndex(rows - 1, c);
-                if (circ) perimeter.push(circ.position);
-            }
-
-            // Left edge
-            for (let r = rows - 2; r > 0; r--) {
-                const circ = getIndex(r, 0);
-                if (circ) perimeter.push(circ.position);
-            }
-        }
-
-        return perimeter;
-    }
-
-    function getEllipseRadiusAtAngle(a, b, angleRad) {
-        return (a * b) / Math.sqrt(
-            (b * Math.cos(angleRad)) ** 2 + (a * Math.sin(angleRad)) ** 2
-        );
-    }
-
-    function placeCirclesAroundOval(ovalCenter, ovalWidth, ovalHeight, numCircles, padding, addCircle) {
-        const a = ovalWidth / 2;
-        const b = ovalHeight / 2;
-
-        for (let i = 0; i < numCircles; i++) {
-            const angle = (i / numCircles) * Math.PI * 2; // full circle
-
-            const radius = getEllipseRadiusAtAngle(a, b, angle) + padding;
-
-            const x = ovalCenter.x + radius * Math.cos(angle);
-            const y = ovalCenter.y + radius * Math.sin(angle);
-
-            addCircle(x, y, i);
-        }
-    }
-
     function placeEvenCirclesAlongOval(ovalCenter, a, b, numCircles, padding, addCircle) {
-        const points = [];
         const steps = 1000;
         const angleStep = (2 * Math.PI) / steps;
         const arcLengths = [0];
@@ -179,6 +109,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             addCircle(x, y, i);
         }
     }
+
 
 
 
@@ -307,82 +238,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         const bounds = new THREE.Box3().setFromPoints(points.map(p => new THREE.Vector3(p.x, p.y, 0)));
         setBounds(bounds);
 
-        // Base height and rectangle size
-        const depth = 2;
-
-        // Compute rectangular base dimensions
-        const minX = bounds.min.x;
-        const maxX = bounds.max.x;
-        const minY = bounds.min.y;
-        const maxY = bounds.max.y;
-        const width = maxX - minX;
-        const height = maxY - minY;
-
-
-        // Create base box geometry
-        const baseGeom = new THREE.BoxGeometry(width, height, depth);
-        baseGeom.translate((minX + maxX) / 2, (minY + maxY) / 2, depth / 2); // Center the base on Z=0
-        let baseMesh = new THREE.Mesh(baseGeom);
-
-
-
-        const outerPath = buildPerimeter(circles, rows, cols, straySlot, supportSlot.enabled);
-        if (outerPath.length > 2) {
-            const shape = new THREE.Shape();
-            shape.moveTo(outerPath[0].x, outerPath[0].y);
-            for (let i = 1; i < outerPath.length; i++) {
-                shape.lineTo(outerPath[i].x, outerPath[i].y);
-            }
-            shape.lineTo(outerPath[0].x, outerPath[0].y); // close the loop
-
-            const extrudeSettings = {
-                depth: 2,
-                bevelEnabled: false,
-            };
-            const baseShapeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-            baseShapeGeometry.translate(0, 0, 0); // Center the base on Z=0
-
-            baseMesh = new THREE.Mesh(baseShapeGeometry);
-        }
-
-
-        // Prepare hole meshes
-        let holeMeshes = circles.map(circle => {
-
-            const holeGeom = new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, depth * 2, 64);
-            holeGeom.rotateX(Math.PI / 2);
-            holeGeom.translate(circle.position.x, circle.position.y, depth / 2);
-            return new THREE.Mesh(holeGeom);
-        });
-
-        // Subtract holes from base
-        let csgResult = CSG.fromMesh(baseMesh);
-
-        holeMeshes.forEach(hole => {
-            const holeCSG = CSG.fromMesh(hole);
-            csgResult = csgResult.subtract(holeCSG);
-        });
-
-
-        //Subtract Support Slot hole
-        if (supportSlot.enabled) {
-            const supportSlotShape = new THREE.Shape();
-            supportSlotShape.absellipse(0, 0, (supportSlot.length / 2) + borderWidth, (supportSlot.width / 2) + borderWidth, 0, Math.PI * 2, false, 0);
-            const extrudeSettings = {
-                depth: 2,
-                bevelEnabled: false,
-            };
-            const supportSlotGeometry = new THREE.ExtrudeGeometry(supportSlotShape, extrudeSettings);
-            supportSlotGeometry.translate(0, 0, 0); // base lies flat on Z=0
-
-            const supportSlotMesh = new THREE.Mesh(supportSlotGeometry);
-            const supportSlotHoleCSG = CSG.fromMesh(supportSlotMesh);
-            csgResult = csgResult.subtract(supportSlotHoleCSG)
-        }
-
         let allExportMeshes = [];
-
-
 
         if (supportSlot.enabled) {
             const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot);
@@ -422,8 +278,15 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         });
         setCirclesData(circles);
 
-
-        const finalBaseMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
+        const finalBaseMesh = buildBase({
+            circles,
+            supportSlot,
+            baseThickness,
+            borderWidth,
+            rows,
+            cols,
+            straySlot,
+        });
 
         setBaseFillGeometry(finalBaseMesh.geometry);
 
