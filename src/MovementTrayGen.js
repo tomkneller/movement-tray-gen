@@ -357,10 +357,10 @@ function MovementTrayGenerator() {
                                 Magnet Slots
                             </Tab>
                             <Tab id="tab">
-                                Support Slots
+                                Formations
                             </Tab>
                             <Tab id="tab">
-                                Formations
+                                Support Slots
                             </Tab>
                         </TabList>
                         <TabPanel>
@@ -371,15 +371,17 @@ function MovementTrayGenerator() {
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Columns:</label>
-                                <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
-                                    className="input" />
-                            </div>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Rows:</label>
-                                <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
-                                    className="input" />
+                            <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Columns:</label>
+                                    <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
+                                        className="input" />
+                                </div>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Rows:</label>
+                                    <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
+                                        className="input" />
+                                </div>
                             </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Base Thickness:</label>
@@ -405,7 +407,6 @@ function MovementTrayGenerator() {
                                 <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-
                             </div>
                         </TabPanel>
                         <TabPanel>
