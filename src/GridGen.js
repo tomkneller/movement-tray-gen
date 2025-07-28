@@ -9,7 +9,7 @@ import { createOvalMesh } from './ovalUtils';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onMaxReached, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
-    const insetDiameter = baseWidth + 1; // Adding 1 to allow model base to fit inside the circle
+    const insetDiameter = baseWidth + 0.5; // Adding 1 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
     const borderHeight = edgeHeight;
@@ -382,6 +382,14 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         let allExportMeshes = [];
 
+
+
+        if (supportSlot.enabled) {
+            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot);
+
+            allExportMeshes.push(ovalGroup);
+        }
+
         circles.forEach(circle => {
             const nearby = circles
                 .filter(c => c !== circle && areInsetAreasOverlapping(circle.position, c.position, borderWidth, borderWidth))
@@ -399,11 +407,11 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 nearby
             );
 
-
-
             group.position.set(circle.position.x, circle.position.y, 0); // Ensure it's placed
 
             group.updateMatrixWorld(true); // Ensure world matrices are correct
+
+
 
             // Push all meshes in the group to allExportMeshes
             group.children.forEach(child => {
@@ -412,12 +420,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 }
             });
         });
-
-        if (supportSlot.enabled) {
-            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot);
-            allExportMeshes.push(ovalGroup);
-        }
-
+        setCirclesData(circles);
 
 
         const finalBaseMesh = CSG.toMesh(csgResult, baseMesh.matrix, baseMesh.material);
@@ -430,12 +433,13 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         const group = new THREE.Group();
         allExportMeshes.forEach(mesh => group.add(mesh));
 
+
         if (onBaseMeshReady) {
             onBaseMeshReady(group);
         }
 
 
-    }, [baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight]);
+    }, [supportSlot.mode, baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight, magnetSlot.enabled]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 

@@ -21,13 +21,13 @@ function MovementTrayGenerator() {
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35.5);
 
-    const [magnetWidth, setMagnetWidth] = useState(2);
+    const [magnetWidth, setMagnetWidth] = useState(4);
     const [magnetDepth, setMagnetDepth] = useState(1);
 
     const [gap, setGap] = useState(0);
     const [baseThickness, setBaseThickness] = useState(2);
-    const [edgeHeight, setEdgeHeight] = useState(4);
-    const [edgeThickness, setEdgeThickness] = useState(2);
+    const [edgeHeight, setEdgeHeight] = useState(5);
+    const [edgeThickness, setEdgeThickness] = useState(1.5);
     const [staggerFormation, setStaggerFomation] = useState(false);
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
     const [hasMagnetSlot, setHasMagnetSlot] = useState(true);
