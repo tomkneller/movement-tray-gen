@@ -494,7 +494,7 @@ function MovementTrayGenerator() {
 
                     <div style={{ marginTop: 12, borderRadius: '8px', backgroundColor: 'amber', width: '500px' }}>
                         <h3>Warning</h3>
-                        <p>This application is in early development and it is highly recommended that you use the repair option in your 3D printer slicer or 3D model viewer first before printing as there may be some artifacts which will result in less than optimal printing results </p>
+                        <p>This application is in early development and it is highly recommended that you use the automatic repair option in your 3D printer slicer or 3D model viewer first before printing as there may be some artifacts which will result in less than optimal printing results </p>
                     </div>
                 </div>
 
