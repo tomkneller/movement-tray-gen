@@ -75,8 +75,8 @@ function MovementTrayGenerator() {
 
     const supportSlot = useMemo(() => ({
         enabled: hasSupportSlot,
-        length: ovalLength + 0.5,
-        width: ovalWidth + 0.5,
+        length: ovalLength + 1,
+        width: ovalWidth + 1,
         mode: supportMode,
         count: supportCount
     }), [hasSupportSlot, ovalLength, ovalWidth, supportCount, supportMode]);
