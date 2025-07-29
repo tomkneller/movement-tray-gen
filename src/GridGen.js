@@ -11,7 +11,7 @@ import { generateCirclePlacements } from './CirclePlacement';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode }) {
     const [circlesData, setCirclesData] = useState([]);
-    const insetDiameter = baseWidth + 0.5; // Adding 1 to allow model base to fit inside the circle
+    const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
     const borderHeight = edgeHeight;
