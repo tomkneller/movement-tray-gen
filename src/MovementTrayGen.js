@@ -111,11 +111,11 @@ function MovementTrayGenerator() {
 
         switch (view) {
             case 'top':
-                cameraRef.current.position.set(30, 30, distance);
+                cameraRef.current.position.set(0, 0, distance);
                 cameraRef.current.lookAt(center);
                 break;
             case 'bottom':
-                cameraRef.current.position.set(30, 30, -distance);
+                cameraRef.current.position.set(0, 0, -distance);
                 cameraRef.current.lookAt(center);
                 break;
             default:
