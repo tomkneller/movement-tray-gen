@@ -55,6 +55,9 @@ Screenshot taken of alpha 0.0.1
 5. Run `npm run make` to package the application for win32
 6. Run `movement-tray-gen.exe` in `out\movement-tray-gen-win32-x64\`
 
+### Web Version
+Visit [website coming soon]
+
 ## FAQ
 ### Can I request a feature?
 Sure! if theres a feature or special base style combination that you use in your tabletop games you can contact me and i'll do my best to implement popular requests
