@@ -127,7 +127,7 @@ function MovementTrayGenerator() {
 
     useEffect(() => {
         recenterCamera();
-    }, [bounds]);
+    }, [bounds, recenterCamera]);
 
     //Required for feather icons to work
     useEffect(() => {
