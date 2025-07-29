@@ -10,9 +10,14 @@ export function createSquareGroup(insetRadius, baseThickness, borderWidth, borde
     const borderMaterial = new MeshStandardMaterial({ color: borderColor });
     const magnetMaterial = new MeshStandardMaterial({ color: 0x555555 });
 
-    // Inner circle shape
+
+    // Inner square shape
     const shapeInner = new Shape();
-    shapeInner.absarc(0, 0, outerRadius - borderWidth, 0, Math.PI * 2, false);
+    shapeInner.moveTo(-insetRadius, -insetRadius); // bottom-left
+    shapeInner.lineTo(insetRadius, -insetRadius);  // bottom-right
+    shapeInner.lineTo(insetRadius, insetRadius);   // top-right
+    shapeInner.lineTo(-insetRadius, insetRadius);  // top-left
+    shapeInner.lineTo(-insetRadius, -insetRadius); // close the path
 
 
     if (magnetSlot.enabled) {
@@ -23,8 +28,7 @@ export function createSquareGroup(insetRadius, baseThickness, borderWidth, borde
 
     const extrudeInner = new ExtrudeGeometry(shapeInner, {
         depth: baseThickness,
-        bevelEnabled: true,
-        curveSegments: 128,
+        bevelEnabled: false,
     });
 
     const innerMesh = new Mesh(extrudeInner, baseMaterial);
@@ -33,36 +37,46 @@ export function createSquareGroup(insetRadius, baseThickness, borderWidth, borde
 
     // Border ring shape
     const shapeBorder = new Shape();
-    shapeBorder.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
+    shapeBorder.moveTo(-outerRadius, -outerRadius); // bottom-left
+    shapeBorder.lineTo(outerRadius, -outerRadius);  // bottom-right
+    shapeBorder.lineTo(outerRadius, outerRadius);   // top-right
+    shapeBorder.lineTo(-outerRadius, outerRadius);  // top-left
+    shapeBorder.lineTo(-outerRadius, -outerRadius); // close the path
+
+
     const holeBorder = new Path();
-    holeBorder.absarc(0, 0, insetRadius, 0, Math.PI * 2, true);
+    holeBorder.moveTo(-insetRadius, -insetRadius); // bottom-left
+    holeBorder.lineTo(insetRadius, -insetRadius);  // bottom-right
+    holeBorder.lineTo(insetRadius, insetRadius);   // top-right
+    holeBorder.lineTo(-insetRadius, insetRadius);  // top-left
+    holeBorder.lineTo(-insetRadius, -insetRadius); // close the path
+
     shapeBorder.holes.push(holeBorder);
 
     const extrudeBorder = new ExtrudeGeometry(shapeBorder, {
         depth: borderHeight,
-        bevelEnabled: true,
-        curveSegments: 128,
+        bevelEnabled: false,
     });
 
     const borderMesh = new Mesh(extrudeBorder, borderMaterial);
     borderMesh.position.z = 0;  // raise border mesh on Z axis to sit on top of inner mesh
     group.add(borderMesh);
 
+    // Magnet
     if (magnetSlot.enabled) {
-        const magnetDepth = baseThickness - magnetSlot.depth;
         const magnetRadius = magnetSlot.width / 2;
+        const magnetDepth = baseThickness - magnetSlot.depth;
 
         const shapeMagnet = new Shape();
         shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
 
         const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
             depth: magnetDepth,
-            curveSegments: 128,
+            bevelEnabled: false,
+            curveSegments: 64,
         });
 
         const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
-        magnetMesh.position.z = 0;  // center extrusion on Z axis if needed
-
         group.add(magnetMesh);
     }
 

@@ -17,6 +17,8 @@ function MovementTrayGenerator() {
     const [showInfoPopup, setShowInfoPopup] = useState(false);
     const [showHelpPopup, setShowHelpPopup] = useState(false);
 
+    const [slotType, setSlotType] = useState('circle');
+
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35.5);
@@ -154,6 +156,9 @@ function MovementTrayGenerator() {
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         switch (name) {
+            case 'slotType':
+                setSlotType(value);
+                break;
             case 'circularDiameter':
                 setCircularDiameter(parseFloat(value));
                 resetMaxSlots();
@@ -236,7 +241,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
+                <GridGen setBounds={setBounds} slotType={slotType} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
             </Canvas>
         </div>);
     };
@@ -381,6 +386,13 @@ function MovementTrayGenerator() {
                         </TabList>
                         <TabPanel>
                             <h3 className='tabTitle'>Tray Options</h3>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Support Mode:</label>
+                                <select name='slotType' value={slotType} onChange={handleInputChange} className="input">
+                                    <option value={'circle'}>Circle</option>
+                                    <option value={'square'}>Square</option>
+                                </select>
+                            </div>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
                                 <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
