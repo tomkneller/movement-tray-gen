@@ -197,7 +197,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             } else {
                 //Support slot is an oval
                 console.log("Support slot is not a circle, generate slots around oval");
-                //TODO: Implement oval support slot generation
 
                 placeEvenCirclesAlongOval(
                     { x: 0, y: 0 }, // center of oval
@@ -206,7 +205,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                     numCircles,             // number of slots
                     2,              // padding from oval edge
                     (x, y, i) => {
-                        // Your circle placement logic here
                         addCircle(x, y, i);
                     }
                 );
