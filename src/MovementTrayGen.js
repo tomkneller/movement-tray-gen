@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -48,6 +48,45 @@ function MovementTrayGenerator() {
 
     const [, setMaxReached] = useState(false);
 
+    const handleBaseMeshReady = useCallback((mesh) => {
+        setExportMesh(mesh);
+    }, []);
+
+    //Center camera
+    const recenterCamera = useCallback(() => {
+        if (!bounds || !cameraRef.current || !controlsRef.current) return;
+
+        const center = new Vector3();
+        bounds.getCenter(center);
+
+        const size = new Vector3();
+        bounds.getSize(size);
+
+        const maxDim = Math.max(size.x, size.y);
+        const distance = maxDim * 1.4; // adjust zoom factor
+
+        // Position camera back and above
+        cameraRef.current.position.set(center.x, center.y - distance, center.z + distance);
+        cameraRef.current.lookAt(center);
+
+        controlsRef.current.target.copy(center);
+        controlsRef.current.update();
+    }, [bounds]);
+
+    const supportSlot = useMemo(() => ({
+        enabled: hasSupportSlot,
+        length: ovalLength + 0.5,
+        width: ovalWidth + 0.5,
+        mode: supportMode,
+        count: supportCount
+    }), [hasSupportSlot, ovalLength, ovalWidth, supportCount, supportMode]);
+
+    const magnetSlot = useMemo(() => ({
+        enabled: hasMagnetSlot,
+        depth: magnetDepth,
+        width: magnetWidth
+    }), [hasMagnetSlot, magnetDepth, magnetWidth]);
+
     const handleMaxReached = (value) => {
         setMaxReached(true);
 
@@ -76,28 +115,6 @@ function MovementTrayGenerator() {
         document.body.classList.toggle('dark-mode', darkMode);
 
     }, [darkMode]);
-
-
-    //Center camera
-    function recenterCamera() {
-        if (!bounds || !cameraRef.current || !controlsRef.current) return;
-
-        const center = new Vector3();
-        bounds.getCenter(center);
-
-        const size = new Vector3();
-        bounds.getSize(size);
-
-        const maxDim = Math.max(size.x, size.y);
-        const distance = maxDim * 1.4; // adjust zoom factor
-
-        // Position camera back and above
-        cameraRef.current.position.set(center.x, center.y - distance, center.z + distance);
-        cameraRef.current.lookAt(center);
-
-        controlsRef.current.target.copy(center);
-        controlsRef.current.update();
-    }
 
     const setCameraView = (view) => {
         const center = new Vector3();
@@ -219,7 +236,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={{ enabled: hasSupportSlot, length: ovalLength, width: ovalWidth, mode: supportMode, count: supportCount }} magnetSlot={{ enabled: hasMagnetSlot, depth: magnetDepth, width: magnetWidth }} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={(mesh) => setExportMesh(mesh)} darkMode={darkMode} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
             </Canvas>
         </div>);
     };
@@ -301,7 +318,6 @@ function MovementTrayGenerator() {
                                 <li><a href="https://github.com/feathericons/feather">Feather - MIT License </a></li>
                                 {/* Add more credits as needed */}
                             </ul>
-
 
                             <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
                             <p>Copyright © 2025 Thomas Kneller</p>
