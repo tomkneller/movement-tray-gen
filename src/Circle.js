@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { createCircleGroup } from './circleUtils';
+import { createCircleGroup } from './utils/circleUtils';
 
 const Circle = ({ position, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor = 'lightgreen', borderColor = 'green' }) => {
     const group = useMemo(() => {
