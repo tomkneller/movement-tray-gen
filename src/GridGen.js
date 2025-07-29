@@ -18,12 +18,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     const [baseFillGeometry, setBaseFillGeometry] = useState(null);
 
-    const [debugHullLine, setDebugHullLine] = useState(null);
-
-    supportSlot.width = supportSlot.width + 1; // Adding 1 to allow model base to fit inside the oval
-    supportSlot.length = supportSlot.length + 1; // Adding 1 to allow model base to fit inside the oval
-
-
     function generateCircleGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
         if (!circles || circles.length === 0) return [];
 
@@ -107,13 +101,13 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         if (onBaseMeshReady) {
             onBaseMeshReady(group);
         }
-    }, [supportSlot.mode, baseWidth, stagger, rows, cols, gap, supportSlot.enabled, supportSlot.length, supportSlot.width, supportSlot.count, straySlot, borderWidth, borderHeight, magnetSlot.enabled]);
+
+    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
     return (
         <>
-            {debugHullLine && <primitive object={debugHullLine} />}
             {baseFillGeometry && (
                 <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
             )}
