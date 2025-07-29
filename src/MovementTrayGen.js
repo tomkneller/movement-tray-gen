@@ -19,7 +19,7 @@ function MovementTrayGenerator() {
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
-    const [ovalWidth, setOvalWidth] = useState(35.5);
+    const [ovalWidth, setOvalWidth] = useState(35);
 
     const [magnetWidth, setMagnetWidth] = useState(4);
     const [magnetDepth, setMagnetDepth] = useState(1);
