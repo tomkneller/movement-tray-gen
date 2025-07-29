@@ -55,11 +55,9 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
 
 function createNonIntersectingBorderSegments(center, insetRadius, outerRadius, borderHeight, nearbyCircles) {
     const segments = [];
-
     const overlapAngles = [];
 
     const baseOuterMaterial = new MeshStandardMaterial({ color: '#333a40' });
-
 
     for (const other of nearbyCircles) {
         const dx = other.x - center.x;

@@ -94,7 +94,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         allExportMeshes.push(finalBaseMesh);
 
-
         const group = new THREE.Group();
         allExportMeshes.forEach(mesh => group.add(mesh));
 
@@ -102,7 +101,22 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             onBaseMeshReady(group);
         }
 
-    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady]);
+    }, [supportSlot,
+        baseWidth,
+        stagger,
+        rows,
+        cols,
+        gap,
+        straySlot,
+        borderWidth,
+        borderHeight,
+        magnetSlot,
+        insetRadius,
+        setBounds,
+        insetDiameter,
+        baseThickness,
+        onBaseMeshReady
+    ]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 

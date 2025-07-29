@@ -319,7 +319,6 @@ function MovementTrayGenerator() {
                                 {/* Add more credits as needed */}
                             </ul>
 
-
                             <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
                             <p>Copyright © 2025 Thomas Kneller</p>
 
