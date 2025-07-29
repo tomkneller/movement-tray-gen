@@ -387,7 +387,7 @@ function MovementTrayGenerator() {
                         <TabPanel>
                             <h3 className='tabTitle'>Tray Options</h3>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Support Mode:</label>
+                                <label style={{ fontWeight: 500 }}>Slot Shape:</label>
                                 <select name='slotType' value={slotType} onChange={handleInputChange} className="input">
                                     <option value={'circle'}>Circle</option>
                                     <option value={'square'}>Square</option>
