@@ -19,7 +19,7 @@ function MovementTrayGenerator() {
 
     const [slotType, setSlotType] = useState('circle');
 
-    const [circularDiameter, setCircularDiameter] = useState(25);
+    const [diameter, setDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35.5);
 
@@ -159,8 +159,8 @@ function MovementTrayGenerator() {
             case 'slotType':
                 setSlotType(value);
                 break;
-            case 'circularDiameter':
-                setCircularDiameter(parseFloat(value));
+            case 'diameter':
+                setDiameter(parseFloat(value));
                 resetMaxSlots();
                 break;
             case 'ovalLength':
@@ -241,7 +241,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} slotType={slotType} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
+                <GridGen setBounds={setBounds} slotType={slotType} baseThickness={baseThickness} baseWidth={diameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
             </Canvas>
         </div>);
     };
@@ -394,8 +394,8 @@ function MovementTrayGenerator() {
                                 </select>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
-                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
+                                <label style={{ fontWeight: 500 }}>Diameter:</label>
+                                <input type="number" name="diameter" value={diameter} onChange={handleInputChange}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
                             </div>
@@ -447,7 +447,7 @@ function MovementTrayGenerator() {
                             <div inert={!hasMagnetSlot}>
                                 <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Magnet Diameter:</label>
-                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
+                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={diameter - 2}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </div>
