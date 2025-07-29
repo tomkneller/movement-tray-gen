@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 
 export function buildBase({
-    circles,
+    slots,
     supportSlot,
     baseThickness,
     borderWidth,
@@ -12,9 +12,9 @@ export function buildBase({
     rows,
     cols
 }) {
-    const circleOuterRadius = circles[0]?.insetRadius + borderWidth;
+    const slotOuterRadius = slots[0]?.insetRadius + borderWidth;
 
-    const outerPath = buildPerimeter(circles, rows, cols, straySlot, supportSlot.enabled, supportSlot.mode);
+    const outerPath = buildPerimeter(slots, rows, cols, straySlot, supportSlot.enabled, supportSlot.mode);
 
     let baseMesh;
     if (outerPath.length > 2) {
@@ -32,7 +32,7 @@ export function buildBase({
         baseShapeGeometry.translate(0, 0, 0);
         baseMesh = new THREE.Mesh(baseShapeGeometry);
     } else {
-        const bounds = new THREE.Box3().setFromPoints(circles.map(c => new THREE.Vector3(c.position.x, c.position.y, 0)));
+        const bounds = new THREE.Box3().setFromPoints(slots.map(c => new THREE.Vector3(c.position.x, c.position.y, 0)));
         const size = new THREE.Vector3();
         bounds.getSize(size);
         const baseGeom = new THREE.BoxGeometry(size.x, size.y, depth);
@@ -42,10 +42,10 @@ export function buildBase({
 
     let csgResult = CSG.fromMesh(baseMesh);
 
-    for (const circle of circles) {
-        const holeGeom = new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, depth * 2, 64);
+    for (const slot of slots) {
+        const holeGeom = new THREE.CylinderGeometry(slotOuterRadius, slotOuterRadius, depth * 2, 64);
         holeGeom.rotateX(Math.PI / 2);
-        holeGeom.translate(circle.position.x, circle.position.y, depth / 2);
+        holeGeom.translate(slot.position.x, slot.position.y, depth / 2);
         const holeMesh = new THREE.Mesh(holeGeom);
         csgResult = csgResult.subtract(CSG.fromMesh(holeMesh));
     }
@@ -62,8 +62,8 @@ export function buildBase({
     return finalBaseMesh;
 }
 
-function buildPerimeter(circles, rows, cols, straySlot, supportEnabled, supportSlotMode) {
-    const getIndex = (r, c) => circles.find(circ => circ.row === r && circ.col === c);
+function buildPerimeter(slots, rows, cols, straySlot, supportEnabled, supportSlotMode) {
+    const getIndex = (r, c) => slots.find(circ => circ.row === r && circ.col === c);
     const perimeter = [];
 
     if (supportEnabled) {
@@ -71,8 +71,8 @@ function buildPerimeter(circles, rows, cols, straySlot, supportEnabled, supportS
             //Oval position (may need changing if support slot can be moved in future)
             perimeter.push(new THREE.Vector2(0, 0));
         }
-        for (const circle of circles) {
-            perimeter.push(new THREE.Vector2(circle.position.x, circle.position.y));
+        for (const slot of slots) {
+            perimeter.push(new THREE.Vector2(slot.position.x, slot.position.y));
         }
         // perimeter.push(new THREE.Vector2(0, 0));
     } else {

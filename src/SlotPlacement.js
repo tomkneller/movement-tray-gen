@@ -1,8 +1,8 @@
 // CirclePlacer.js
 import { Vector2 } from 'three';
-import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, doesInsetAreaIntersectOval, canAddCircle } from './CirclePlacementUtils';
+import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, doesInsetAreaIntersectOval, canAddSlot } from './SlotPlacementUtils';
 
-export function generateCirclePlacements({
+export function generateSlotPlacements({
     insetRadius,
     borderWidth,
     rows,
@@ -12,30 +12,30 @@ export function generateCirclePlacements({
     straySlot,
     supportSlot
 }) {
-    const circles = [];
+    const slots = [];
     const points = [];
 
-    const circleOuterRadius = insetRadius + borderWidth;
-    const xOffset = circleOuterRadius + insetRadius + gap;
+    const slotOuterRadius = insetRadius + borderWidth;
+    const xOffset = slotOuterRadius + insetRadius + gap;
     const yOffset = stagger
-        ? Math.sqrt((2 * circleOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98
-        : circleOuterRadius + insetRadius + gap;
+        ? Math.sqrt((2 * slotOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98
+        : slotOuterRadius + insetRadius + gap;
 
     let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
 
-    const addCircle = (x, y, row = 0, col = 0) => {
+    const addSlot = (x, y, row = 0, col = 0) => {
         const position = { x, y };
 
-        if (!canAddCircle(x, y, row, col, circles, insetRadius, borderWidth, supportSlot)) {
+        if (!canAddSlot(x, y, row, col, slots, insetRadius, borderWidth, supportSlot)) {
             return false;
         }
 
-        circles.push({ position, insetRadius, borderWidth, borderHeight: borderWidth, row, col });
+        slots.push({ position, insetRadius, borderWidth, borderHeight: borderWidth, row, col });
         points.push(new Vector2(x, y));
-        minx = Math.min(minx, x - circleOuterRadius);
-        miny = Math.min(miny, y - circleOuterRadius);
-        maxx = Math.max(maxx, x + circleOuterRadius);
-        maxy = Math.max(maxy, y + circleOuterRadius);
+        minx = Math.min(minx, x - slotOuterRadius);
+        miny = Math.min(miny, y - slotOuterRadius);
+        maxx = Math.max(maxx, x + slotOuterRadius);
+        maxy = Math.max(maxy, y + slotOuterRadius);
 
         return true;
     };
@@ -56,7 +56,7 @@ export function generateCirclePlacements({
                 const y = centerY + b * Math.sin(angle);
                 const position = { x, y };
 
-                let overlaps = circles.some(existing =>
+                let overlaps = slots.some(existing =>
                     areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius + borderWidth)
                 );
 
@@ -64,7 +64,7 @@ export function generateCirclePlacements({
                 const outerIntersects = doesInsetAreaIntersectOval(position, { x: centerX, y: centerY }, insetRadius + borderWidth, supportSlot.length, supportSlot.width);
 
                 if (!overlaps && !insetIntersects && !outerIntersects) {
-                    addCircle(x, y, 0, added);
+                    addSlot(x, y, 0, added);
                     added++;
 
                     const dx = -a * Math.sin(angle);
@@ -87,7 +87,7 @@ export function generateCirclePlacements({
                 supportSlot.count,
                 2,
                 (x, y, i) => {
-                    addCircle(x, y, i);
+                    addSlot(x, y, i);
                 }
             );
         }
@@ -103,10 +103,10 @@ export function generateCirclePlacements({
                 let x = col * xOffset;
                 if (isStaggeredRow) x += xOffset / 2;
                 const y = row * yOffset;
-                addCircle(x, y, row, col);
+                addSlot(x, y, row, col);
             }
         }
     }
 
-    return { circles, points };
+    return { slots, points };
 }

@@ -1,6 +1,6 @@
 /** Utility functions related to placing slots on the tray **/
 
-export function placeEvenCirclesAlongOval(ovalCenter, a, b, numCircles, padding, addCircle) {
+export function placeEvenCirclesAlongOval(ovalCenter, a, b, numCircles, padding, addSlot) {
     const steps = 1000;
     const angleStep = (2 * Math.PI) / steps;
     const arcLengths = [0];
@@ -46,7 +46,7 @@ export function placeEvenCirclesAlongOval(ovalCenter, a, b, numCircles, padding,
         const x = ovalCenter.x + (a + padding) * Math.cos(t);
         const y = ovalCenter.y + (b + padding) * Math.sin(t);
 
-        addCircle(x, y, i);
+        addSlot(x, y, i);
     }
 }
 
@@ -66,11 +66,11 @@ export function doesInsetAreaIntersectOval(circlePos, ovalPos, purpleRadius, ova
     return (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) < 1;
 }
 
-export function canAddCircle(x, y, row, col, circles, insetRadius, borderWidth, supportSlot) {
+export function canAddSlot(x, y, row, col, slots, insetRadius, borderWidth, supportSlot) {
     const position = { x, y };
 
     // 1. Check purple-to-purple (inset) overlap with other circles
-    for (const existing of circles) {
+    for (const existing of slots) {
         if (areInsetAreasOverlapping(position, existing.position, insetRadius, insetRadius)) {
             return false;
         }

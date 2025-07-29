@@ -8,11 +8,11 @@ import { createCircleGroup } from './circleUtils';
 import { createSquareGroup } from './squareUtils';
 import { createOvalMesh } from './ovalUtils';
 import { buildBase } from './BaseBuilder';
-import { areInsetAreasOverlapping } from './CirclePlacementUtils';
-import { generateCirclePlacements } from './CirclePlacement';
+import { areInsetAreasOverlapping } from './SlotPlacementUtils';
+import { generateSlotPlacements } from './SlotPlacement';
 
 function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode }) {
-    const [circlesData, setCirclesData] = useState([]);
+    const [slotsData, setSlotsData] = useState([]);
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
@@ -20,13 +20,13 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
 
     const [baseFillGeometry, setBaseFillGeometry] = useState(null);
 
-    function generateCircleGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
-        if (!circles || circles.length === 0) return [];
+    function generateCircleGroups(slots, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
+        if (!slots || slots.length === 0) return [];
 
-        return circles.flatMap(circle => {
-            const overlappingNeighbors = circles
-                .filter(c => c !== circle && areInsetAreasOverlapping(circle.position, c.position, borderWidth, borderWidth))
-                .map(c => c.position);
+        return slots.flatMap(slot => {
+            const overlappingNeighbors = slots
+                .filter(s => s !== slot && areInsetAreasOverlapping(slot.position, s.position, borderWidth, borderWidth))
+                .map(s => s.position);
 
             const group = createCircleGroup(
                 insetDiameter / 2,
@@ -34,13 +34,13 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
                 borderWidth,
                 borderHeight,
                 magnetSlot,
-                circle.mainColor || 'lightgreen',
-                circle.borderColor || 'green',
-                circle.position,
+                slot.mainColor || 'lightgreen',
+                slot.borderColor || 'green',
+                slot.position,
                 overlappingNeighbors
             );
 
-            group.position.set(circle.position.x, circle.position.y, 0);
+            group.position.set(slot.position.x, slot.position.y, 0);
             group.updateMatrixWorld(true);
 
             return group.children.filter(child => child.isMesh);
@@ -49,13 +49,13 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
 
 
 
-    function generateSquareGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
-        if (!circles || circles.length === 0) return [];
+    function generateSquareGroups(slots, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
+        if (!slots || slots.length === 0) return [];
 
-        return circles.flatMap(circle => {
-            const overlappingNeighbors = circles
-                .filter(c => c !== circle && areInsetAreasOverlapping(circle.position, c.position, borderWidth, borderWidth))
-                .map(c => c.position);
+        return slots.flatMap(slot => {
+            const overlappingNeighbors = slots
+                .filter(s => s !== slot && areInsetAreasOverlapping(slot.position, s.position, borderWidth, borderWidth))
+                .map(s => s.position);
 
             const group = createSquareGroup(
                 insetDiameter / 2,
@@ -63,13 +63,13 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
                 borderWidth,
                 borderHeight,
                 magnetSlot,
-                circle.mainColor || 'lightgreen',
-                circle.borderColor || 'green',
-                circle.position,
+                slot.mainColor || 'lightgreen',
+                slot.borderColor || 'green',
+                slot.position,
                 overlappingNeighbors
             );
 
-            group.position.set(circle.position.x, circle.position.y, 0);
+            group.position.set(slot.position.x, slot.position.y, 0);
             group.updateMatrixWorld(true);
 
             return group.children.filter(child => child.isMesh);
@@ -77,7 +77,7 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
     }
 
     useEffect(() => {
-        const { circles, points } = generateCirclePlacements({
+        const { slots, points } = generateSlotPlacements({
             insetRadius,
             borderWidth,
             rows,
@@ -100,11 +100,11 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
         }
 
 
-        let circleMeshes;
+        let slotMeshes;
 
         if (slotType === 'circle') {
-            circleMeshes = generateCircleGroups(
-                circles,
+            slotMeshes = generateCircleGroups(
+                slots,
                 insetDiameter,
                 baseThickness,
                 borderWidth,
@@ -112,8 +112,8 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
                 magnetSlot
             );
         } else {
-            circleMeshes = generateSquareGroups(
-                circles,
+            slotMeshes = generateSquareGroups(
+                slots,
                 insetDiameter,
                 baseThickness,
                 borderWidth,
@@ -123,14 +123,14 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
         }
 
 
-        allExportMeshes.push(...circleMeshes);
+        allExportMeshes.push(...slotMeshes);
 
-        setCirclesData(circles);
+        setSlotsData(slots);
 
 
         if (slotType !== 'square') {
             const finalBaseMesh = buildBase({
-                circles,
+                slots,
                 supportSlot,
                 baseThickness,
                 borderWidth,
@@ -160,10 +160,10 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
             {slotType === "circle" && baseFillGeometry && (
                 <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
             )}
-            {slotType === "circle" && circlesData.map((circle, index) => (
+            {slotType === "circle" && slotsData.map((slot, index) => (
                 <Circle
                     key={index}
-                    {...circle}
+                    {...slot}
                     insetDiameter={insetDiameter}
                     baseThickness={baseThickness}
                     borderWidth={borderWidth}
@@ -185,10 +185,10 @@ function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, ed
                     outerColor="green"
                 />
             )}
-            {slotType === "square" && circlesData.map((circle, index) => (
+            {slotType === "square" && slotsData.map((slot, index) => (
                 <Square
                     key={index}
-                    {...circle}
+                    {...slot}
                     insetDiameter={insetDiameter}
                     baseThickness={baseThickness}
                     borderWidth={borderWidth}
