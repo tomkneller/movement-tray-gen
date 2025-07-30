@@ -1,6 +1,6 @@
 // CirclePlacer.js
 import { Vector2 } from 'three';
-import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, doesInsetAreaIntersectOval, canAddSlot } from './SlotPlacementUtils';
+import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, doesInsetAreaIntersectOval, canAddSlot } from './utils/SlotPlacementUtils';
 
 export function generateSlotPlacements({
     insetRadius,

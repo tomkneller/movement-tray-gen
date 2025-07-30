@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { createOvalMesh } from './ovalUtils';
+import { createOvalMesh } from './utils/ovalUtils';
 
 function Oval({ position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot }) {
     const ovalGroup = useMemo(() => {

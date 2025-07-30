@@ -4,11 +4,11 @@ import * as THREE from 'three';
 import Circle from './Circle';
 import Oval from './Oval';
 import Square from './Square';
-import { createCircleGroup } from './circleUtils';
+import { createCircleGroup } from './utils/circleUtils';
 import { createSquareGroup } from './squareUtils';
-import { createOvalMesh } from './ovalUtils';
+import { createOvalMesh } from './utils/ovalUtils';
 import { buildBase } from './BaseBuilder';
-import { areInsetAreasOverlapping } from './SlotPlacementUtils';
+import { areInsetAreasOverlapping } from './utils/SlotPlacementUtils';
 import { generateSlotPlacements } from './SlotPlacement';
 
 function GridGen({ setBounds, slotType, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode }) {
