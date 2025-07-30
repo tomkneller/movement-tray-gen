@@ -56,7 +56,7 @@ Screenshot taken of alpha 0.0.1
 6. Run `movement-tray-gen.exe` in `out\movement-tray-gen-win32-x64\`
 
 ### Web Version
-Visit [website coming soon]
+Visit [movement-tray-gen.vercel.app](https://movement-tray-gen.vercel.app/)
 
 ## FAQ
 ### Can I request a feature?
