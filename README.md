@@ -18,6 +18,7 @@
 
 ## Demo Image
 ![Screenshot](preview/screenshot.png "Screenshot")
+Screenshot taken of alpha 0.0.1
 
 ## Contents
 - [Features](#features)
@@ -33,14 +34,20 @@
 - Different formations including Grid and Staggered
 - Exports to STL format for easy 3D printing
 
-## Run
+## How to run
+### (Windows)EXE setup
+1. [Download the Latest Release](https://github.com/tomkneller/movement-tray-gen/releases/latest)
+2. Run the setup file
+3. The application is installed and ready to use
+
+### React Dev Run
 1. Clone the repo
 2. Install `npm` [using this guide](https://nodejs.org/en/learn/getting-started/an-introduction-to-the-npm-package-manager)
 3. Run `npm i` to install dependencies
 4. Run `npm run react-start`
 5. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## Electron Build
+### Electron Build
 1. Clone the repo
 2. Install `npm` [using this guide](https://nodejs.org/en/learn/getting-started/an-introduction-to-the-npm-package-manager)
 3. Run `npm i` to install dependencies
@@ -48,8 +55,8 @@
 5. Run `npm run make` to package the application for win32
 6. Run `movement-tray-gen.exe` in `out\movement-tray-gen-win32-x64\`
 
-## License
-[Add license type]
+### Web Version
+Visit [website coming soon]
 
 ## FAQ
 ### Can I request a feature?
