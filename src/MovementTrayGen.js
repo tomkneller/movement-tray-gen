@@ -471,7 +471,7 @@ function MovementTrayGenerator() {
                         </TabPanel>
                         <TabPanel>
                             <h3>Formation</h3>
-                            <div inert={hasSupportSlot}>
+                            <div inert={hasSupportSlot || slotType === 'square'}>
                                 <div>
                                     <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
                                     <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
