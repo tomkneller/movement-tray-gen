@@ -482,7 +482,7 @@ function MovementTrayGenerator() {
                                 </div>
                             </div>
                         </TabPanel>
-                        <TabPanel>
+                        <TabPanel inert={slotType === 'square'}>
                             <h3 className='tabTitle'>Add support slot</h3>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Support Slot:</label>
