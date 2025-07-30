@@ -158,6 +158,9 @@ function MovementTrayGenerator() {
         switch (name) {
             case 'slotType':
                 setSlotType(value);
+                if (value === 'square') {
+                    setGap(edgeThickness);
+                }
                 break;
             case 'diameter':
                 setDiameter(parseFloat(value));
@@ -173,6 +176,9 @@ function MovementTrayGenerator() {
                 break;
             case 'gap':
                 setGap(parseFloat(value));
+                if (slotType === 'square') {
+                    setEdgeThickness(parseFloat(value));
+                }
                 break;
             case 'baseThickness':
                 setBaseThickness(parseFloat(value));
@@ -182,6 +188,9 @@ function MovementTrayGenerator() {
                 break;
             case 'edgeThickness':
                 setEdgeThickness(parseFloat(value));
+                if (slotType === 'square') {
+                    setGap(parseFloat(value));
+                }
                 break;
             case 'staggerFormation':
                 setStaggerFomation(!staggerFormation);
@@ -221,6 +230,7 @@ function MovementTrayGenerator() {
                 break;
         }
     };
+
 
     const generateVisualization = () => {
         return (<div style={{ width: '100%', height: '100%' }}>
