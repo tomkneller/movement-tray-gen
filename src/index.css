@@ -177,6 +177,8 @@ body.dark-mode .dark-mode-toggle {
   margin-right: 32px;
   padding: 24px;
   position: 'relative';
+  width: 500px;
+  height: 100%;
 }
 
 body.dark-mode .tray-panel {
@@ -222,6 +224,7 @@ body.dark-mode .header {
   align-items: center;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  height: 32px;
 }
 
 body.dark-mode .footer {
@@ -296,4 +299,25 @@ body.dark-mode .modal-content {
   display: flex;
   align-items: center; /* vertical alignment */
   gap: 0.5rem;          /* space between icon and text */
+}
+
+/* Medium screens */
+@media all and (max-width: 800px) { 
+  .container{
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .trayFrame{
+    width: 100%;
+  }
+
+  .tray-panel{
+   display: none;
+  }
+  }
+
+/* Small screens */
+@media all and (max-width: 500px) {
+ 
 }
