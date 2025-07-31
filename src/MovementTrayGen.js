@@ -241,7 +241,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
             </Canvas>
         </div>);
     };

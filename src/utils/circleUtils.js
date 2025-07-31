@@ -1,7 +1,7 @@
 import { Shape, Path, ExtrudeGeometry, Mesh, MeshStandardMaterial, Group, CylinderGeometry } from 'three';
 import { CSG } from 'three-csg-ts';
 
-export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor, center, nearbyCircles = []) {
+export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor, center, nearbyCircles = [], hollowBottom) {
     const group = new Group();
 
     if (center) {
@@ -24,6 +24,17 @@ export function createCircleGroup(insetRadius, baseThickness, borderWidth, borde
             magnetMesh.updateMatrixWorld();
 
             csgBase = csgBase.subtract(CSG.fromMesh(magnetMesh));
+        }
+
+        if (hollowBottom) {
+            console.log("hollow bottoms");
+            const hollowBottomGeom = new CylinderGeometry(insetRadius - 3, insetRadius - 3, baseThickness, 64);
+            hollowBottomGeom.rotateX(Math.PI / 2);
+            const hollowBottomMesh = new Mesh(hollowBottomGeom);
+            hollowBottomMesh.position.z = 0;
+            hollowBottomMesh.updateMatrixWorld();
+
+            csgBase = csgBase.subtract(CSG.fromMesh(hollowBottomMesh));
         }
 
         // Create mesh from CSG result
