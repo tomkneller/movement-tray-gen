@@ -310,6 +310,14 @@ body.dark-mode .link {
   color: #00cec9;
 }
 
+.warning-box {
+   padding: 15px;
+   margin-top: 12px;
+   border-radius: 8px;
+   background-color: rgb(255, 255, 0);
+   color: rgb(0, 0, 0);
+}
+
 
 /* Medium screens */
 @media all and (max-width: 800px) { 
