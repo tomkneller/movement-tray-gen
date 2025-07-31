@@ -1,53 +1,46 @@
-import { Shape, Path, ExtrudeGeometry, Mesh, MeshStandardMaterial, Group } from 'three';
+import { Shape, Path, ExtrudeGeometry, Mesh, MeshStandardMaterial, Group, CylinderGeometry } from 'three';
+import { CSG } from 'three-csg-ts';
 
 export function createCircleGroup(insetRadius, baseThickness, borderWidth, borderHeight, magnetSlot, mainColor, borderColor, center, nearbyCircles = []) {
     const group = new Group();
 
-    const outerRadius = insetRadius + borderWidth;
+    if (center) {
+        const outerRadius = insetRadius + borderWidth;
+        const baseMaterial = new MeshStandardMaterial({ color: '#e0e3eb', roughness: 0.5, metalness: 0.1 });
 
-    const baseMaterial = new MeshStandardMaterial({ color: '#e0e3eb', roughness: 0.5, metalness: 0.1 });
-    const magnetMaterial = new MeshStandardMaterial({ color: '#555555' });
+        // Base cylinder
+        const baseGeom = new CylinderGeometry(insetRadius, insetRadius, baseThickness, 64);
+        baseGeom.rotateX(Math.PI / 2);
+        const baseMesh = new Mesh(baseGeom, baseMaterial);
 
-    // Inner base
-    const shapeInner = new Shape();
-    shapeInner.absarc(0, 0, insetRadius, 0, Math.PI * 2, false);
+        let csgBase = CSG.fromMesh(baseMesh);
 
-    if (magnetSlot.enabled) {
-        const hole = new Path();
-        hole.absarc(0, 0, magnetSlot.width / 2, 0, Math.PI * 2, true);
-        shapeInner.holes.push(hole);
-    }
+        // Magnet subtraction
+        if (magnetSlot.enabled) {
+            const magnetGeom = new CylinderGeometry(magnetSlot.width / 2, magnetSlot.width / 2, magnetSlot.depth, 64);
+            magnetGeom.rotateX(Math.PI / 2);
+            const magnetMesh = new Mesh(magnetGeom);
+            magnetMesh.position.z = (baseThickness / 2) - (magnetSlot.depth / 2);
+            magnetMesh.updateMatrixWorld();
 
-    const extrudeInner = new ExtrudeGeometry(shapeInner, {
-        depth: baseThickness,
-        bevelEnabled: false,
-        curveSegments: 64,
-    });
+            csgBase = csgBase.subtract(CSG.fromMesh(magnetMesh));
+        }
 
-    const innerMesh = new Mesh(extrudeInner, baseMaterial);
-    group.add(innerMesh);
+        // Create mesh from CSG result
+        const finalBaseMesh = CSG.toMesh(csgBase, baseMesh.matrix, baseMaterial);
+        finalBaseMesh.position.set(center.x, center.y, baseThickness / 2);
+        finalBaseMesh.updateMatrixWorld();
+        group.add(finalBaseMesh);
 
-    // Border arcs
-    const arcs = createNonIntersectingBorderSegments(center, insetRadius, outerRadius, borderHeight, nearbyCircles);
-    arcs.forEach(mesh => group.add(mesh));
-
-    // Magnet
-    if (magnetSlot.enabled) {
-        const magnetRadius = magnetSlot.width / 2;
-        const magnetDepth = baseThickness - magnetSlot.depth;
-
-        const shapeMagnet = new Shape();
-        shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
-
-        const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
-            depth: magnetDepth,
-            bevelEnabled: false,
-            curveSegments: 64,
+        // Create border segments
+        const arcs = createNonIntersectingBorderSegments(center, insetRadius, outerRadius, borderHeight, nearbyCircles);
+        arcs.forEach(mesh => {
+            mesh.position.set(center.x, center.y, 0);
+            group.add(mesh);
         });
-
-        const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
-        group.add(magnetMesh);
     }
+
+    group.updateMatrixWorld(true);
 
     return group;
 }

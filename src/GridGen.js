@@ -3,10 +3,10 @@ import { MeshStandardMaterial, DoubleSide } from 'three';
 import * as THREE from 'three';
 import Circle from './Circle';
 import Oval from './Oval';
-import { createCircleGroup } from './circleUtils';
-import { createOvalMesh } from './ovalUtils';
+import { createCircleGroup } from './utils/circleUtils';
+import { createOvalMesh } from './utils/ovalUtils';
 import { buildBase } from './BaseBuilder';
-import { areInsetAreasOverlapping } from './CirclePlacementUtils';
+import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
 import { generateCirclePlacements } from './CirclePlacement';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode }) {
@@ -38,7 +38,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 overlappingNeighbors
             );
 
-            group.position.set(circle.position.x, circle.position.y, 0);
             group.updateMatrixWorld(true);
 
             return group.children.filter(child => child.isMesh);

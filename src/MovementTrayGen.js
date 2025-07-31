@@ -19,7 +19,7 @@ function MovementTrayGenerator() {
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
-    const [ovalWidth, setOvalWidth] = useState(35.5);
+    const [ovalWidth, setOvalWidth] = useState(35);
 
     const [magnetWidth, setMagnetWidth] = useState(4);
     const [magnetDepth, setMagnetDepth] = useState(1);
@@ -77,8 +77,8 @@ function MovementTrayGenerator() {
 
     const supportSlot = useMemo(() => ({
         enabled: hasSupportSlot,
-        length: ovalLength + 0.5,
-        width: ovalWidth + 0.5,
+        length: ovalLength + 1,
+        width: ovalWidth + 1,
         mode: supportMode,
         count: supportCount
     }), [hasSupportSlot, ovalLength, ovalWidth, supportCount, supportMode]);
