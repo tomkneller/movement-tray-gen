@@ -38,7 +38,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 overlappingNeighbors
             );
 
-            group.position.set(circle.position.x, circle.position.y, 0);
             group.updateMatrixWorld(true);
 
             return group.children.filter(child => child.isMesh);
