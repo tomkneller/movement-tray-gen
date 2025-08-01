@@ -13,29 +13,32 @@ function Header() {
 
     return (
         <div className='header'>
-            <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
-            <h2 className='title'>Movement Tray Forge</h2>
-
-            <div style={{ gap: '1rem', position: 'absolute', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}>
+            <div className='header-title'>
+                <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
+                <h2 className='title'>Movement Tray Forge</h2>
+            </div>
+            {/* <div style={{ gap: '1rem', position: 'absolute', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}> */}
+            <div className='header-buttons'>
                 <button
                     id='dark-mode-toggle'
                     className='dark-mode-toggle'
+                    type='button'
                     onClick={() => setDarkMode(dm => !dm)}>
                     <div className='icon-text'>
                         <i data-feather={darkMode ? "moon" : "sun"} aria-label="dark-mode-icon" />
-                        {darkMode ? 'Light Mode' : 'Dark Mode'}
+                        <p> {darkMode ? 'Light Mode' : 'Dark Mode'}</p>
                     </div>
                 </button>
                 <button
                     className='dark-mode-toggle'
-                    style={{ top: 24, right: 150 }}
+                    type='button'
                     onClick={
                         //show popup for features coming soon
                         () => setShowInfoPopup(true)
                     }>
                     <div className='icon-text' >
-                        <i data-feather="info" aria-label="info" style={{ marginRight: 6 }} />
-                        Info
+                        <i data-feather="info" aria-label="info" />
+                        <p>Info</p>
                     </div>
                 </button >
                 {showInfoPopup && (
@@ -71,14 +74,14 @@ function Header() {
                 }
                 <button
                     className='dark-mode-toggle'
-                    style={{ top: 24, right: 275 }}
+                    type='button'
                     onClick={
                         //show popup for features coming soon
                         () => setShowHelpPopup(true)
                     }>
                     <div className='icon-text'>
                         <i data-feather="help-circle" aria-label="help-icon" />
-                        Help
+                        <p>Help</p>
                     </div>
                 </button>
                 {
