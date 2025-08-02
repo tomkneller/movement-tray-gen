@@ -1,15 +1,27 @@
 import { useState, useEffect } from 'react';
+import { useTheme } from '../ThemeContext';
+
+import { Info, HelpCircle, Moon, Sun } from 'react-feather';
 
 function Header() {
-
-    const [darkMode, setDarkMode] = useState(false);
     const [showInfoPopup, setShowInfoPopup] = useState(false);
     const [showHelpPopup, setShowHelpPopup] = useState(false);
 
-    useEffect(() => {
-        document.body.classList.toggle('dark-mode', darkMode);
-
-    }, [darkMode]);
+    const ThemeToggleButton = () => {
+        const { theme, toggleTheme } = useTheme();
+        return (
+            <button
+                id='dark-mode-toggle'
+                className='dark-mode-toggle'
+                type='button'
+                onClick={toggleTheme}>
+                <div className='icon-text'>
+                    {theme === 'dark-mode' ? <Moon /> : <Sun />}
+                    <p> {theme === 'dark-mode' ? 'Light Mode' : 'Dark Mode'}</p>
+                </div>
+            </button >
+        );
+    };
 
     return (
         <div className='header'>
@@ -17,18 +29,8 @@ function Header() {
                 <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
                 <h2 className='title'>Movement Tray Forge</h2>
             </div>
-            {/* <div style={{ gap: '1rem', position: 'absolute', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}> */}
             <div className='header-buttons'>
-                <button
-                    id='dark-mode-toggle'
-                    className='dark-mode-toggle'
-                    type='button'
-                    onClick={() => setDarkMode(dm => !dm)}>
-                    <div className='icon-text'>
-                        <i data-feather={darkMode ? "moon" : "sun"} aria-label="dark-mode-icon" />
-                        <p> {darkMode ? 'Light Mode' : 'Dark Mode'}</p>
-                    </div>
-                </button>
+                <ThemeToggleButton />
                 <button
                     className='dark-mode-toggle'
                     type='button'
@@ -37,7 +39,7 @@ function Header() {
                         () => setShowInfoPopup(true)
                     }>
                     <div className='icon-text' >
-                        <i data-feather="info" aria-label="info" />
+                        <Info />
                         <p>Info</p>
                     </div>
                 </button >
@@ -80,7 +82,7 @@ function Header() {
                         () => setShowHelpPopup(true)
                     }>
                     <div className='icon-text'>
-                        <i data-feather="help-circle" aria-label="help-icon" />
+                        <HelpCircle />
                         <p>Help</p>
                     </div>
                 </button>

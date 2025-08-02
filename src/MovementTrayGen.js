@@ -7,7 +7,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
-const feather = require('feather-icons');
+import { Download, Eye, Home } from 'react-feather';
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
@@ -142,11 +142,6 @@ function MovementTrayGenerator() {
     useEffect(() => {
         recenterCamera();
     }, [bounds, recenterCamera]);
-
-    //Required for feather icons to work
-    useEffect(() => {
-        feather.replace();
-    }, []);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -414,7 +409,7 @@ function MovementTrayGenerator() {
                 >
 
                     <div className='icon-text' style={{ justifyContent: 'center' }}>
-                        <i data-feather="download" aria-label="download-icon" />
+                        <Download />
                         Download STL
                     </div>
                 </button>
@@ -429,8 +424,8 @@ function MovementTrayGenerator() {
 
             <div className='trayFrame'>
                 <div className='camera-controls'>
-                    <i data-feather="eye" ></i>
-                    <button title='Default' className='button' type='button' onClick={() => recenterCamera()}><i data-feather="home"></i></button>
+                    <Eye />
+                    <button title='Default' className='button' type='button' onClick={() => recenterCamera()}><Home /></button>
                     <button className='button' type='button' onClick={() => setCameraView('top')}>Top</button>
                     <button className='button' type='button' onClick={() => setCameraView('bottom')}>Bottom</button>
                 </div>
