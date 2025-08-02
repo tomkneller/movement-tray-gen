@@ -9,7 +9,7 @@ import { buildBase } from './BaseBuilder';
 import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
 import { generateCirclePlacements } from './CirclePlacement';
 
-function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
@@ -18,7 +18,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
     const [baseFillGeometry, setBaseFillGeometry] = useState(null);
 
-    function generateCircleGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot) {
+    function generateCircleGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot, hollowBottom) {
         if (!circles || circles.length === 0) return [];
 
         return circles.flatMap(circle => {
@@ -35,10 +35,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 circle.mainColor || 'lightgreen',
                 circle.borderColor || 'green',
                 circle.position,
-                overlappingNeighbors
+                overlappingNeighbors,
+                hollowBottom
             );
 
-            group.position.set(circle.position.x, circle.position.y, 0);
             group.updateMatrixWorld(true);
 
             return group.children.filter(child => child.isMesh);
@@ -74,7 +74,8 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             baseThickness,
             borderWidth,
             borderHeight,
-            magnetSlot
+            magnetSlot,
+            hollowBottom
         );
         allExportMeshes.push(...circleMeshes);
 
@@ -101,22 +102,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             onBaseMeshReady(group);
         }
 
-    }, [supportSlot,
-        baseWidth,
-        stagger,
-        rows,
-        cols,
-        gap,
-        straySlot,
-        borderWidth,
-        borderHeight,
-        magnetSlot,
-        insetRadius,
-        setBounds,
-        insetDiameter,
-        baseThickness,
-        onBaseMeshReady
-    ]);
+    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady, hollowBottom]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
@@ -136,6 +122,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                     magnetSlot={magnetSlot}
                     mainColor="lightgreen"
                     borderColor="green"
+                    hollowBottom={hollowBottom}
                 />
             ))}
             {supportSlot.enabled && (

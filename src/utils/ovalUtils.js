@@ -5,7 +5,9 @@ import {
     MeshStandardMaterial,
     Mesh,
     Group,
+    CylinderGeometry
 } from 'three';
+import { CSG } from 'three-csg-ts';
 
 export function createOvalMesh(position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot) {
     const group = new Group();
@@ -19,32 +21,9 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
     const outerLengthRadius = innerLengthRadius + borderWidth;
     const outerWidthRadius = innerWidthRadius + borderWidth;
 
-    // Outer shape
-    const outerShape = new Shape();
-    outerShape.ellipse(0, 0, outerLengthRadius, outerWidthRadius, 0, 2 * Math.PI, false);
-    const hole1 = new Path();
-    hole1.ellipse(0, 0, outerLengthRadius - 2, outerWidthRadius - 2, 0, 2 * Math.PI, true);
-    outerShape.holes.push(hole1);
-
-    const outerGeom = new ExtrudeGeometry(outerShape, {
-        depth: borderHeight,
-        bevelEnabled: false,
-        curveSegments: 128,
-    });
-    const outerMesh = new Mesh(outerGeom, baseOuterMaterial);
-
-
-    group.add(outerMesh);
-
     // Inner oval
     const innerShape = new Shape();
     innerShape.ellipse(0, 0, outerLengthRadius - borderWidth, outerWidthRadius - borderWidth, 0, 2 * Math.PI, false);
-
-    if (magnetSlot.enabled) {
-        const magnetHole = new Path();
-        magnetHole.absarc(0, 0, magnetSlot.width / 2, 0, Math.PI * 2, true);
-        innerShape.holes.push(magnetHole);
-    }
 
     const innerGeom = new ExtrudeGeometry(innerShape, {
         depth: baseThickness,
@@ -57,31 +36,49 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
         baseMaterial
     );
 
-    group.add(innerMesh);
+    innerMesh.updateMatrix();
+
+    let csgBase = CSG.fromMesh(innerMesh);
 
     // Optional magnet slot
     if (magnetSlot.enabled) {
-        const magnetDepth = baseThickness - magnetSlot.depth;
-        const magnetRadius = magnetSlot.width / 2;
+        const magnetGeom = new CylinderGeometry(magnetSlot.width / 2, magnetSlot.width / 2, magnetSlot.depth, 64);
+        magnetGeom.rotateX(Math.PI / 2);
+        const magnetMesh = new Mesh(magnetGeom);
+        magnetMesh.position.z = baseThickness - (magnetSlot.depth / 2);
+        magnetMesh.updateMatrixWorld();
 
-        const shapeMagnet = new Shape();
-        shapeMagnet.absarc(0, 0, magnetRadius, 0, Math.PI * 2, false);
-
-        const extrudeMagnet = new ExtrudeGeometry(shapeMagnet, {
-            depth: magnetDepth,
-            bevelEnabled: false,
-            curveSegments: 64,
-        });
-
-        const magnetMesh = new Mesh(extrudeMagnet, magnetMaterial);
-        magnetMesh.position.z = 0;  // center extrusion on Z axis if needed
-
-        group.add(magnetMesh);
+        csgBase = csgBase.subtract(CSG.fromMesh(magnetMesh));
     }
 
-    group.position.z = 0;
+    // Create mesh from CSG result
+    const finalBaseMesh = CSG.toMesh(csgBase, innerMesh.matrix, baseMaterial);
+    finalBaseMesh.position.set(0, 0, 0);
+    finalBaseMesh.updateMatrixWorld();
+    group.add(finalBaseMesh);
+
+
+    // Border shape: outer oval minus inner oval
+    const outerShape = new Shape();
+    outerShape.ellipse(0, 0, outerLengthRadius, outerWidthRadius, 0, 2 * Math.PI, false);
+
+    // Subtract inner oval from outer to form the ring
+    const borderHole = new Path();
+    borderHole.ellipse(0, 0, outerLengthRadius - borderWidth, outerWidthRadius - borderWidth, 0, 2 * Math.PI, true);
+    outerShape.holes.push(borderHole);
+
+    // Extrude the ring
+    const borderGeom = new ExtrudeGeometry(outerShape, {
+        depth: borderHeight,
+        bevelEnabled: false,
+        curveSegments: 128,
+    });
+
+    const borderMesh = new Mesh(borderGeom, baseOuterMaterial);
+    borderMesh.position.z = 0;
+    group.add(borderMesh);
+
+    group.updateMatrixWorld(true);
 
     return group;
 }
-
-

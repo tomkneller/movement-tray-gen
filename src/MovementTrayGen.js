@@ -32,6 +32,8 @@ function MovementTrayGenerator() {
     const [hasSupportSlot, setHasSupportSlot] = useState(false);
     const [hasMagnetSlot, setHasMagnetSlot] = useState(true);
 
+    const [hasHollowBottom, setHasHollowBottom] = useState(false);
+
     const [supportMode, setSupportMode] = useState('circle');
     const [supportCount, setSupportCount] = useState(6);
 
@@ -212,6 +214,9 @@ function MovementTrayGenerator() {
             case 'straySlot':
                 setHasStraySlot(!hasStraySlot);
                 break;
+            case 'hollowBottom':
+                setHasHollowBottom(!hasHollowBottom);
+                break;
             default:
                 break;
         }
@@ -236,7 +241,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
             </Canvas>
         </div>);
     };
@@ -423,6 +428,11 @@ function MovementTrayGenerator() {
                                 <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Hollow Bottoms:</label>
+                                <input type="checkbox" name="hollowBottom" checked={hasHollowBottom} value={hasHollowBottom} onChange={handleInputChange}
+                                    style={{ marginLeft: 8 }} />
                             </div>
                         </TabPanel>
                         <TabPanel>
