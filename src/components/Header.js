@@ -50,6 +50,7 @@ function Header() {
                             <ul>
                                 <li>Mobile-friendly interface</li>
                                 <li>Saved dark/light mode preferences</li>
+                                <li>Added Hollow Bottoms Option</li>
                             </ul>
                             <h2>Upcoming Features</h2>
                             <ul>
