@@ -7,15 +7,13 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
-const feather = require('feather-icons');
+import { Download, Eye, Home } from 'react-feather';
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
     const controlsRef = useRef();
 
     const [darkMode, setDarkMode] = useState(false);
-    const [showInfoPopup, setShowInfoPopup] = useState(false);
-    const [showHelpPopup, setShowHelpPopup] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -113,10 +111,7 @@ function MovementTrayGenerator() {
         }
     }, [supportMode, ovalWidth]);
 
-    useEffect(() => {
-        document.body.classList.toggle('dark-mode', darkMode);
 
-    }, [darkMode]);
 
     const setCameraView = (view) => {
         const center = new Vector3();
@@ -147,11 +142,6 @@ function MovementTrayGenerator() {
     useEffect(() => {
         recenterCamera();
     }, [bounds, recenterCamera]);
-
-    //Required for feather icons to work
-    useEffect(() => {
-        feather.replace();
-    }, []);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -223,8 +213,8 @@ function MovementTrayGenerator() {
     };
 
     const generateVisualization = () => {
-        return (<div style={{ width: '100%', height: '100%' }}>
-            <Canvas style={{ width: '100%', height: '100%', borderRadius: '16px' }} shadows>
+        return (<div style={{ width: '100%' }}>
+            <Canvas className='tray-canvas' shadows>
                 {/* <CameraControls bounds={bounds} /> */}
                 <PerspectiveCamera ref={cameraRef}
                     makeDefault
@@ -270,288 +260,196 @@ function MovementTrayGenerator() {
     };
 
     return (
-        <div className='background-body'>
-            <div className='header'>
-                <img src='logo192.png' width={'50'} height={'50'} style={{ display: 'block', borderRadius: 8 }} alt='logo png' />
-                <h2 className='title'>Movement Tray Forge</h2>
-            </div>
-
-            <div style={{ gap: '1rem', position: 'absolute', top: 24, right: 24, zIndex: 1000, display: 'flex', flexDirection: 'row' }}>
-                <button
-                    id='dark-mode-toggle'
-                    className='dark-mode-toggle'
-                    onClick={() => setDarkMode(dm => !dm)}
+        <div className='container' >
+            <div className='tray-panel'>
+                <Tabs
+                    selectedTabClassName="react-tabs__tab--selected"
+                    style={{ marginBottom: 16 }}
                 >
-                    {/* {darkMode ? 'Light Mode' : 'Dark Mode'} */}
-                    <div className='icon-text'>
-                        <i data-feather={darkMode ? "moon" : "sun"} aria-label="dark-mode-icon" />
-                        {darkMode ? 'Light Mode' : 'Dark Mode'}
-                    </div>
-                </button>
-                <button
-                    className='dark-mode-toggle'
-                    style={{ top: 24, right: 150 }}
-                    onClick={
-                        //show popup for features coming soon
-                        () => setShowInfoPopup(true)
-                    }>
-                    <div className='icon-text' >
-                        <i data-feather="info" aria-label="info" style={{ marginRight: 6 }} />
-                        Info
-                    </div>
-                </button >
-
-                {showInfoPopup && (
-                    <div className="modal-overlay">
-                        <div className="modal-content">
-                            <h2>Upcoming Features</h2>
-                            <ul>
-                                <li>Different formations including staggered, wedge and diamond</li>
-                                <li>Support for different base shapes (oval, square)</li>
-                                <li>Customizable support slots for different models</li>
-                                <li>Export to other formats (OBJ, 3MF)</li>
-                                <li>Save and load configurations</li>
-                                <li>Mobile-friendly interface</li>
-                                <li>Improved performance for large trays</li>
-                                <li>And much more...</li>
-                            </ul>
-                            <h3>Licenses & Credits</h3>
-                            <p>Developed using:</p>
-                            <ul>
-                                <li><a href='https://github.com/mrdoob/three.js/'>Three.js - MIT License</a></li>
-                                <li><a href="https://github.com/facebook/react">React - MIT License</a></li>
-                                <li><a href="https://github.com/feathericons/feather">Feather - MIT License </a></li>
-                                {/* Add more credits as needed */}
-                            </ul>
-
-                            <a href='https://github.com/tomkneller/movement-tray-gen' style={{ color: darkMode ? 'grey' : 'blue' }}> https://github.com/tomkneller/movement-tray-gen</a>
-                            <p>Copyright © 2025 Thomas Kneller</p>
-
-                            <button className='button' onClick={() => setShowInfoPopup(false)}>Close</button>
-                        </div>
-                    </div>
-                )
-                }
-
-                <button
-                    className='dark-mode-toggle'
-                    style={{ top: 24, right: 275 }}
-                    onClick={
-                        //show popup for features coming soon
-                        () => setShowHelpPopup(true)
-                    }>
-                    <div className='icon-text'>
-                        <i data-feather="help-circle" aria-label="help-icon" />
-                        Help
-                    </div>
-                </button>
-
-                {
-                    showHelpPopup && (
-                        <div className="modal-overlay">
-                            <div className="modal-content">
-                                <h2>Help</h2>
-                                <h3>Controls</h3>
-                                <p>You can look around the movement tray using the mouse</p>
-                                <p><b>Hold Left Click</b> and move the mouse to change your viewing angle</p>
-                                <p><b>Hold Right Click</b> and move the mouse to pan</p>
-                                <p><b>ScrollWheel</b> to zoom in and out</p>
-                                <button className='button' onClick={() => setShowHelpPopup(false)}>Close</button>
-                            </div>
-                        </div>
-                    )
-                }
-
-            </div>
-
-            <div className='container' style={{ height: '82vh' }}>
-                <div className='tray-panel'>
-                    <Tabs
-                        selectedTabClassName="react-tabs__tab--selected"
-                        style={{ marginBottom: 16 }}
-                    >
-                        <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
-                            <Tab id="tab">
-                                Tray Options
-                            </Tab>
-                            <Tab id="tab">
-                                Magnet Slots
-                            </Tab>
-                            <Tab id="tab">
-                                Formations
-                            </Tab>
-                            <Tab id="tab">
-                                Support Slots
-                            </Tab>
-                        </TabList>
-                        <TabPanel>
-                            <h3 className='tabTitle'>Tray Options</h3>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
-                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
+                    <TabList style={{ borderBottom: '1px solid #dfe6e9', marginBottom: 16 }}>
+                        <Tab id="tab">
+                            Tray Options
+                        </Tab>
+                        <Tab id="tab">
+                            Magnet Slots
+                        </Tab>
+                        <Tab id="tab">
+                            Formations
+                        </Tab>
+                        <Tab id="tab">
+                            Support Slots
+                        </Tab>
+                    </TabList>
+                    <TabPanel>
+                        <h3 className='tabTitle'>Tray Options</h3>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Circular Diameter:
+                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-                            </div>
-                            <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Columns:</label>
-                                    <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
+                            </label>
+                        </div>
+                        <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Columns:
+                                    <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} min={1} max={10}
                                         className="input" />
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Rows:</label>
-                                    <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
-                                        className="input" />
-                                </div>
+                                </label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Base Thickness:</label>
+                                <label style={{ fontWeight: 500 }}>Rows:
+                                    <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} min={1} max={10}
+                                        className="input" />
+                                </label>
+                            </div>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Base Thickness:
                                 <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-
-                            </div>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Edge Height:</label>
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Edge Height:
                                 <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-                            </div>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Edge Thickness:</label>
-                                <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1}
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Edge Thickness:
+                                <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1} max={10}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-                            </div>
-                            <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Gap:</label>
-                                <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
+                            </label>
+                        </div>
+                        <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Gap:
+                                <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0} max={20}
                                     className="input" />
                                 <label style={{ fontWeight: 500 }}>mm</label>
-                            </div>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Hollow Bottoms:</label>
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Hollow Bottoms:
                                 <input type="checkbox" name="hollowBottom" checked={hasHollowBottom} value={hasHollowBottom} onChange={handleInputChange}
                                     style={{ marginLeft: 8 }} />
-                            </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <h3 className='tabTitle'>Add Magnet Slots</h3>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
+                                <label style={{ color: 'red' }}>Enable just before export if required (may cause perfomance issues)</label>
+                            </label>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <h3 className='tabTitle'>Add Magnet Slots</h3>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Magnet Slots:
                                 <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
                                     style={{ marginLeft: 8 }} />
-                            </div>
-                            <div inert={!hasMagnetSlot}>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Magnet Diameter:</label>
+                            </label>
+                        </div>
+                        <div inert={!hasMagnetSlot}>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Magnet Diameter:
                                     <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
+                                </label>
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Magnet Depth:
                                     <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
-                                </div>
+                                </label>
                             </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <h3>Formation</h3>
-                            <div inert={hasSupportSlot}>
-                                <div>
-                                    <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <h3>Formation</h3>
+                        <div inert={hasSupportSlot}>
+                            <div>
+                                <label style={{ fontWeight: 500 }}>Stagger Formation:
                                     <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
-                                </div>
-                                <div inert={!staggerFormation}>
-                                    <label style={{ fontWeight: 500 }}>Remove Stray Slots:</label>
+                                </label>
+                            </div>
+                            <div inert={!staggerFormation}>
+                                <label style={{ fontWeight: 500 }}>Remove Stray Slots:
                                     <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
-                                </div>
+                                </label>
                             </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <h3 className='tabTitle'>Add support slot</h3>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Support Slot:</label>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <h3 className='tabTitle'>Add support slot</h3>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Support Slot:
                                 <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
-                            </div>
-                            <div inert={!hasSupportSlot} >
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Support Mode:</label>
+                            </label>
+                        </div>
+                        <div inert={!hasSupportSlot} >
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Support Mode:
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
                                         <option value={'circle'}>Circle</option>
                                         <option value={'oval'}>Oval</option>
                                     </select>
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
-                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} className="input" />
-                                </div>
-                                <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Oval Width:</label>
-                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} className="input" />
+                                </label>
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Support Slots Count:
+                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} min={0} max={maxSlots} className="input" />
+                                </label>
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Oval Width:
+                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} min={10} max={200} className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
-                                </div>
-                                <div inert={supportMode === 'circle'}>
-                                    <div style={{ marginBottom: 12 }}>
-                                        <label style={{ fontWeight: 500 }}>Oval Length:</label>
-                                        <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} className="input" />
+                                </label>
+                            </div>
+                            <div inert={supportMode === 'circle'}>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Length: <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} min={10} max={200} className="input" />
                                         <label style={{ fontWeight: 500 }}>mm</label>
-                                    </div>
+                                    </label>
                                 </div>
                             </div>
-                        </TabPanel>
-                    </Tabs>
-
-                    {/* Download STL button fixed at the bottom */}
-                    <button
-                        onClick={handleDownloadSTL}
-                        className='download-btn'
-                        onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
-                        onMouseOut={e => e.currentTarget.style.background = 'none'}
-                    >
-
-                        <div className='icon-text' style={{ justifyContent: 'center' }}>
-                            <i data-feather="download" aria-label="download-icon" />
-                            Download STL
                         </div>
-                    </button>
+                    </TabPanel>
+                </Tabs>
 
-                    <div className="warningBox" style={{ padding: '15px', marginTop: 12, borderRadius: '8px', backgroundColor: 'yellow', width: '500px', color: 'black' }}>
-                        <h3>Warning</h3>
-                        <p>This application is in early development and it is highly recommended that you use the automatic repair option in your 3D printer slicer or 3D model viewer first before printing as there may be some artifacts which will result in less than optimal printing results </p>
+                {/* Download STL button fixed at the bottom */}
+                <button
+                    type='button'
+                    onClick={handleDownloadSTL}
+                    className='download-btn'
+                    onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}
+                    onMouseOut={e => e.currentTarget.style.background = 'none'}
+                >
+
+                    <div className='icon-text' style={{ justifyContent: 'center' }}>
+                        <Download />
+                        Download STL
                     </div>
-                </div>
+                </button>
 
-
-
-                <div className='trayFrame' style={{ height: '100%', minWidth: '300px' }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '8rem',
-                        right: '4rem',
-                        zIndex: 10,
-                        display: 'flex',
-                        gap: '0.5rem',
-                        height: '40px',
-                        backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '8px',
-                        padding: '0.5rem',
-                        alignItems: 'center',
-                    }}>
-                        <i data-feather="eye" style={{ height: 40 }}></i>
-                        <button className='button' style={{ height: 40 }} onClick={() => recenterCamera()}><i data-feather="home"></i></button>
-                        <button className='button' style={{ height: 40 }} onClick={() => setCameraView('top')}>Top</button>
-                        <button className='button' style={{ height: 40 }} onClick={() => setCameraView('bottom')}>Bottom</button>
-                    </div>
-                    {generateVisualization()}
+                <div className="warning-box">
+                    <h3>Warning</h3>
+                    <p>This application is in early development and it is highly recommended that you use the automatic repair option in your 3D printer slicer or 3D model viewer first before printing as there may be some artifacts which will result in less than optimal printing results </p>
                 </div>
             </div>
-            <div className='footer'>
-                <p>Copyright © 2025 tomkneller</p>
+
+
+
+            <div className='trayFrame'>
+                <div className='camera-controls'>
+                    <Eye style={{ width: '100%' }} />
+                    <button title='Default' className='button' type='button' onClick={() => recenterCamera()}><Home /></button>
+                    <button className='button' type='button' onClick={() => setCameraView('top')}>Top</button>
+                    <button className='button' type='button' onClick={() => setCameraView('bottom')}>Bottom</button>
+                </div>
+                {generateVisualization()}
             </div>
-        </div >
+        </div>
     );
 }
 

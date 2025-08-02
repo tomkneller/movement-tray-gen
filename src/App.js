@@ -1,14 +1,16 @@
-import React, { } from 'react';
 import MovementTrayGenerator from './MovementTrayGen';
+import { ThemeProvider } from './ThemeContext';
+import Header from './components/Header';
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <div style={{ flex: 1, height: '100vh', width: '100vw' }}>
-        <MovementTrayGenerator />
+    <ThemeProvider>
+      <Header />
+      <MovementTrayGenerator />
+      <div className='footer'>
+        <p>Copyright © 2025 tomkneller</p>
       </div>
-
-    </div>
+    </ThemeProvider>
   );
 }
 
