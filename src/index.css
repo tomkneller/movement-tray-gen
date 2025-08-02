@@ -95,12 +95,6 @@ body.dark-mode #tab {
 }
 
 body.dark-mode .react-tabs__tab {
-  padding: 8px 20px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-  border: none;
   color: #f5f6fa !important;
   background: #393e57 !important;
 }
