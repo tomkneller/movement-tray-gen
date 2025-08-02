@@ -424,7 +424,7 @@ function MovementTrayGenerator() {
 
             <div className='trayFrame'>
                 <div className='camera-controls'>
-                    <Eye />
+                    <Eye style={{ width: '100%' }} />
                     <button title='Default' className='button' type='button' onClick={() => recenterCamera()}><Home /></button>
                     <button className='button' type='button' onClick={() => setCameraView('top')}>Top</button>
                     <button className='button' type='button' onClick={() => setCameraView('bottom')}>Bottom</button>
