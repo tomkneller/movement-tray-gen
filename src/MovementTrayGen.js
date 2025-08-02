@@ -283,73 +283,84 @@ function MovementTrayGenerator() {
                     <TabPanel>
                         <h3 className='tabTitle'>Tray Options</h3>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Circular Diameter:</label>
-                            <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange}
-                                className="input" />
-                            <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Circular Diameter:
+                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
+                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+                            </label>
                         </div>
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Columns:</label>
-                                <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange}
-                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>Columns:
+                                    <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} min={1} max={10}
+                                        className="input" />
+                                </label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Rows:</label>
-                                <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange}
-                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>Rows:
+                                    <input type="number" name="formationRows" value={formationRows} onChange={handleInputChange} min={1} max={10}
+                                        className="input" />
+                                </label>
                             </div>
                         </div>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Base Thickness:</label>
-                            <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
-                                className="input" />
-                            <label style={{ fontWeight: 500 }}>mm</label>
-
+                            <label style={{ fontWeight: 500 }}>Base Thickness:
+                                <input type="number" name="baseThickness" value={baseThickness} onChange={handleInputChange} min={2} max={edgeHeight}
+                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+                            </label>
                         </div>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Edge Height:</label>
-                            <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
-                                className="input" />
-                            <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Edge Height:
+                                <input type="number" name="edgeHeight" value={edgeHeight} onChange={handleInputChange} min={2} max={10}
+                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+                            </label>
                         </div>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Edge Thickness:</label>
-                            <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1}
-                                className="input" />
-                            <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Edge Thickness:
+                                <input type="number" name="edgeThickness" value={edgeThickness} onChange={handleInputChange} min={1} max={10}
+                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+                            </label>
                         </div>
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Gap:</label>
-                            <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0}
-                                className="input" />
-                            <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Gap:
+                                <input type="number" name="gap" value={gap} onChange={handleInputChange} min={0} max={20}
+                                    className="input" />
+                                <label style={{ fontWeight: 500 }}>mm</label>
+                            </label>
                         </div>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Hollow Bottoms:</label>
-                            <input type="checkbox" name="hollowBottom" checked={hasHollowBottom} value={hasHollowBottom} onChange={handleInputChange}
-                                style={{ marginLeft: 8 }} />
+                            <label style={{ fontWeight: 500 }}>Hollow Bottoms:
+                                <input type="checkbox" name="hollowBottom" checked={hasHollowBottom} value={hasHollowBottom} onChange={handleInputChange}
+                                    style={{ marginLeft: 8 }} />
+                                <label style={{ color: 'red' }}>Enable just before export if required (may cause perfomance issues)</label>
+                            </label>
                         </div>
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add Magnet Slots</h3>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Magnet Slots:</label>
-                            <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
-                                style={{ marginLeft: 8 }} />
+                            <label style={{ fontWeight: 500 }}>Magnet Slots:
+                                <input type="checkbox" name="magnetSlot" checked={hasMagnetSlot} value={hasMagnetSlot} onChange={handleInputChange}
+                                    style={{ marginLeft: 8 }} />
+                            </label>
                         </div>
                         <div inert={!hasMagnetSlot}>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Magnet Diameter:</label>
-                                <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
-                                    className="input" />
-                                <label style={{ fontWeight: 500 }}>mm</label>
+                                <label style={{ fontWeight: 500 }}>Magnet Diameter:
+                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
+                                        className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                </label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Magnet Depth:</label>
-                                <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
-                                    className="input" />
-                                <label style={{ fontWeight: 500 }}>mm</label>
+                                <label style={{ fontWeight: 500 }}>Magnet Depth:
+                                    <input type="number" name="magnetDepth" value={magnetDepth} onChange={handleInputChange} min={1} max={baseThickness - 1}
+                                        className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                </label>
                             </div>
                         </div>
                     </TabPanel>
@@ -357,43 +368,49 @@ function MovementTrayGenerator() {
                         <h3>Formation</h3>
                         <div inert={hasSupportSlot}>
                             <div>
-                                <label style={{ fontWeight: 500 }}>Stagger Formation:</label>
-                                <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
+                                <label style={{ fontWeight: 500 }}>Stagger Formation:
+                                    <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
+                                </label>
                             </div>
                             <div inert={!staggerFormation}>
-                                <label style={{ fontWeight: 500 }}>Remove Stray Slots:</label>
-                                <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                                <label style={{ fontWeight: 500 }}>Remove Stray Slots:
+                                    <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                                </label>
                             </div>
                         </div>
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add support slot</h3>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Support Slot:</label>
-                            <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
+                            <label style={{ fontWeight: 500 }}>Support Slot:
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
+                            </label>
                         </div>
                         <div inert={!hasSupportSlot} >
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Support Mode:</label>
-                                <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
-                                    <option value={'circle'}>Circle</option>
-                                    <option value={'oval'}>Oval</option>
-                                </select>
+                                <label style={{ fontWeight: 500 }}>Support Mode:
+                                    <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
+                                        <option value={'circle'}>Circle</option>
+                                        <option value={'oval'}>Oval</option>
+                                    </select>
+                                </label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Support Slots Count:</label>
-                                <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} max={maxSlots} className="input" />
+                                <label style={{ fontWeight: 500 }}>Support Slots Count:
+                                    <input type="number" name="supportCount" value={supportCount} onChange={handleInputChange} min={0} max={maxSlots} className="input" />
+                                </label>
                             </div>
                             <div style={{ marginBottom: 12 }}>
-                                <label style={{ fontWeight: 500 }}>Oval Width:</label>
-                                <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} className="input" />
-                                <label style={{ fontWeight: 500 }}>mm</label>
+                                <label style={{ fontWeight: 500 }}>Oval Width:
+                                    <input type="number" name="ovalWidth" value={ovalWidth} onChange={handleInputChange} min={10} max={200} className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                </label>
                             </div>
                             <div inert={supportMode === 'circle'}>
                                 <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontWeight: 500 }}>Oval Length:</label>
-                                    <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} className="input" />
-                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                    <label style={{ fontWeight: 500 }}>Oval Length: <input type="number" name="ovalLength" value={ovalLength} onChange={handleInputChange} min={10} max={200} className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -402,6 +419,7 @@ function MovementTrayGenerator() {
 
                 {/* Download STL button fixed at the bottom */}
                 <button
+                    type='button'
                     onClick={handleDownloadSTL}
                     className='download-btn'
                     onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.08)'}

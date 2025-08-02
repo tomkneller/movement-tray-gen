@@ -46,6 +46,11 @@ function Header() {
                 {showInfoPopup && (
                     <div className="modal-overlay">
                         <div className="modal-content">
+                            <h2>New in this version </h2>
+                            <ul>
+                                <li>Mobile-friendly interface</li>
+                                <li>Saved dark/light mode preferences</li>
+                            </ul>
                             <h2>Upcoming Features</h2>
                             <ul>
                                 <li>Different formations including staggered, wedge and diamond</li>
@@ -53,7 +58,6 @@ function Header() {
                                 <li>Customizable support slots for different models</li>
                                 <li>Export to other formats (OBJ, 3MF)</li>
                                 <li>Save and load configurations</li>
-                                <li>Mobile-friendly interface</li>
                                 <li>Improved performance for large trays</li>
                                 <li>And much more...</li>
                             </ul>
