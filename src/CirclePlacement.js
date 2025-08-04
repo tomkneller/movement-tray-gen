@@ -9,6 +9,7 @@ export function generateCirclePlacements({
     cols,
     gap,
     stagger,
+    triangleFormation,
     straySlot,
     supportSlot
 }) {
@@ -90,6 +91,18 @@ export function generateCirclePlacements({
                     addCircle(x, y, i);
                 }
             );
+        }
+    } else if (triangleFormation) {
+        for (let row = 0; row < rows; row++) {
+            const cols = row + 1;
+            const rowWidth = cols * xOffset;
+
+            for (let col = 0; col < cols; col++) {
+                // Center the row horizontally
+                const x = col * xOffset - rowWidth / 2 + xOffset / 2;
+                const y = row * yOffset;
+                addCircle(x, y, row, col);
+            }
         }
     } else {
         for (let row = 0; row < rows; row++) {

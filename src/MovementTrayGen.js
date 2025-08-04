@@ -31,6 +31,7 @@ function MovementTrayGenerator() {
     const [hasMagnetSlot, setHasMagnetSlot] = useState(true);
 
     const [hasHollowBottom, setHasHollowBottom] = useState(false);
+    const [hasTriangleFormation, setHasTriangleFormation] = useState(false);
 
     const [supportMode, setSupportMode] = useState('circle');
     const [supportCount, setSupportCount] = useState(6);
@@ -177,6 +178,10 @@ function MovementTrayGenerator() {
                     setHasStraySlot(false);
                 }
                 break;
+            case 'triangleFormation':
+                setHasTriangleFormation(!hasTriangleFormation);
+                setFormationCols(formationRows);
+                break;
             case 'supportSlot':
                 setHasSupportSlot(!hasSupportSlot);
                 break;
@@ -231,7 +236,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
             </Canvas>
         </div>);
     };
@@ -290,7 +295,7 @@ function MovementTrayGenerator() {
                             </label>
                         </div>
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
-                            <div style={{ marginBottom: 12 }}>
+                            <div inert={hasTriangleFormation} style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Columns:
                                     <input type="number" name="formationCols" value={formationCols} onChange={handleInputChange} min={1} max={10}
                                         className="input" />
@@ -367,6 +372,7 @@ function MovementTrayGenerator() {
                     <TabPanel>
                         <h3>Formation</h3>
                         <div inert={hasSupportSlot}>
+                            <h4>Stagger</h4>
                             <div>
                                 <label style={{ fontWeight: 500 }}>Stagger Formation:
                                     <input type='checkbox' name="staggerFormation" checked={staggerFormation} value={staggerFormation} onChange={handleInputChange} />
@@ -375,6 +381,13 @@ function MovementTrayGenerator() {
                             <div inert={!staggerFormation}>
                                 <label style={{ fontWeight: 500 }}>Remove Stray Slots:
                                     <input type="checkbox" name="straySlot" checked={hasStraySlot} value={hasStraySlot} onChange={handleInputChange} />
+                                </label>
+                            </div>
+                            <h4>Triangle</h4>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Triangle Formation:
+                                    <input type="checkbox" name="triangleFormation" checked={hasTriangleFormation} value={hasTriangleFormation} onChange={handleInputChange}
+                                        style={{ marginLeft: 8 }} />
                                 </label>
                             </div>
                         </div>

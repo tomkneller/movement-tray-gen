@@ -9,7 +9,7 @@ import { buildBase } from './BaseBuilder';
 import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
 import { generateCirclePlacements } from './CirclePlacement';
 
-function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom }) {
     const [circlesData, setCirclesData] = useState([]);
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
@@ -53,6 +53,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             cols,
             gap,
             stagger,
+            triangleFormation,
             straySlot,
             supportSlot
         });
@@ -102,7 +103,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             onBaseMeshReady(group);
         }
 
-    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady, hollowBottom]);
+    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady, hollowBottom, triangleFormation]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
