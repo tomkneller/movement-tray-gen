@@ -103,6 +103,18 @@ function MovementTrayGenerator() {
         setMaxSlots(100);
     }
 
+    const handlePresetSelect = (diameter) => {
+        setCircularDiameter(diameter);
+        setEdgeHeight(10);
+        setHasMagnetSlot(false);
+        resetMaxSlots();
+    };
+
+    const handleMovementPreset = (diameter) => {
+        setCircularDiameter(diameter);
+        setEdgeHeight(5);
+    }
+
     useEffect(() => {
     }, [bounds]);
 
@@ -284,6 +296,9 @@ function MovementTrayGenerator() {
                         <Tab id="tab">
                             Support Slots
                         </Tab>
+                        <Tab id="tab">
+                            Presets
+                        </Tab>
                     </TabList>
                     <TabPanel>
                         <h3 className='tabTitle'>Tray Options</h3>
@@ -425,6 +440,35 @@ function MovementTrayGenerator() {
                                         <label style={{ fontWeight: 500 }}>mm</label>
                                     </label>
                                 </div>
+                            </div>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <h3>Presets</h3>
+                        <div inert={hasSupportSlot}>
+                            <h4>Movement Tray Presets</h4>
+                            <h5>Circle</h5>
+                            <button onClick={() => handleMovementPreset(25.5)}>25mm</button><button onClick={() => handleMovementPreset(28.5)}>28mm</button><button onClick={() => handleMovementPreset(32.5)}>32mm</button><button onClick={() => handleMovementPreset(40.5)}>40mm</button><button onClick={() => handleMovementPreset(50.5)}>50mm</button><button onClick={() => handleMovementPreset(60.5)}>60mm</button>
+                            <h4>Paint Storage Presets</h4>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Paint Brand:
+                                    <select name='paintSize' onChange={(e) => {
+                                        const paintBrands = {
+                                            'vallejo': 25,
+                                            'citadel': 33,
+                                            'ak-interactive': 10,
+                                            'army-painter': 25,
+                                            'scale75': 10
+                                        };
+                                        handlePresetSelect(paintBrands[e.target.value]);
+                                    }} className="input">
+                                        <option value={'vallejo'}>Vallejo Dropper</option>
+                                        <option value={'citadel'}>Citadel Pot</option>
+                                        <option value={'army-painter'}>Army Painter Dropper</option>
+                                        <option value={'ak-interactive'}>AK Interactive Dropper</option>
+                                        <option value={'scale75'}>Scale 75 Dropper</option>
+                                    </select>
+                                </label>
                             </div>
                         </div>
                     </TabPanel>

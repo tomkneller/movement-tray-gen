@@ -176,7 +176,7 @@ body.dark-mode .button {
   margin-left: 16px;
   margin-right: 16px;
   padding: 24px;
-  width: 400px;
+  width: min-content;
 }
 
 body.dark-mode .tray-panel {
