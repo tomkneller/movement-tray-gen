@@ -98,21 +98,61 @@ function MovementTrayGenerator() {
         // Potentially disable increment button or show a message
     };
 
+    /* Reset all parameters to default */
+    const presetResetDefault = () => {
+        setCircularDiameter(25);
+        setEdgeHeight(5);
+        setHasMagnetSlot(true);
+        setHasSupportSlot(false);
+        setGap(0);
+        setSupportCount(6);
+        setSupportMode('circle');
+        setOvalWidth(35);
+        setOvalLength(60);
+        resetMaxSlots();
+    }
+
     const resetMaxSlots = () => {
         setMaxReached(false);
         setMaxSlots(100);
     }
 
+    /* Set tray to preset for paint holder trays */
     const handlePresetSelect = (diameter) => {
+        presetResetDefault();
         setCircularDiameter(diameter);
         setEdgeHeight(10);
         setHasMagnetSlot(false);
         resetMaxSlots();
     };
 
+    /* Set tray to preset for movement trays */
     const handleMovementPreset = (diameter) => {
+        presetResetDefault();
         setCircularDiameter(diameter);
         setEdgeHeight(5);
+    }
+
+    /* Set tray to preset for movement trays with support slots */
+    const handleSpecialPreset = (diameter, supportMode, slotCount, ovalWidth, ovalLength) => {
+        presetResetDefault();
+        setCircularDiameter(diameter);
+        setEdgeHeight(8);
+        setHasSupportSlot(true);
+        setSupportMode(supportMode);
+        setSupportCount(slotCount);
+
+        if (supportMode) {
+            if (supportMode === 'circle') {
+                setOvalWidth(ovalWidth);
+            }
+            else {
+                setOvalWidth(ovalWidth);
+                setOvalLength(ovalLength);
+            }
+        }
+
+        // resetMaxSlots();
     }
 
     useEffect(() => {
@@ -445,10 +485,19 @@ function MovementTrayGenerator() {
                     </TabPanel>
                     <TabPanel>
                         <h3>Presets</h3>
-                        <div inert={hasSupportSlot}>
+                        <div>
                             <h4>Movement Tray Presets</h4>
                             <h5>Circle</h5>
-                            <button onClick={() => handleMovementPreset(25.5)}>25mm</button><button onClick={() => handleMovementPreset(28.5)}>28mm</button><button onClick={() => handleMovementPreset(32.5)}>32mm</button><button onClick={() => handleMovementPreset(40.5)}>40mm</button><button onClick={() => handleMovementPreset(50.5)}>50mm</button><button onClick={() => handleMovementPreset(60.5)}>60mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(25.5)}>25mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(28.5)}>28mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(32.5)}>32mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(40.5)}>40mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(50.5)}>50mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(60.5)}>60mm</button>
+                            <h5>Special</h5>
+                            <button className='button' onClick={() => handleSpecialPreset(25.5, 'oval', 9, 60.5, 36)}>Skitarii</button>
+                            <button className='button' onClick={() => handleSpecialPreset(28.5, 'circle', 9, 32.5)}>Novitiate/Repentia Squad</button>
+                            <button className='button' onClick={() => handleSpecialPreset(29, 'circle', 9, 40.5)}>Guardian Squad</button>
                             <h4>Paint Storage Presets</h4>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Paint Brand:
