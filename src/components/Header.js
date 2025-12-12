@@ -74,6 +74,8 @@ function Header() {
                             <a className='link' href='https://github.com/tomkneller/movement-tray-gen'> https://github.com/tomkneller/movement-tray-gen</a>
                             <p>Copyright © 2025 Thomas Kneller</p>
 
+                            <p>This product is not affiliated with or endorsed by Games Workshop Limited, The Army Painter, Vallejo, or any other company mentioned. All trademarks are the property of their respective owners.</p>
+
                             <button className='button' onClick={() => setShowInfoPopup(false)}>Close</button>
                         </div>
                     </div>

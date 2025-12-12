@@ -7,7 +7,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
-import { Download, Eye, Home } from 'react-feather';
+import { Download, Eye, Home, RotateCcw } from 'react-feather';
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
@@ -486,6 +486,9 @@ function MovementTrayGenerator() {
                     <TabPanel>
                         <h3>Presets</h3>
                         <div>
+                            <div className='reset-controls' >
+                                <button className='button' style={{ width: 'min-content' }} type='button' onClick={() => presetResetDefault()}><RotateCcw style={{ width: '100%' }} /> Reset Defaults</button>
+                            </div>
                             <h4>Movement Tray Presets</h4>
                             <h5>Circle</h5>
                             <button className='button' onClick={() => handleMovementPreset(25.5)}>25mm</button>
@@ -494,10 +497,6 @@ function MovementTrayGenerator() {
                             <button className='button' onClick={() => handleMovementPreset(40.5)}>40mm</button>
                             <button className='button' onClick={() => handleMovementPreset(50.5)}>50mm</button>
                             <button className='button' onClick={() => handleMovementPreset(60.5)}>60mm</button>
-                            <h5>Special</h5>
-                            <button className='button' onClick={() => handleSpecialPreset(25.5, 'oval', 9, 60.5, 36)}>Skitarii</button>
-                            <button className='button' onClick={() => handleSpecialPreset(28.5, 'circle', 9, 32.5)}>Novitiate/Repentia Squad</button>
-                            <button className='button' onClick={() => handleSpecialPreset(29, 'circle', 9, 40.5)}>Guardian Squad</button>
                             <h4>Paint Storage Presets</h4>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Paint Brand:
@@ -553,6 +552,7 @@ function MovementTrayGenerator() {
                     <button className='button' type='button' onClick={() => setCameraView('top')}>Top</button>
                     <button className='button' type='button' onClick={() => setCameraView('bottom')}>Bottom</button>
                 </div>
+
                 {generateVisualization()}
             </div>
         </div>
