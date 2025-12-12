@@ -497,6 +497,11 @@ function MovementTrayGenerator() {
                             <button className='button' onClick={() => handleMovementPreset(40.5)}>40mm</button>
                             <button className='button' onClick={() => handleMovementPreset(50.5)}>50mm</button>
                             <button className='button' onClick={() => handleMovementPreset(60.5)}>60mm</button>
+                            <h5>Special</h5>
+                            <h6>Games Workshop Compatible</h6>
+                            <button className='button' onClick={() => handleSpecialPreset(25.5, 'oval', 9, 60.5, 36)}>Skitarii</button>
+                            <button className='button' onClick={() => handleSpecialPreset(28.5, 'circle', 9, 32.5)}>Novitiate/Repentia Squad</button>
+                            <button className='button' onClick={() => handleSpecialPreset(29, 'circle', 9, 40.5)}>Guardian Squad</button>
                             <h4>Paint Storage Presets</h4>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Paint Brand:
