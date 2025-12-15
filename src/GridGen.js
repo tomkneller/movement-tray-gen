@@ -5,12 +5,13 @@ import Circle from './Circle';
 import Oval from './Oval';
 import { createCircleGroup } from './utils/circleUtils';
 import { createOvalMesh } from './utils/ovalUtils';
-import { buildBase } from './BaseBuilder';
+import { buildBase, computePerimeterDebug } from './BaseBuilder';
 import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
 import { generateCirclePlacements } from './CirclePlacement';
 
-function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom }) {
+function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom, perimeterDebug }) {
     const [circlesData, setCirclesData] = useState([]);
+    const [debugData, setDebugData] = useState(null);
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
@@ -82,6 +83,20 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
 
         setCirclesData(circles);
 
+        // compute debug info for visualization if requested
+        if (perimeterDebug) {
+            try {
+                const dbg = computePerimeterDebug(circles);
+                setDebugData(dbg);
+            } catch (err) {
+                // don't fail the render if debug computation has issues
+                setDebugData(null);
+                console.warn('Perimeter debug computation failed', err);
+            }
+        } else {
+            setDebugData(null);
+        }
+
         const finalBaseMesh = buildBase({
             circles,
             supportSlot,
@@ -137,6 +152,50 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                     mainColor="lightgreen"
                     outerColor="green"
                 />
+            )}
+
+            {/* Debug visualizations for perimeter generation */}
+            {debugData && (
+                <group>
+                    {debugData.hullCenters && debugData.hullCenters.map((p, idx) => (
+                        <mesh key={'hc' + idx} position={[p[0], p[1], 0.5]}>
+                            <sphereGeometry args={[0.6, 8, 8]} />
+                            <meshBasicMaterial color={'#ff0000'} />
+                        </mesh>
+                    ))}
+                    {debugData.triangles && debugData.triangles.map((t, idx) => (
+                        <group key={'tri' + idx}>
+                            <mesh position={[t.center.x, t.center.y, 0.6]}>
+                                <sphereGeometry args={[0.5, 8, 8]} />
+                                <meshBasicMaterial color={'#0000ff'} />
+                            </mesh>
+                            <mesh position={[t.pA.x, t.pA.y, 0.5]}>
+                                <sphereGeometry args={[0.35, 8, 8]} />
+                                <meshBasicMaterial color={'#ffff00'} />
+                            </mesh>
+                            <mesh position={[t.pB.x, t.pB.y, 0.5]}>
+                                <sphereGeometry args={[0.35, 8, 8]} />
+                                <meshBasicMaterial color={'#ffff00'} />
+                            </mesh>
+                            <mesh position={[t.pC.x, t.pC.y, 0.5]}>
+                                <sphereGeometry args={[0.35, 8, 8]} />
+                                <meshBasicMaterial color={'#ffff00'} />
+                            </mesh>
+                        </group>
+                    ))}
+                    {debugData.connectors && debugData.connectors.map((c, idx) => (
+                        <group key={'con' + idx}>
+                            <mesh position={[c.pA.x, c.pA.y, 0.5]}>
+                                <sphereGeometry args={[0.35, 8, 8]} />
+                                <meshBasicMaterial color={'#ffa500'} />
+                            </mesh>
+                            <mesh position={[c.pB.x, c.pB.y, 0.5]}>
+                                <sphereGeometry args={[0.35, 8, 8]} />
+                                <meshBasicMaterial color={'#ffa500'} />
+                            </mesh>
+                        </group>
+                    ))}
+                </group>
             )}
 
             <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({

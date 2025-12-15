@@ -12,6 +12,7 @@
     "react-tabs": "^6.1.0",
     "three": "^0.176.0",
     "three-csg-ts": "^3.2.0",
+    "concaveman": "^1.2.1",
     "web-vitals": "^5.0.1"
   },
   "scripts": {

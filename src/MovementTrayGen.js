@@ -32,6 +32,7 @@ function MovementTrayGenerator() {
 
     const [hasHollowBottom, setHasHollowBottom] = useState(false);
     const [hasTriangleFormation, setHasTriangleFormation] = useState(false);
+    const [hasPerimeterDebug, setHasPerimeterDebug] = useState(false);
 
     const [supportMode, setSupportMode] = useState('circle');
     const [supportCount, setSupportCount] = useState(6);
@@ -288,7 +289,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
             </Canvas>
         </div>);
     };
@@ -396,6 +397,13 @@ function MovementTrayGenerator() {
                                 <input type="checkbox" name="hollowBottom" checked={hasHollowBottom} value={hasHollowBottom} onChange={handleInputChange}
                                     style={{ marginLeft: 8 }} />
                                 <label style={{ color: 'red' }}>Enable just before export if required (may cause perfomance issues)</label>
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Perimeter Debug Overlay:
+                                <input type="checkbox" name="perimeterDebug" checked={hasPerimeterDebug} value={hasPerimeterDebug} onChange={() => setHasPerimeterDebug(!hasPerimeterDebug)}
+                                    style={{ marginLeft: 8 }} />
+                                <label style={{ color: '#666' }}>Show hull, triangle centers, and connector points for debugging</label>
                             </label>
                         </div>
                     </TabPanel>
