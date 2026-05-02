@@ -1,32 +1,61 @@
-import { useMemo, useEffect } from 'react';
-import { MeshStandardMaterial, DoubleSide } from 'three';
+import { useMemo, useEffect, useRef, useState } from 'react';
+import { MeshStandardMaterial, DoubleSide, BufferGeometry, BufferAttribute, Box3, Vector3, PlaneGeometry } from 'three';
 import * as THREE from 'three';
 import { createCircleGroup } from './utils/circleUtils';
 import { createOvalMesh } from './utils/ovalUtils';
-import { buildBase, buildBorder, computePerimeterDebug } from './BaseBuilder';
-import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
-import { generateCirclePlacements } from './CirclePlacement';
+
+function deserializeGeometry(serializedGeometry) {
+    if (!serializedGeometry) return null;
+
+    const geometry = new BufferGeometry();
+
+    Object.entries(serializedGeometry.attributes).forEach(([name, attribute]) => {
+        geometry.setAttribute(
+            name,
+            new BufferAttribute(attribute.array, attribute.itemSize, attribute.normalized)
+        );
+    });
+
+    if (serializedGeometry.index) {
+        geometry.setIndex(
+            new BufferAttribute(
+                serializedGeometry.index.array,
+                serializedGeometry.index.itemSize,
+                serializedGeometry.index.normalized
+            )
+        );
+    }
+
+    if (serializedGeometry.groups) {
+        serializedGeometry.groups.forEach(group => geometry.addGroup(group.start, group.count, group.materialIndex));
+    }
+
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    return geometry;
+}
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom, perimeterDebug }) {
+    const workerRef = useRef(null);
+    const requestIdRef = useRef(0);
+
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
     const borderHeight = edgeHeight;
 
+    const [workerResult, setWorkerResult] = useState({
+        baseGeometry: null,
+        borderGeometry: null,
+        bounds: null,
+        circles: [],
+        debugData: null
+    });
+
     function generateCircleMeshes(circles, insetDiameterValue, baseThicknessValue, borderWidthValue, borderHeightValue, magnetSlotValue, hollowBottomValue) {
         if (!circles || circles.length === 0) return [];
 
         return circles.flatMap(circle => {
-            const outerRadius = (circle.insetRadius || insetDiameterValue / 2) + borderWidthValue;
-            const overlappingNeighbors = circles
-                .filter(candidate => candidate !== circle && areInsetAreasOverlapping(
-                    circle.position,
-                    candidate.position,
-                    outerRadius,
-                    (candidate.insetRadius || insetDiameterValue / 2) + borderWidthValue
-                ))
-                .map(candidate => candidate.position);
-
             const group = createCircleGroup(
                 insetDiameterValue / 2,
                 baseThicknessValue,
@@ -36,7 +65,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 circle.mainColor || 'lightgreen',
                 circle.borderColor || 'green',
                 circle.position,
-                overlappingNeighbors,
+                [],
                 hollowBottomValue,
                 false
             );
@@ -46,113 +75,127 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
         });
     }
 
-    const generated = useMemo(() => {
-        const { circles, points } = generateCirclePlacements({
-            insetRadius,
-            borderWidth,
-            rows,
-            cols,
-            gap,
-            stagger,
-            triangleFormation,
-            straySlot,
-            supportSlot
+    useEffect(() => {
+        const worker = new Worker(new URL('./workers/trayGenerationWorker.js', import.meta.url));
+        workerRef.current = worker;
+
+        worker.onmessage = event => {
+            const { requestId, result } = event.data;
+            if (requestId !== requestIdRef.current) return;
+
+            setWorkerResult({
+                baseGeometry: deserializeGeometry(result.baseGeometry),
+                borderGeometry: deserializeGeometry(result.borderGeometry),
+                bounds: result.bounds,
+                circles: result.circles,
+                debugData: result.debugData
+            });
+        };
+
+        return () => {
+            worker.terminate();
+            workerRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!workerRef.current) return;
+
+        const requestId = ++requestIdRef.current;
+        workerRef.current.postMessage({
+            requestId,
+            params: {
+                insetRadius,
+                borderWidth,
+                rows,
+                cols,
+                gap,
+                stagger,
+                triangleFormation,
+                straySlot,
+                supportSlot,
+                perimeterDebug,
+                baseThickness,
+                borderHeight
+            }
         });
+    }, [baseThickness, borderHeight, borderWidth, gap, insetRadius, perimeterDebug, rows, cols, stagger, straySlot, supportSlot, triangleFormation]);
 
-        const bounds = new THREE.Box3().setFromPoints(points.map(point => new THREE.Vector3(point.x, point.y, 0)));
-        const circleMeshes = generateCircleMeshes(
-            circles,
-            insetDiameter,
-            baseThickness,
-            borderWidth,
-            borderHeight,
-            magnetSlot,
-            hollowBottom
-        );
+    const circleMeshes = useMemo(() => generateCircleMeshes(
+        workerResult.circles,
+        insetDiameter,
+        baseThickness,
+        borderWidth,
+        borderHeight,
+        magnetSlot,
+        hollowBottom
+    ), [workerResult.circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot, hollowBottom]);
 
-        const supportMeshes = supportSlot.enabled
+    const supportMeshes = useMemo(() => (
+        supportSlot.enabled
             ? createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot, false)
                 .children
                 .filter(child => child.isMesh)
-            : [];
+            : []
+    ), [supportSlot, baseThickness, borderWidth, borderHeight, magnetSlot]);
 
-        let debugData = null;
-        if (perimeterDebug) {
-            try {
-                debugData = computePerimeterDebug(circles, supportSlot, borderWidth);
-            } catch (err) {
-                console.warn('Perimeter debug computation failed', err);
-            }
+    const exportGroup = useMemo(() => {
+        const group = new THREE.Group();
+
+        circleMeshes.forEach(mesh => group.add(mesh.clone()));
+        supportMeshes.forEach(mesh => group.add(mesh.clone()));
+
+        if (workerResult.baseGeometry) {
+            group.add(new THREE.Mesh(workerResult.baseGeometry.clone(), new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })));
         }
 
-        const baseMesh = buildBase({
-            circles,
-            supportSlot,
-            baseThickness,
-            borderWidth,
-            rows,
-            cols,
-            straySlot,
-        });
+        if (workerResult.borderGeometry) {
+            group.add(new THREE.Mesh(workerResult.borderGeometry.clone(), new MeshStandardMaterial({ color: '#333a40', side: DoubleSide })));
+        }
 
-        const borderMesh = buildBorder({
-            circles,
-            supportSlot,
-            borderWidth,
-            edgeHeight: borderHeight
-        });
-
-        const exportGroup = new THREE.Group();
-        [...circleMeshes, ...supportMeshes, baseMesh, borderMesh].forEach(mesh => {
-            exportGroup.add(mesh.clone());
-        });
-
-        return {
-            baseMesh,
-            borderMesh,
-            bounds,
-            circleMeshes,
-            debugData,
-            exportGroup,
-            supportMeshes
-        };
-    }, [baseThickness, borderHeight, borderWidth, gap, hollowBottom, insetDiameter, insetRadius, magnetSlot, perimeterDebug, rows, cols, stagger, straySlot, supportSlot, triangleFormation]);
+        return group;
+    }, [circleMeshes, supportMeshes, workerResult.baseGeometry, workerResult.borderGeometry]);
 
     useEffect(() => {
-        setBounds(generated.bounds);
+        if (workerResult.bounds) {
+            const bounds = new Box3(
+                new Vector3(workerResult.bounds.min.x, workerResult.bounds.min.y, workerResult.bounds.min.z),
+                new Vector3(workerResult.bounds.max.x, workerResult.bounds.max.y, workerResult.bounds.max.z)
+            );
+            setBounds(bounds);
+        }
 
         if (onBaseMeshReady) {
-            onBaseMeshReady(generated.exportGroup);
+            onBaseMeshReady(exportGroup);
         }
-    }, [generated, onBaseMeshReady, setBounds]);
+    }, [workerResult.bounds, exportGroup, onBaseMeshReady, setBounds]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
     return (
         <>
-            {generated.baseMesh?.geometry && (
-                <mesh geometry={generated.baseMesh.geometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
+            {workerResult.baseGeometry && (
+                <mesh geometry={workerResult.baseGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
             )}
-            {generated.borderMesh?.geometry && (
-                <mesh geometry={generated.borderMesh.geometry} material={new MeshStandardMaterial({ color: '#333a40', side: DoubleSide })} position={[0, 0, 0]} />
+            {workerResult.borderGeometry && (
+                <mesh geometry={workerResult.borderGeometry} material={new MeshStandardMaterial({ color: '#333a40', side: DoubleSide })} position={[0, 0, 0]} />
             )}
-            {generated.circleMeshes.map((mesh, index) => (
+            {circleMeshes.map((mesh, index) => (
                 <primitive key={`circle-${index}`} object={mesh} />
             ))}
-            {generated.supportMeshes.map((mesh, index) => (
+            {supportMeshes.map((mesh, index) => (
                 <primitive key={`support-${index}`} object={mesh} />
             ))}
 
-            {/* Debug visualizations for perimeter generation */}
-            {generated.debugData && (
+            {workerResult.debugData && (
                 <group>
-                    {generated.debugData.hullCenters && generated.debugData.hullCenters.map((p, idx) => (
+                    {workerResult.debugData.hullCenters && workerResult.debugData.hullCenters.map((p, idx) => (
                         <mesh key={'hc' + idx} position={[p[0], p[1], 0.5]}>
                             <sphereGeometry args={[0.6, 8, 8]} />
                             <meshBasicMaterial color={'#ff0000'} />
                         </mesh>
                     ))}
-                    {generated.debugData.triangles && generated.debugData.triangles.map((t, idx) => (
+                    {workerResult.debugData.triangles && workerResult.debugData.triangles.map((t, idx) => (
                         <group key={'tri' + idx}>
                             <mesh position={[t.center.x, t.center.y, 0.6]}>
                                 <sphereGeometry args={[0.5, 8, 8]} />
@@ -172,7 +215,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                             </mesh>
                         </group>
                     ))}
-                    {generated.debugData.connectors && generated.debugData.connectors.map((c, idx) => (
+                    {workerResult.debugData.connectors && workerResult.debugData.connectors.map((c, idx) => (
                         <group key={'con' + idx}>
                             <mesh position={[c.pA.x, c.pA.y, 0.5]}>
                                 <sphereGeometry args={[0.35, 8, 8]} />
@@ -187,7 +230,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                 </group>
             )}
 
-            <mesh geometry={new THREE.PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
+            <mesh geometry={new PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
                 color: planeColor, roughness: 1, metalness: 0.5,
                 transparent: true,
                 opacity: 0.95
