@@ -58,6 +58,11 @@ export function areInsetAreasOverlapping(pos1, pos2, purpleRadius1, purpleRadius
     return distanceSq < minAllowed * minAllowed;
 }
 
+export function areRectanglesOverlapping(pos1, size1, pos2, size2) {
+    return Math.abs(pos1.x - pos2.x) < ((size1.width + size2.width) / 2) &&
+        Math.abs(pos1.y - pos2.y) < ((size1.height + size2.height) / 2);
+}
+
 export function doesInsetAreaIntersectOval(circlePos, ovalPos, purpleRadius, ovalLength, ovalWidth) {
     const dx = circlePos.x - ovalPos.x;
     const dy = circlePos.y - ovalPos.y;

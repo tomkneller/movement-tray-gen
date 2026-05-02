@@ -1,6 +1,6 @@
 // CirclePlacer.js
 import { Vector2 } from 'three';
-import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, doesInsetAreaIntersectOval, canAddCircle, nudgePositionAwayFromOval, relaxPositions, doesOuterIntrudeIntoInset } from './utils/CirclePlacementUtils';
+import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, areRectanglesOverlapping, doesInsetAreaIntersectOval, canAddCircle, nudgePositionAwayFromOval, relaxPositions, doesOuterIntrudeIntoInset } from './utils/CirclePlacementUtils';
 
 // local helper to compute circle-circle intersection points
 function circleIntersections(x0, y0, r0, x1, y1, r1) {
@@ -24,7 +24,10 @@ function circleIntersections(x0, y0, r0, x1, y1, r1) {
 }
 
 export function generateCirclePlacements({
+    slotShape = 'circle',
     insetRadius,
+    insetWidth,
+    insetHeight,
     borderWidth,
     rows,
     cols,
@@ -37,32 +40,62 @@ export function generateCirclePlacements({
     const circles = [];
     const points = [];
 
+    const resolvedInsetWidth = slotShape === 'rectangle' ? insetWidth : insetRadius * 2;
+    const resolvedInsetHeight = slotShape === 'rectangle' ? insetHeight : insetRadius * 2;
+    const outerWidth = resolvedInsetWidth + (borderWidth * 2);
+    const outerHeight = resolvedInsetHeight + (borderWidth * 2);
     const circleOuterRadius = insetRadius + borderWidth;
-    const xOffset = circleOuterRadius + insetRadius + gap;
-    const yOffset = stagger
+    const xOffset = outerWidth + gap;
+    const yOffset = slotShape === 'circle' && stagger
         ? Math.sqrt((2 * circleOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98
-        : circleOuterRadius + insetRadius + gap;
+        : outerHeight + gap;
 
     let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
 
     const addCircle = (x, y, row = 0, col = 0) => {
         const position = { x, y };
 
-        if (!canAddCircle(x, y, row, col, circles, insetRadius, borderWidth, supportSlot)) {
-            return false;
+        if (slotShape === 'rectangle') {
+            const overlaps = circles.some(existing => areRectanglesOverlapping(
+                position,
+                { width: resolvedInsetWidth, height: resolvedInsetHeight },
+                existing.position,
+                {
+                    width: existing.insetWidth || resolvedInsetWidth,
+                    height: existing.insetHeight || resolvedInsetHeight
+                }
+            ));
+
+            if (overlaps) {
+                return false;
+            }
+        } else {
+            if (!canAddCircle(x, y, row, col, circles, insetRadius, borderWidth, supportSlot)) {
+                return false;
+            }
         }
 
-        circles.push({ position, insetRadius, borderWidth, borderHeight: borderWidth, row, col });
+        circles.push({
+            position,
+            insetRadius,
+            insetWidth: resolvedInsetWidth,
+            insetHeight: resolvedInsetHeight,
+            borderWidth,
+            borderHeight: borderWidth,
+            row,
+            col,
+            shape: slotShape
+        });
         points.push(new Vector2(x, y));
-        minx = Math.min(minx, x - circleOuterRadius);
-        miny = Math.min(miny, y - circleOuterRadius);
-        maxx = Math.max(maxx, x + circleOuterRadius);
-        maxy = Math.max(maxy, y + circleOuterRadius);
+        minx = Math.min(minx, x - (outerWidth / 2));
+        miny = Math.min(miny, y - (outerHeight / 2));
+        maxx = Math.max(maxx, x + (outerWidth / 2));
+        maxy = Math.max(maxy, y + (outerHeight / 2));
 
         return true;
     };
 
-    if (supportSlot.enabled) {
+    if (supportSlot.enabled && slotShape === 'circle') {
         const centerX = 0, centerY = 0;
 
         if (supportSlot.mode === 'circle') {

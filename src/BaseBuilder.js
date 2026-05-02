@@ -37,6 +37,16 @@ function createOuterCircleMesh(circle, outerRadius, depth) {
     return mesh;
 }
 
+function createOuterRectangleMesh(slot, borderWidth, depth) {
+    const outerWidth = (slot.insetWidth || 0) + (borderWidth * 2);
+    const outerHeight = (slot.insetHeight || 0) + (borderWidth * 2);
+    const geometry = new THREE.BoxGeometry(outerWidth, outerHeight, depth);
+    const mesh = new THREE.Mesh(geometry);
+    mesh.position.set(slot.position.x, slot.position.y, depth / 2);
+    mesh.updateMatrix();
+    return mesh;
+}
+
 function createOuterSupportMesh(supportSlot, borderWidth, depth) {
     const outerShape = new THREE.Shape();
     outerShape.absellipse(
@@ -58,7 +68,11 @@ function buildOuterShellCSG(circles, supportSlot, borderWidth, depth) {
     if (!circles || circles.length === 0) return null;
 
     const outerRadius = (circles[0].insetRadius || 10) + borderWidth;
-    const outerMeshes = circles.map(circle => createOuterCircleMesh(circle, outerRadius, depth));
+    const outerMeshes = circles.map(circle =>
+        circle.shape === 'rectangle'
+            ? createOuterRectangleMesh(circle, borderWidth, depth)
+            : createOuterCircleMesh(circle, outerRadius, depth)
+    );
 
     if (supportSlot?.enabled) {
         outerMeshes.push(createOuterSupportMesh(supportSlot, borderWidth, depth));
@@ -74,8 +88,12 @@ function subtractInsetHoles(baseCSG, circles, supportSlot, depth, mergeHoles = t
         let result = baseCSG;
 
         for (const circle of circles) {
-            const holeGeometry = new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
-            holeGeometry.rotateX(Math.PI / 2);
+            const holeGeometry = circle.shape === 'rectangle'
+                ? new THREE.BoxGeometry(circle.insetWidth, circle.insetHeight, depth * 3)
+                : new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
+            if (circle.shape !== 'rectangle') {
+                holeGeometry.rotateX(Math.PI / 2);
+            }
             holeGeometry.translate(circle.position.x, circle.position.y, depth / 2);
             const holeMesh = new THREE.Mesh(holeGeometry);
             holeMesh.updateMatrix();
@@ -98,8 +116,12 @@ function subtractInsetHoles(baseCSG, circles, supportSlot, depth, mergeHoles = t
     const holeParts = [];
 
     for (const circle of circles) {
-        const holeGeometry = new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
-        holeGeometry.rotateX(Math.PI / 2);
+        const holeGeometry = circle.shape === 'rectangle'
+            ? new THREE.BoxGeometry(circle.insetWidth, circle.insetHeight, depth * 3)
+            : new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
+        if (circle.shape !== 'rectangle') {
+            holeGeometry.rotateX(Math.PI / 2);
+        }
         holeGeometry.translate(circle.position.x, circle.position.y, depth / 2);
         const holeMesh = new THREE.Mesh(holeGeometry);
         holeMesh.updateMatrix();
@@ -134,15 +156,26 @@ export function buildBase({
     if (!circles || circles.length === 0) return new THREE.Mesh();
 
     const resolvedDepth = depth ?? baseThickness;
+    const slotShape = circles[0].shape || 'circle';
     const circleOuterRadius = (circles[0].insetRadius || 10) + borderWidth;
-    const connectionThreshold = (circleOuterRadius * 2) * 1.6;
+    const rectangleHalfDiagonal = Math.sqrt(
+        ((circles[0].insetWidth || 0) / 2) ** 2 +
+        ((circles[0].insetHeight || 0) / 2) ** 2
+    ) + borderWidth;
+    const connectionThreshold = slotShape === 'rectangle'
+        ? rectangleHalfDiagonal * 2.1
+        : (circleOuterRadius * 2) * 1.6;
 
     const solidParts = [];
     const connectionPoints = [];
 
     circles.forEach(circle => {
-        const geometry = new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, resolvedDepth, 40);
-        geometry.rotateX(Math.PI / 2);
+        const geometry = slotShape === 'rectangle'
+            ? new THREE.BoxGeometry(circle.insetWidth + (borderWidth * 2), circle.insetHeight + (borderWidth * 2), resolvedDepth)
+            : new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, resolvedDepth, 40);
+        if (slotShape !== 'rectangle') {
+            geometry.rotateX(Math.PI / 2);
+        }
         geometry.translate(circle.position.x, circle.position.y, resolvedDepth / 2);
         const mesh = new THREE.Mesh(geometry);
         mesh.updateMatrix();

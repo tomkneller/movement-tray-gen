@@ -62,7 +62,10 @@ function buildBounds(points) {
 self.onmessage = event => {
     const { requestId, params } = event.data;
     const {
+        slotShape,
         insetRadius,
+        insetWidth,
+        insetHeight,
         borderWidth,
         rows,
         cols,
@@ -77,7 +80,10 @@ self.onmessage = event => {
     } = params;
 
     const { circles, points } = generateCirclePlacements({
+        slotShape,
         insetRadius,
+        insetWidth,
+        insetHeight,
         borderWidth,
         rows,
         cols,

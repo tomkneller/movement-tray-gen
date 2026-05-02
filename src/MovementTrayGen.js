@@ -15,7 +15,10 @@ function MovementTrayGenerator() {
 
     const [darkMode] = useState(false);
 
+    const [slotShape, setSlotShape] = useState('circle');
     const [circularDiameter, setCircularDiameter] = useState(25);
+    const [rectWidth, setRectWidth] = useState(25);
+    const [rectHeight, setRectHeight] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35);
 
@@ -55,6 +58,10 @@ function MovementTrayGenerator() {
     const handleBaseMeshReady = useCallback((mesh) => {
         setExportMesh(mesh);
     }, []);
+
+    const currentBaseWidth = slotShape === 'rectangle' ? rectWidth : circularDiameter;
+    const currentBaseHeight = slotShape === 'rectangle' ? rectHeight : circularDiameter;
+    const maxMagnetWidth = Math.max(1, Math.min(currentBaseWidth, currentBaseHeight) - 2);
 
     //Center camera
     const recenterCamera = useCallback(() => {
@@ -104,12 +111,15 @@ function MovementTrayGenerator() {
     /* Reset all parameters to default */
     const presetResetDefault = () => {
         setCircularDiameter(25);
+        setRectWidth(25);
+        setRectHeight(25);
         setEdgeHeight(5);
         setHasMagnetSlot(true);
         setHasSupportSlot(false);
         setGap(0);
         setSupportCount(6);
         setSupportMode('circle');
+        setSlotShape('circle');
         setOvalWidth(35);
         setOvalLength(60);
         resetMaxSlots();
@@ -181,11 +191,11 @@ function MovementTrayGenerator() {
 
         switch (view) {
             case 'top':
-                cameraRef.current.position.set(0, 0, distance);
+                cameraRef.current.position.set(20, 45, distance);
                 cameraRef.current.lookAt(center);
                 break;
             case 'bottom':
-                cameraRef.current.position.set(0, 0, -distance);
+                cameraRef.current.position.set(20, 45, -distance);
                 cameraRef.current.lookAt(center);
                 break;
             default:
@@ -204,6 +214,14 @@ function MovementTrayGenerator() {
         switch (name) {
             case 'circularDiameter':
                 setCircularDiameter(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'rectWidth':
+                setRectWidth(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'rectHeight':
+                setRectHeight(parseFloat(value));
                 resetMaxSlots();
                 break;
             case 'ovalLength':
@@ -238,7 +256,14 @@ function MovementTrayGenerator() {
                 setFormationCols(formationRows);
                 break;
             case 'supportSlot':
+                if (slotShape === 'rectangle') break;
                 setHasSupportSlot(!hasSupportSlot);
+                break;
+            case 'slotShape':
+                setSlotShape(value);
+                if (value === 'rectangle') {
+                    setHasSupportSlot(false);
+                }
                 break;
             case 'supportMode':
                 setSupportMode(value);
@@ -295,7 +320,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={slotShape === 'rectangle' ? rectWidth : circularDiameter} baseHeight={slotShape === 'rectangle' ? rectHeight : circularDiameter} slotShape={slotShape} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
             </Canvas>
         </div>);
     };
@@ -350,11 +375,34 @@ function MovementTrayGenerator() {
                     <TabPanel>
                         <h3 className='tabTitle'>Tray Options</h3>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Circular Diameter:
-                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
-                                    className="input" />
-                                <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Base Shape:
+                                <select name="slotShape" value={slotShape} onChange={handleInputChange} className="input">
+                                    <option value={'circle'}>Circle</option>
+                                    <option value={'rectangle'}>Rectangle</option>
+                                </select>
                             </label>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            {slotShape === 'circle' ? (
+                                <label style={{ fontWeight: 500 }}>Circular Diameter:
+                                    <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
+                                        className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                </label>
+                            ) : (
+                                <>
+                                    <label style={{ fontWeight: 500 }}>Rectangle Width:
+                                        <input type="number" name="rectWidth" value={rectWidth} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                    <label style={{ fontWeight: 500, marginLeft: 12 }}>Rectangle Depth:
+                                        <input type="number" name="rectHeight" value={rectHeight} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </>
+                            )}
                         </div>
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                             <div inert={hasTriangleFormation} style={{ marginBottom: 12 }}>
@@ -424,7 +472,7 @@ function MovementTrayGenerator() {
                         <div inert={!hasMagnetSlot}>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Magnet Diameter:
-                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
+                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={maxMagnetWidth}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </label>
@@ -463,12 +511,15 @@ function MovementTrayGenerator() {
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add support slot</h3>
+                        {slotShape === 'rectangle' && (
+                            <p style={{ color: '#666' }}>Support slots are currently only available for circular base mode.</p>
+                        )}
                         <div style={{ marginBottom: 12 }}>
                             <label style={{ fontWeight: 500 }}>Support Slot:
                                 <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
                             </label>
                         </div>
-                        <div inert={!hasSupportSlot} >
+                        <div inert={!hasSupportSlot || slotShape === 'rectangle'} >
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Support Mode:
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
