@@ -1,52 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { MeshStandardMaterial, DoubleSide } from 'three';
 import * as THREE from 'three';
-import Circle from './Circle';
-import Oval from './Oval';
 import { createCircleGroup } from './utils/circleUtils';
 import { createOvalMesh } from './utils/ovalUtils';
-import { buildBase, computePerimeterDebug } from './BaseBuilder';
+import { buildBase, buildBorder, computePerimeterDebug } from './BaseBuilder';
 import { areInsetAreasOverlapping } from './utils/CirclePlacementUtils';
 import { generateCirclePlacements } from './CirclePlacement';
 
 function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom, perimeterDebug }) {
-    const [circlesData, setCirclesData] = useState([]);
-    const [debugData, setDebugData] = useState(null);
     const insetDiameter = baseWidth + 0.5; // Adding 0.5 to allow model base to fit inside the circle
     const insetRadius = insetDiameter / 2;
     const borderWidth = edgeThickness;
     const borderHeight = edgeHeight;
 
-    const [baseFillGeometry, setBaseFillGeometry] = useState(null);
-
-    function generateCircleGroups(circles, insetDiameter, baseThickness, borderWidth, borderHeight, magnetSlot, hollowBottom) {
+    function generateCircleMeshes(circles, insetDiameterValue, baseThicknessValue, borderWidthValue, borderHeightValue, magnetSlotValue, hollowBottomValue) {
         if (!circles || circles.length === 0) return [];
 
         return circles.flatMap(circle => {
+            const outerRadius = (circle.insetRadius || insetDiameterValue / 2) + borderWidthValue;
             const overlappingNeighbors = circles
-                .filter(c => c !== circle && areInsetAreasOverlapping(circle.position, c.position, borderWidth, borderWidth))
-                .map(c => c.position);
+                .filter(candidate => candidate !== circle && areInsetAreasOverlapping(
+                    circle.position,
+                    candidate.position,
+                    outerRadius,
+                    (candidate.insetRadius || insetDiameterValue / 2) + borderWidthValue
+                ))
+                .map(candidate => candidate.position);
 
             const group = createCircleGroup(
-                insetDiameter / 2,
-                baseThickness,
-                borderWidth,
-                borderHeight,
-                magnetSlot,
+                insetDiameterValue / 2,
+                baseThicknessValue,
+                borderWidthValue,
+                borderHeightValue,
+                magnetSlotValue,
                 circle.mainColor || 'lightgreen',
                 circle.borderColor || 'green',
                 circle.position,
                 overlappingNeighbors,
-                hollowBottom
+                hollowBottomValue,
+                false
             );
 
             group.updateMatrixWorld(true);
-
             return group.children.filter(child => child.isMesh);
         });
     }
 
-    useEffect(() => {
+    const generated = useMemo(() => {
         const { circles, points } = generateCirclePlacements({
             insetRadius,
             borderWidth,
@@ -59,18 +59,8 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             supportSlot
         });
 
-        const bounds = new THREE.Box3().setFromPoints(points.map(p => new THREE.Vector3(p.x, p.y, 0)));
-        setBounds(bounds);
-
-        let allExportMeshes = [];
-
-        if (supportSlot.enabled) {
-            const ovalGroup = createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot);
-
-            allExportMeshes.push(ovalGroup);
-        }
-
-        const circleMeshes = generateCircleGroups(
+        const bounds = new THREE.Box3().setFromPoints(points.map(point => new THREE.Vector3(point.x, point.y, 0)));
+        const circleMeshes = generateCircleMeshes(
             circles,
             insetDiameter,
             baseThickness,
@@ -79,25 +69,23 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             magnetSlot,
             hollowBottom
         );
-        allExportMeshes.push(...circleMeshes);
 
-        setCirclesData(circles);
+        const supportMeshes = supportSlot.enabled
+            ? createOvalMesh({ x: 0, y: 0 }, supportSlot.length, supportSlot.width, baseThickness, borderWidth, borderHeight, magnetSlot, false)
+                .children
+                .filter(child => child.isMesh)
+            : [];
 
-        // compute debug info for visualization if requested
+        let debugData = null;
         if (perimeterDebug) {
             try {
-                const dbg = computePerimeterDebug(circles);
-                setDebugData(dbg);
+                debugData = computePerimeterDebug(circles, supportSlot, borderWidth);
             } catch (err) {
-                // don't fail the render if debug computation has issues
-                setDebugData(null);
                 console.warn('Perimeter debug computation failed', err);
             }
-        } else {
-            setDebugData(null);
         }
 
-        const finalBaseMesh = buildBase({
+        const baseMesh = buildBase({
             circles,
             supportSlot,
             baseThickness,
@@ -107,63 +95,64 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
             straySlot,
         });
 
-        setBaseFillGeometry(finalBaseMesh.geometry);
+        const borderMesh = buildBorder({
+            circles,
+            supportSlot,
+            borderWidth,
+            edgeHeight: borderHeight
+        });
 
-        allExportMeshes.push(finalBaseMesh);
+        const exportGroup = new THREE.Group();
+        [...circleMeshes, ...supportMeshes, baseMesh, borderMesh].forEach(mesh => {
+            exportGroup.add(mesh.clone());
+        });
 
-        const group = new THREE.Group();
-        allExportMeshes.forEach(mesh => group.add(mesh));
+        return {
+            baseMesh,
+            borderMesh,
+            bounds,
+            circleMeshes,
+            debugData,
+            exportGroup,
+            supportMeshes
+        };
+    }, [baseThickness, borderHeight, borderWidth, gap, hollowBottom, insetDiameter, insetRadius, magnetSlot, perimeterDebug, rows, cols, stagger, straySlot, supportSlot, triangleFormation]);
+
+    useEffect(() => {
+        setBounds(generated.bounds);
 
         if (onBaseMeshReady) {
-            onBaseMeshReady(group);
+            onBaseMeshReady(generated.exportGroup);
         }
-
-    }, [supportSlot, baseWidth, stagger, rows, cols, gap, straySlot, borderWidth, borderHeight, magnetSlot, insetRadius, setBounds, insetDiameter, baseThickness, onBaseMeshReady, hollowBottom, triangleFormation]);
+    }, [generated, onBaseMeshReady, setBounds]);
 
     const planeColor = darkMode ? 0x2a3550 : '#7A7474';
 
     return (
         <>
-            {baseFillGeometry && (
-                <mesh geometry={baseFillGeometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
+            {generated.baseMesh?.geometry && (
+                <mesh geometry={generated.baseMesh.geometry} material={new MeshStandardMaterial({ color: '#d6cfc7', side: DoubleSide })} position={[0, 0, 0]} />
             )}
-            {circlesData.map((circle, index) => (
-                <Circle
-                    key={index}
-                    {...circle}
-                    insetDiameter={insetDiameter}
-                    baseThickness={baseThickness}
-                    borderWidth={borderWidth}
-                    borderHeight={borderHeight}
-                    magnetSlot={magnetSlot}
-                    mainColor="lightgreen"
-                    borderColor="green"
-                    hollowBottom={hollowBottom}
-                />
+            {generated.borderMesh?.geometry && (
+                <mesh geometry={generated.borderMesh.geometry} material={new MeshStandardMaterial({ color: '#333a40', side: DoubleSide })} position={[0, 0, 0]} />
+            )}
+            {generated.circleMeshes.map((mesh, index) => (
+                <primitive key={`circle-${index}`} object={mesh} />
             ))}
-            {supportSlot.enabled && (
-                <Oval
-                    length={supportSlot.length}
-                    width={supportSlot.width}
-                    baseThickness={baseThickness}
-                    borderWidth={borderWidth}
-                    borderHeight={borderHeight}
-                    magnetSlot={magnetSlot}
-                    mainColor="lightgreen"
-                    outerColor="green"
-                />
-            )}
+            {generated.supportMeshes.map((mesh, index) => (
+                <primitive key={`support-${index}`} object={mesh} />
+            ))}
 
             {/* Debug visualizations for perimeter generation */}
-            {debugData && (
+            {generated.debugData && (
                 <group>
-                    {debugData.hullCenters && debugData.hullCenters.map((p, idx) => (
+                    {generated.debugData.hullCenters && generated.debugData.hullCenters.map((p, idx) => (
                         <mesh key={'hc' + idx} position={[p[0], p[1], 0.5]}>
                             <sphereGeometry args={[0.6, 8, 8]} />
                             <meshBasicMaterial color={'#ff0000'} />
                         </mesh>
                     ))}
-                    {debugData.triangles && debugData.triangles.map((t, idx) => (
+                    {generated.debugData.triangles && generated.debugData.triangles.map((t, idx) => (
                         <group key={'tri' + idx}>
                             <mesh position={[t.center.x, t.center.y, 0.6]}>
                                 <sphereGeometry args={[0.5, 8, 8]} />
@@ -183,7 +172,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, edgeHeight, edgeThicknes
                             </mesh>
                         </group>
                     ))}
-                    {debugData.connectors && debugData.connectors.map((c, idx) => (
+                    {generated.debugData.connectors && generated.debugData.connectors.map((c, idx) => (
                         <group key={'con' + idx}>
                             <mesh position={[c.pA.x, c.pA.y, 0.5]}>
                                 <sphereGeometry args={[0.35, 8, 8]} />

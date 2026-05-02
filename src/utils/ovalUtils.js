@@ -9,11 +9,10 @@ import {
 } from 'three';
 import { CSG } from 'three-csg-ts';
 
-export function createOvalMesh(position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot) {
+export function createOvalMesh(position, length, width, baseThickness, borderWidth, borderHeight, magnetSlot, includeBorder = true) {
     const group = new Group();
 
     const baseMaterial = new MeshStandardMaterial({ color: '#e0e3eb', roughness: 0.5, metalness: 0.1 });
-    const magnetMaterial = new MeshStandardMaterial({ color: '#555555' });
     const baseOuterMaterial = new MeshStandardMaterial({ color: '#333a40' });
 
     const innerLengthRadius = length / 2;
@@ -31,28 +30,29 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
         curveSegments: 128,
     });
 
-    const innerMesh = new Mesh(
-        innerGeom,
-        baseMaterial
-    );
+    let finalBaseMesh;
+    if (!magnetSlot.enabled) {
+        finalBaseMesh = new Mesh(innerGeom, baseMaterial);
+    } else {
+        const innerMesh = new Mesh(
+            innerGeom,
+            baseMaterial
+        );
 
-    innerMesh.updateMatrix();
+        innerMesh.updateMatrix();
 
-    let csgBase = CSG.fromMesh(innerMesh);
+        let csgBase = CSG.fromMesh(innerMesh);
 
-    // Optional magnet slot
-    if (magnetSlot.enabled) {
-        const magnetGeom = new CylinderGeometry(magnetSlot.width / 2, magnetSlot.width / 2, magnetSlot.depth, 64);
+        const magnetGeom = new CylinderGeometry(magnetSlot.width / 2, magnetSlot.width / 2, magnetSlot.depth, 48);
         magnetGeom.rotateX(Math.PI / 2);
         const magnetMesh = new Mesh(magnetGeom);
         magnetMesh.position.z = baseThickness - (magnetSlot.depth / 2);
         magnetMesh.updateMatrixWorld();
 
         csgBase = csgBase.subtract(CSG.fromMesh(magnetMesh));
+        finalBaseMesh = CSG.toMesh(csgBase, innerMesh.matrix, baseMaterial);
     }
 
-    // Create mesh from CSG result
-    const finalBaseMesh = CSG.toMesh(csgBase, innerMesh.matrix, baseMaterial);
     finalBaseMesh.position.set(0, 0, 0);
     finalBaseMesh.updateMatrixWorld();
     group.add(finalBaseMesh);
@@ -74,9 +74,11 @@ export function createOvalMesh(position, length, width, baseThickness, borderWid
         curveSegments: 128,
     });
 
-    const borderMesh = new Mesh(borderGeom, baseOuterMaterial);
-    borderMesh.position.z = 0;
-    group.add(borderMesh);
+    if (includeBorder) {
+        const borderMesh = new Mesh(borderGeom, baseOuterMaterial);
+        borderMesh.position.z = 0;
+        group.add(borderMesh);
+    }
 
     group.updateMatrixWorld(true);
 

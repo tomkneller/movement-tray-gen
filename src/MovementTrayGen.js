@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue, startTransition } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -13,7 +13,7 @@ function MovementTrayGenerator() {
     const cameraRef = useRef();
     const controlsRef = useRef();
 
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode] = useState(false);
 
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [ovalLength, setOvalLength] = useState(60);
@@ -39,6 +39,8 @@ function MovementTrayGenerator() {
 
     const [formationCols, setFormationCols] = useState(3);
     const [formationRows, setFormationRows] = useState(4);
+    const deferredFormationCols = useDeferredValue(formationCols);
+    const deferredFormationRows = useDeferredValue(formationRows);
 
     const [bounds, setBounds] = useState(null);
 
@@ -254,10 +256,14 @@ function MovementTrayGenerator() {
                 setMagnetWidth(parseFloat(value));
                 break;
             case 'formationCols':
-                setFormationCols(parseFloat(value));
+                startTransition(() => {
+                    setFormationCols(parseFloat(value));
+                });
                 break;
             case 'formationRows':
-                setFormationRows(parseFloat(value));
+                startTransition(() => {
+                    setFormationRows(parseFloat(value));
+                });
                 break;
             case 'straySlot':
                 setHasStraySlot(!hasStraySlot);
@@ -289,7 +295,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
             </Canvas>
         </div>);
     };

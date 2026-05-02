@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../ThemeContext';
 
 import { Info, HelpCircle, Moon, Sun } from 'react-feather';
