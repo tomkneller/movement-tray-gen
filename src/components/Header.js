@@ -48,15 +48,15 @@ function Header() {
                         <div className="modal-content">
                             <h2>New in this version </h2>
                             <ul>
-                                <li>Mobile-friendly interface</li>
-                                <li>Saved dark/light mode preferences</li>
-                                <li>Added Hollow Bottoms Option</li>
+                                <li>Customizable support slots for different models</li>
+                                <li>Support for square base shapes</li>
+                                <li>Added staggered and triangle formations</li>
+                                <li>Fixed issues with support slot placement</li>
                             </ul>
                             <h2>Upcoming Features</h2>
                             <ul>
-                                <li>Different formations including staggered, wedge and diamond</li>
-                                <li>Support for different base shapes (oval, square)</li>
-                                <li>Customizable support slots for different models</li>
+                                <li>Different formations including diamond and arrowhead</li>
+                                <li>Support for oval base shapes</li>
                                 <li>Export to other formats (OBJ, 3MF)</li>
                                 <li>Save and load configurations</li>
                                 <li>Improved performance for large trays</li>
