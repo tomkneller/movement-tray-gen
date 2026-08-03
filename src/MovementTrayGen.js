@@ -180,6 +180,8 @@ function MovementTrayGenerator() {
 
 
     const setCameraView = (view) => {
+        if (!bounds || !cameraRef.current || !controlsRef.current) return;
+
         const center = new Vector3();
         bounds.getCenter(center);
 
@@ -187,21 +189,23 @@ function MovementTrayGenerator() {
         bounds.getSize(size);
 
         const maxDim = Math.max(size.x, size.y);
-        const distance = maxDim * 1.4; // adjust zoom factor
+        const distance = Math.max(maxDim * 1.4, 1);
 
         switch (view) {
             case 'top':
-                cameraRef.current.position.set(20, 45, distance);
-                cameraRef.current.lookAt(center);
+                cameraRef.current.position.set(center.x, center.y, center.z + distance);
                 break;
             case 'bottom':
-                cameraRef.current.position.set(20, 45, -distance);
-                cameraRef.current.lookAt(center);
+                cameraRef.current.position.set(center.x, center.y, center.z - distance);
                 break;
             default:
-                break
+                return;
         }
 
+        cameraRef.current.up.set(0, 1, 0);
+        controlsRef.current.target.copy(center);
+        cameraRef.current.lookAt(center);
+        controlsRef.current.update();
         cameraRef.current.updateProjectionMatrix();
     };
 
