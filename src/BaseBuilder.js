@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { getSupportConnectorPairs } from './utils/baseFillUtils';
 
 function getDistance(p1, p2) {
     return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
@@ -192,7 +193,6 @@ export function buildBase({
         const mesh = new THREE.Mesh(geometry);
         mesh.updateMatrix();
         solidParts.push(mesh);
-        connectionPoints.push({ x: 0, y: 0 });
     }
 
     for (let i = 0; i < connectionPoints.length; i++) {
@@ -253,6 +253,26 @@ export function buildBase({
             }
         }
     }
+
+    const supportConnectorPairs = getSupportConnectorPairs({
+        circles,
+        supportSlot,
+        borderWidth,
+        circleOuterRadius,
+        connectionThreshold
+    });
+    supportConnectorPairs.forEach(([current, next]) => {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(current.position.x, current.position.y);
+        shape.lineTo(next.position.x, next.position.y);
+        shape.closePath();
+
+        const geometry = new THREE.ExtrudeGeometry(shape, { depth: resolvedDepth, bevelEnabled: false });
+        const mesh = new THREE.Mesh(geometry);
+        mesh.updateMatrix();
+        solidParts.push(mesh);
+    });
 
     let baseCSG = unionMeshes(solidParts);
     if (!baseCSG) return new THREE.Mesh();

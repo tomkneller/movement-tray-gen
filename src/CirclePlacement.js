@@ -222,13 +222,14 @@ export function generateCirclePlacements({
             // Oval mode
             placeEvenCirclesAlongOval(
                 { x: 0, y: 0 },
-                supportSlot.length,
-                supportSlot.width,
+                supportSlot.length / 2,
+                supportSlot.width / 2,
                 supportSlot.count,
-                2,
+                circleOuterRadius + 1,
                 (x, y, i) => {
                     addCircle(x, y, i);
-                }
+                },
+                circleOuterRadius + insetRadius
             );
         }
     } else if (triangleFormation) {
