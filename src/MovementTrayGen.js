@@ -386,28 +386,34 @@ function MovementTrayGenerator() {
                                 </select>
                             </label>
                         </div>
-                        <div style={{ marginBottom: 12 }}>
-                            {slotShape === 'circle' ? (
+
+                        {slotShape === 'circle' ? (
+                            <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Circular Diameter:
                                     <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </label>
-                            ) : (
-                                <>
+                            </div>
+                        ) : (
+                            <>
+                                <div style={{ marginBottom: 12 }}>
                                     <label style={{ fontWeight: 500 }}>Rectangle Width:
                                         <input type="number" name="rectWidth" value={rectWidth} onChange={handleInputChange} min={10} max={200}
                                             className="input" />
                                         <label style={{ fontWeight: 500 }}>mm</label>
                                     </label>
-                                    <label style={{ fontWeight: 500, marginLeft: 12 }}>Rectangle Depth:
+                                </div>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Rectangle Depth:
                                         <input type="number" name="rectHeight" value={rectHeight} onChange={handleInputChange} min={10} max={200}
                                             className="input" />
                                         <label style={{ fontWeight: 500 }}>mm</label>
                                     </label>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            </>
+                        )}
+
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                             <div inert={hasTriangleFormation} style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Columns:
