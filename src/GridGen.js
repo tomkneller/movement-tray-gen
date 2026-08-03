@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useRef, useState } from 'react';
-import { MeshStandardMaterial, DoubleSide, BufferGeometry, BufferAttribute, Box3, Vector3, PlaneGeometry } from 'three';
+import { MeshStandardMaterial, DoubleSide, BufferGeometry, BufferAttribute, Box3, Vector3 } from 'three';
+import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { createCircleGroup } from './utils/circleUtils';
 import { createOvalMesh } from './utils/ovalUtils';
@@ -39,6 +40,12 @@ function deserializeGeometry(serializedGeometry) {
 function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom, perimeterDebug }) {
     const workerRef = useRef(null);
     const requestIdRef = useRef(0);
+    const cuttingMatTexture = useTexture('/assets/cutting-mat.jpg');
+
+    useEffect(() => {
+        cuttingMatTexture.colorSpace = THREE.SRGBColorSpace;
+        cuttingMatTexture.needsUpdate = true;
+    }, [cuttingMatTexture]);
 
     const insetDiameter = baseWidth + 0.5;
     const insetRadius = insetDiameter / 2;
@@ -190,8 +197,6 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
         }
     }, [workerResult.bounds, exportGroup, onBaseMeshReady, setBounds]);
 
-    const planeColor = darkMode ? 0x2a3550 : '#7A7474';
-
     return (
         <>
             {workerResult.baseGeometry && (
@@ -250,11 +255,15 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
                 </group>
             )}
 
-            <mesh geometry={new PlaneGeometry(1000, 1000)} material={new MeshStandardMaterial({
-                color: planeColor, roughness: 1, metalness: 0.5,
-                transparent: true,
-                opacity: 0.95
-            })} receiveShadow position={[0, 0, 0]} />
+            <mesh receiveShadow position={[0, 0, 0]}>
+                <planeGeometry args={[1000, 527.34375]} />
+                <meshStandardMaterial
+                    map={cuttingMatTexture}
+                    color={darkMode ? '#a8a8a8' : '#ffffff'}
+                    roughness={1}
+                    metalness={0}
+                />
+            </mesh>
         </>
     );
 }
