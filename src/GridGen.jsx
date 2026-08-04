@@ -6,6 +6,8 @@ import { createCircleGroup } from './utils/circleUtils';
 import { createOvalMesh } from './utils/ovalUtils';
 import { createRectangleGroup } from './utils/rectangleUtils';
 
+const cuttingMatUrl = `${import.meta.env.BASE_URL}assets/cutting-mat.jpg`;
+
 function deserializeGeometry(serializedGeometry) {
     if (!serializedGeometry) return null;
 
@@ -40,7 +42,7 @@ function deserializeGeometry(serializedGeometry) {
 function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, edgeHeight, edgeThickness, stagger, triangleFormation, rows, cols, gap, supportSlot, magnetSlot, straySlot, onBaseMeshReady, darkMode, hollowBottom, perimeterDebug }) {
     const workerRef = useRef(null);
     const requestIdRef = useRef(0);
-    const cuttingMatTexture = useTexture('/assets/cutting-mat.jpg');
+    const cuttingMatTexture = useTexture(cuttingMatUrl);
 
     useEffect(() => {
         cuttingMatTexture.colorSpace = THREE.SRGBColorSpace;
@@ -98,7 +100,10 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
     }
 
     useEffect(() => {
-        const worker = new Worker(new URL('./workers/trayGenerationWorker.js', import.meta.url));
+        const worker = new Worker(
+            new URL('./workers/trayGenerationWorker.js', import.meta.url),
+            { type: 'module' }
+        );
         workerRef.current = worker;
 
         worker.onmessage = event => {

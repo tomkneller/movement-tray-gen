@@ -2,8 +2,6 @@ import { generateCirclePlacements } from './CirclePlacement';
 import { getSupportConnectorPairs } from './utils/baseFillUtils';
 import { getDistanceToOvalBoundary } from './utils/CirclePlacementUtils';
 
-jest.setTimeout(30000);
-
 const insetRadius = 12.75;
 const borderWidth = 1.5;
 
