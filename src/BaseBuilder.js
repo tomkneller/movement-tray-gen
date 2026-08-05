@@ -48,6 +48,47 @@ function createOuterRectangleMesh(slot, borderWidth, depth) {
     return mesh;
 }
 
+function createOvalGeometry(width, height, depth) {
+    const shape = new THREE.Shape();
+    shape.absellipse(0, 0, width / 2, height / 2, 0, Math.PI * 2);
+    return new THREE.ExtrudeGeometry(shape, {
+        depth,
+        bevelEnabled: false,
+        curveSegments: 64
+    });
+}
+
+function createOuterOvalMesh(slot, borderWidth, depth) {
+    const geometry = createOvalGeometry(
+        slot.insetWidth + (borderWidth * 2),
+        slot.insetHeight + (borderWidth * 2),
+        depth
+    );
+    geometry.translate(slot.position.x, slot.position.y, 0);
+    const mesh = new THREE.Mesh(geometry);
+    mesh.updateMatrix();
+    return mesh;
+}
+
+function createInsetHoleMesh(slot, depth) {
+    let geometry;
+    if (slot.shape === 'rectangle') {
+        geometry = new THREE.BoxGeometry(slot.insetWidth, slot.insetHeight, depth * 3);
+        geometry.translate(slot.position.x, slot.position.y, depth / 2);
+    } else if (slot.shape === 'oval') {
+        geometry = createOvalGeometry(slot.insetWidth, slot.insetHeight, depth * 3);
+        geometry.translate(slot.position.x, slot.position.y, -depth);
+    } else {
+        geometry = new THREE.CylinderGeometry(slot.insetRadius, slot.insetRadius, depth * 3, 32);
+        geometry.rotateX(Math.PI / 2);
+        geometry.translate(slot.position.x, slot.position.y, depth / 2);
+    }
+
+    const mesh = new THREE.Mesh(geometry);
+    mesh.updateMatrix();
+    return mesh;
+}
+
 function createOuterSupportMesh(supportSlot, borderWidth, depth) {
     const outerShape = new THREE.Shape();
     outerShape.absellipse(
@@ -69,11 +110,11 @@ function buildOuterShellCSG(circles, supportSlot, borderWidth, depth) {
     if (!circles || circles.length === 0) return null;
 
     const outerRadius = (circles[0].insetRadius || 10) + borderWidth;
-    const outerMeshes = circles.map(circle =>
-        circle.shape === 'rectangle'
-            ? createOuterRectangleMesh(circle, borderWidth, depth)
-            : createOuterCircleMesh(circle, outerRadius, depth)
-    );
+    const outerMeshes = circles.map(circle => {
+        if (circle.shape === 'rectangle') return createOuterRectangleMesh(circle, borderWidth, depth);
+        if (circle.shape === 'oval') return createOuterOvalMesh(circle, borderWidth, depth);
+        return createOuterCircleMesh(circle, outerRadius, depth);
+    });
 
     if (supportSlot?.enabled) {
         outerMeshes.push(createOuterSupportMesh(supportSlot, borderWidth, depth));
@@ -89,16 +130,7 @@ function subtractInsetHoles(baseCSG, circles, supportSlot, depth, mergeHoles = t
         let result = baseCSG;
 
         for (const circle of circles) {
-            const holeGeometry = circle.shape === 'rectangle'
-                ? new THREE.BoxGeometry(circle.insetWidth, circle.insetHeight, depth * 3)
-                : new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
-            if (circle.shape !== 'rectangle') {
-                holeGeometry.rotateX(Math.PI / 2);
-            }
-            holeGeometry.translate(circle.position.x, circle.position.y, depth / 2);
-            const holeMesh = new THREE.Mesh(holeGeometry);
-            holeMesh.updateMatrix();
-            result = result.subtract(CSG.fromMesh(holeMesh));
+            result = result.subtract(CSG.fromMesh(createInsetHoleMesh(circle, depth)));
         }
 
         if (supportSlot?.enabled) {
@@ -117,16 +149,7 @@ function subtractInsetHoles(baseCSG, circles, supportSlot, depth, mergeHoles = t
     const holeParts = [];
 
     for (const circle of circles) {
-        const holeGeometry = circle.shape === 'rectangle'
-            ? new THREE.BoxGeometry(circle.insetWidth, circle.insetHeight, depth * 3)
-            : new THREE.CylinderGeometry(circle.insetRadius, circle.insetRadius, depth * 3, 32);
-        if (circle.shape !== 'rectangle') {
-            holeGeometry.rotateX(Math.PI / 2);
-        }
-        holeGeometry.translate(circle.position.x, circle.position.y, depth / 2);
-        const holeMesh = new THREE.Mesh(holeGeometry);
-        holeMesh.updateMatrix();
-        holeParts.push(holeMesh);
+        holeParts.push(createInsetHoleMesh(circle, depth));
     }
 
     if (supportSlot?.enabled) {
@@ -163,21 +186,53 @@ export function buildBase({
         ((circles[0].insetWidth || 0) / 2) ** 2 +
         ((circles[0].insetHeight || 0) / 2) ** 2
     ) + borderWidth;
+    const ovalOuterWidth = (circles[0].insetWidth || 0) + (borderWidth * 2);
+    const ovalOuterHeight = (circles[0].insetHeight || 0) + (borderWidth * 2);
     const connectionThreshold = slotShape === 'rectangle'
         ? rectangleHalfDiagonal * 2.1
-        : (circleOuterRadius * 2) * 1.6;
+        : slotShape === 'oval'
+            ? Math.max(ovalOuterWidth, ovalOuterHeight) * 1.6
+            : (circleOuterRadius * 2) * 1.6;
+
+    const areConnectionPointsClose = (point1, point2) => {
+        if (slotShape !== 'oval') return getDistance(point1, point2) < connectionThreshold;
+
+        const dx = point2.x - point1.x;
+        const dy = point2.y - point1.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance < 1e-9) return true;
+
+        const directionX = dx / distance;
+        const directionY = dy / distance;
+        const radiusX = ovalOuterWidth / 2;
+        const radiusY = ovalOuterHeight / 2;
+        const radialExtent = 1 / Math.sqrt(
+            (directionX * directionX) / (radiusX * radiusX) +
+            (directionY * directionY) / (radiusY * radiusY)
+        );
+        return distance < (radialExtent * 2) * 1.6;
+    };
 
     const solidParts = [];
     const connectionPoints = [];
 
     circles.forEach(circle => {
-        const geometry = slotShape === 'rectangle'
-            ? new THREE.BoxGeometry(circle.insetWidth + (borderWidth * 2), circle.insetHeight + (borderWidth * 2), resolvedDepth)
-            : new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, resolvedDepth, 40);
-        if (slotShape !== 'rectangle') {
+        let geometry;
+        if (slotShape === 'rectangle') {
+            geometry = new THREE.BoxGeometry(circle.insetWidth + (borderWidth * 2), circle.insetHeight + (borderWidth * 2), resolvedDepth);
+            geometry.translate(circle.position.x, circle.position.y, resolvedDepth / 2);
+        } else if (slotShape === 'oval') {
+            geometry = createOvalGeometry(
+                circle.insetWidth + (borderWidth * 2),
+                circle.insetHeight + (borderWidth * 2),
+                resolvedDepth
+            );
+            geometry.translate(circle.position.x, circle.position.y, 0);
+        } else {
+            geometry = new THREE.CylinderGeometry(circleOuterRadius, circleOuterRadius, resolvedDepth, 40);
             geometry.rotateX(Math.PI / 2);
+            geometry.translate(circle.position.x, circle.position.y, resolvedDepth / 2);
         }
-        geometry.translate(circle.position.x, circle.position.y, resolvedDepth / 2);
         const mesh = new THREE.Mesh(geometry);
         mesh.updateMatrix();
         solidParts.push(mesh);
@@ -202,9 +257,9 @@ export function buildBase({
                 const p2 = connectionPoints[j];
                 const p3 = connectionPoints[k];
 
-                if (getDistance(p1, p2) < connectionThreshold &&
-                    getDistance(p2, p3) < connectionThreshold &&
-                    getDistance(p3, p1) < connectionThreshold) {
+                if (areConnectionPointsClose(p1, p2) &&
+                    areConnectionPointsClose(p2, p3) &&
+                    areConnectionPointsClose(p3, p1)) {
                     const shape = new THREE.Shape();
                     shape.moveTo(p1.x, p1.y);
                     shape.lineTo(p2.x, p2.y);
@@ -220,12 +275,12 @@ export function buildBase({
                 for (let l = k + 1; l < connectionPoints.length; l++) {
                     const p4 = connectionPoints[l];
 
-                    const distances = [
-                        getDistance(p1, p2), getDistance(p1, p3), getDistance(p1, p4),
-                        getDistance(p2, p3), getDistance(p2, p4), getDistance(p3, p4)
-                    ].filter(value => value < connectionThreshold);
+                    const closeConnections = [
+                        [p1, p2], [p1, p3], [p1, p4],
+                        [p2, p3], [p2, p4], [p3, p4]
+                    ].filter(([left, right]) => areConnectionPointsClose(left, right));
 
-                    if (distances.length >= 5) {
+                    if (closeConnections.length >= 5) {
                         const points = [p1, p2, p3, p4];
                         const center = {
                             x: (p1.x + p2.x + p3.x + p4.x) / 4,

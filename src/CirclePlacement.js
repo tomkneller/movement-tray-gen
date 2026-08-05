@@ -1,6 +1,6 @@
 // CirclePlacer.js
 import { Vector2 } from 'three';
-import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, areRectanglesOverlapping, doesInsetAreaIntersectOval, canAddCircle, nudgePositionAwayFromOval, relaxPositions, doesOuterIntrudeIntoInset } from './utils/CirclePlacementUtils';
+import { placeEvenCirclesAlongOval, areInsetAreasOverlapping, areRectanglesOverlapping, areEllipsesOverlapping, doesInsetAreaIntersectOval, canAddCircle, nudgePositionAwayFromOval, relaxPositions, doesOuterIntrudeIntoInset } from './utils/CirclePlacementUtils';
 
 // local helper to compute circle-circle intersection points
 function circleIntersections(x0, y0, r0, x1, y1, r1) {
@@ -40,15 +40,17 @@ export function generateCirclePlacements({
     const circles = [];
     const points = [];
 
-    const resolvedInsetWidth = slotShape === 'rectangle' ? insetWidth : insetRadius * 2;
-    const resolvedInsetHeight = slotShape === 'rectangle' ? insetHeight : insetRadius * 2;
+    const resolvedInsetWidth = slotShape === 'circle' ? insetRadius * 2 : insetWidth;
+    const resolvedInsetHeight = slotShape === 'circle' ? insetRadius * 2 : insetHeight;
     const outerWidth = resolvedInsetWidth + (borderWidth * 2);
     const outerHeight = resolvedInsetHeight + (borderWidth * 2);
     const circleOuterRadius = insetRadius + borderWidth;
     const xOffset = outerWidth + gap;
-    const yOffset = slotShape === 'circle' && stagger
+    const yOffset = stagger && slotShape === 'circle'
         ? Math.sqrt((2 * circleOuterRadius) ** 2 - (xOffset / 2) ** 2) * 0.98
-        : outerHeight + gap;
+        : stagger && slotShape === 'oval'
+            ? (outerHeight + gap) * (Math.sqrt(3) / 2) * 0.98
+            : outerHeight + gap;
 
     let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
 
@@ -69,6 +71,22 @@ export function generateCirclePlacements({
             if (overlaps) {
                 return false;
             }
+        } else if (slotShape === 'oval') {
+            const insetSize = { width: resolvedInsetWidth, height: resolvedInsetHeight };
+            const outerSize = {
+                width: resolvedInsetWidth + (borderWidth * 2),
+                height: resolvedInsetHeight + (borderWidth * 2)
+            };
+            const overlaps = circles.some(existing => {
+                const existingInsetSize = {
+                    width: existing.insetWidth || resolvedInsetWidth,
+                    height: existing.insetHeight || resolvedInsetHeight
+                };
+                return areEllipsesOverlapping(position, insetSize, existing.position, existingInsetSize) ||
+                    areEllipsesOverlapping(position, outerSize, existing.position, existingInsetSize);
+            });
+
+            if (overlaps) return false;
         } else {
             if (!canAddCircle(x, y, row, col, circles, insetRadius, borderWidth, supportSlot)) {
                 return false;
@@ -261,5 +279,9 @@ export function generateCirclePlacements({
         }
     }
 
-    return { circles, points };
+    const bounds = Number.isFinite(minx)
+        ? { min: { x: minx, y: miny }, max: { x: maxx, y: maxy } }
+        : null;
+
+    return { circles, points, bounds };
 }

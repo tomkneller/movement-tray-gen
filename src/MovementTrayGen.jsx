@@ -19,6 +19,8 @@ function MovementTrayGenerator() {
     const [circularDiameter, setCircularDiameter] = useState(25);
     const [rectWidth, setRectWidth] = useState(25);
     const [rectHeight, setRectHeight] = useState(25);
+    const [ovalBaseLength, setOvalBaseLength] = useState(60);
+    const [ovalBaseWidth, setOvalBaseWidth] = useState(35);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35);
 
@@ -59,8 +61,12 @@ function MovementTrayGenerator() {
         setExportMesh(mesh);
     }, []);
 
-    const currentBaseWidth = slotShape === 'rectangle' ? rectWidth : circularDiameter;
-    const currentBaseHeight = slotShape === 'rectangle' ? rectHeight : circularDiameter;
+    const currentBaseWidth = slotShape === 'circle'
+        ? circularDiameter
+        : slotShape === 'oval' ? ovalBaseLength : rectWidth;
+    const currentBaseHeight = slotShape === 'circle'
+        ? circularDiameter
+        : slotShape === 'oval' ? ovalBaseWidth : rectHeight;
     const maxMagnetWidth = Math.max(1, Math.min(currentBaseWidth, currentBaseHeight) - 2);
 
     //Center camera
@@ -85,12 +91,12 @@ function MovementTrayGenerator() {
     }, [bounds]);
 
     const supportSlot = useMemo(() => ({
-        enabled: hasSupportSlot,
+        enabled: hasSupportSlot && slotShape === 'circle',
         length: ovalLength + 1,
         width: ovalWidth + 1,
         mode: supportMode,
         count: supportCount
-    }), [hasSupportSlot, ovalLength, ovalWidth, supportCount, supportMode]);
+    }), [hasSupportSlot, ovalLength, ovalWidth, slotShape, supportCount, supportMode]);
 
     const magnetSlot = useMemo(() => ({
         enabled: hasMagnetSlot,
@@ -113,6 +119,8 @@ function MovementTrayGenerator() {
         setCircularDiameter(25);
         setRectWidth(25);
         setRectHeight(25);
+        setOvalBaseLength(60);
+        setOvalBaseWidth(35);
         setEdgeHeight(5);
         setHasMagnetSlot(true);
         setHasSupportSlot(false);
@@ -228,6 +236,14 @@ function MovementTrayGenerator() {
                 setRectHeight(parseFloat(value));
                 resetMaxSlots();
                 break;
+            case 'ovalBaseLength':
+                setOvalBaseLength(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'ovalBaseWidth':
+                setOvalBaseWidth(parseFloat(value));
+                resetMaxSlots();
+                break;
             case 'ovalLength':
                 setOvalLength(parseFloat(value));
                 resetMaxSlots();
@@ -260,12 +276,12 @@ function MovementTrayGenerator() {
                 setFormationCols(formationRows);
                 break;
             case 'supportSlot':
-                if (slotShape === 'rectangle') break;
+                if (slotShape !== 'circle') break;
                 setHasSupportSlot(!hasSupportSlot);
                 break;
             case 'slotShape':
                 setSlotShape(value);
-                if (value === 'rectangle') {
+                if (value !== 'circle') {
                     setHasSupportSlot(false);
                 }
                 break;
@@ -324,7 +340,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={slotShape === 'rectangle' ? rectWidth : circularDiameter} baseHeight={slotShape === 'rectangle' ? rectHeight : circularDiameter} slotShape={slotShape} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={currentBaseWidth} baseHeight={currentBaseHeight} slotShape={slotShape} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
             </Canvas>
         </div>);
     };
@@ -382,6 +398,7 @@ function MovementTrayGenerator() {
                             <label style={{ fontWeight: 500 }}>Base Shape:
                                 <select name="slotShape" value={slotShape} onChange={handleInputChange} className="input">
                                     <option value={'circle'}>Circle</option>
+                                    <option value={'oval'}>Oval</option>
                                     <option value={'rectangle'}>Rectangle</option>
                                 </select>
                             </label>
@@ -395,6 +412,23 @@ function MovementTrayGenerator() {
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </label>
                             </div>
+                        ) : slotShape === 'oval' ? (
+                            <>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Length:
+                                        <input type="number" name="ovalBaseLength" value={ovalBaseLength} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Width:
+                                        <input type="number" name="ovalBaseWidth" value={ovalBaseWidth} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                            </>
                         ) : (
                             <>
                                 <div style={{ marginBottom: 12 }}>
@@ -521,15 +555,15 @@ function MovementTrayGenerator() {
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add support slot</h3>
-                        {slotShape === 'rectangle' && (
+                        {slotShape !== 'circle' && (
                             <p style={{ color: '#666' }}>Support slots are currently only available for circular base mode.</p>
                         )}
                         <div style={{ marginBottom: 12 }}>
                             <label style={{ fontWeight: 500 }}>Support Slot:
-                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} disabled={slotShape !== 'circle'} className="input" />
                             </label>
                         </div>
-                        <div inert={!hasSupportSlot || slotShape === 'rectangle'} >
+                        <div inert={!hasSupportSlot || slotShape !== 'circle'} >
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Support Mode:
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">

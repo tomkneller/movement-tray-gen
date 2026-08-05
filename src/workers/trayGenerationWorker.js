@@ -79,7 +79,7 @@ self.onmessage = event => {
         borderHeight
     } = params;
 
-    const { circles, points } = generateCirclePlacements({
+    const { circles, points, bounds: placementBounds } = generateCirclePlacements({
         slotShape,
         insetRadius,
         insetWidth,
@@ -114,7 +114,12 @@ self.onmessage = event => {
     const baseGeometry = serializeGeometry(baseMesh.geometry);
     const borderGeometry = serializeGeometry(borderMesh.geometry);
     const debugData = perimeterDebug ? computePerimeterDebug(circles, supportSlot, borderWidth) : null;
-    const bounds = buildBounds(points);
+    const bounds = placementBounds
+        ? {
+            min: { x: placementBounds.min.x, y: placementBounds.min.y, z: 0 },
+            max: { x: placementBounds.max.x, y: placementBounds.max.y, z: borderHeight }
+        }
+        : buildBounds(points);
 
     const transferables = [];
     if (baseGeometry) transferables.push(...baseGeometry.transferables);

@@ -142,6 +142,14 @@ export function areRectanglesOverlapping(pos1, size1, pos2, size2) {
         Math.abs(pos1.y - pos2.y) < ((size1.height + size2.height) / 2);
 }
 
+export function areEllipsesOverlapping(pos1, size1, pos2, size2) {
+    const combinedRadiusX = Math.max((size1.width + size2.width) / 2, 1e-6);
+    const combinedRadiusY = Math.max((size1.height + size2.height) / 2, 1e-6);
+    const normalizedX = (pos1.x - pos2.x) / combinedRadiusX;
+    const normalizedY = (pos1.y - pos2.y) / combinedRadiusY;
+    return (normalizedX * normalizedX) + (normalizedY * normalizedY) < 1 - 1e-6;
+}
+
 export function doesInsetAreaIntersectOval(circlePos, ovalPos, purpleRadius, ovalLength, ovalWidth) {
     return getDistanceToOvalBoundary(circlePos, ovalPos, ovalLength, ovalWidth) < purpleRadius - 1e-6;
 }

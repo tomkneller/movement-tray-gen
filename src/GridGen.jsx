@@ -68,8 +68,9 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
         if (!slots || slots.length === 0) return [];
 
         return slots.flatMap(slot => {
-            const group = slot.shape === 'rectangle'
-                ? createRectangleGroup(
+            let group;
+            if (slot.shape === 'rectangle') {
+                group = createRectangleGroup(
                     slot.insetWidth || insetWidthValue,
                     slot.insetHeight || insetHeightValue,
                     baseThicknessValue,
@@ -79,8 +80,21 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
                     slot.position,
                     hollowBottomValue,
                     false
-                )
-                : createCircleGroup(
+                );
+            } else if (slot.shape === 'oval') {
+                group = createOvalMesh(
+                    slot.position,
+                    slot.insetWidth || insetWidthValue,
+                    slot.insetHeight || insetHeightValue,
+                    baseThicknessValue,
+                    borderWidthValue,
+                    borderHeightValue,
+                    magnetSlotValue,
+                    false,
+                    hollowBottomValue
+                );
+            } else {
+                group = createCircleGroup(
                     insetDiameterValue / 2,
                     baseThicknessValue,
                     borderWidthValue,
@@ -93,6 +107,7 @@ function GridGen({ setBounds, baseThickness, baseWidth, baseHeight, slotShape, e
                     hollowBottomValue,
                     false
                 );
+            }
 
             group.updateMatrixWorld(true);
             return group.children.filter(child => child.isMesh);
