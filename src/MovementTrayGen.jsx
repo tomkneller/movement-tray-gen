@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue, startTransition } from 'react';
 import GridGen from './GridGen';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -7,15 +7,20 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { Vector3 } from 'three';
 import './index.css';
-import { Download, Eye, Home } from 'react-feather';
+import { Download, Eye, Home, RotateCcw } from 'react-feather';
 
 function MovementTrayGenerator() {
     const cameraRef = useRef();
     const controlsRef = useRef();
 
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode] = useState(false);
 
+    const [slotShape, setSlotShape] = useState('circle');
     const [circularDiameter, setCircularDiameter] = useState(25);
+    const [rectWidth, setRectWidth] = useState(25);
+    const [rectHeight, setRectHeight] = useState(25);
+    const [ovalBaseLength, setOvalBaseLength] = useState(60);
+    const [ovalBaseWidth, setOvalBaseWidth] = useState(35);
     const [ovalLength, setOvalLength] = useState(60);
     const [ovalWidth, setOvalWidth] = useState(35);
 
@@ -32,12 +37,15 @@ function MovementTrayGenerator() {
 
     const [hasHollowBottom, setHasHollowBottom] = useState(false);
     const [hasTriangleFormation, setHasTriangleFormation] = useState(false);
+    const [hasPerimeterDebug, setHasPerimeterDebug] = useState(false);
 
     const [supportMode, setSupportMode] = useState('circle');
     const [supportCount, setSupportCount] = useState(6);
 
     const [formationCols, setFormationCols] = useState(3);
     const [formationRows, setFormationRows] = useState(4);
+    const deferredFormationCols = useDeferredValue(formationCols);
+    const deferredFormationRows = useDeferredValue(formationRows);
 
     const [bounds, setBounds] = useState(null);
 
@@ -52,6 +60,14 @@ function MovementTrayGenerator() {
     const handleBaseMeshReady = useCallback((mesh) => {
         setExportMesh(mesh);
     }, []);
+
+    const currentBaseWidth = slotShape === 'circle'
+        ? circularDiameter
+        : slotShape === 'oval' ? ovalBaseLength : rectWidth;
+    const currentBaseHeight = slotShape === 'circle'
+        ? circularDiameter
+        : slotShape === 'oval' ? ovalBaseWidth : rectHeight;
+    const maxMagnetWidth = Math.max(1, Math.min(currentBaseWidth, currentBaseHeight) - 2);
 
     //Center camera
     const recenterCamera = useCallback(() => {
@@ -75,12 +91,12 @@ function MovementTrayGenerator() {
     }, [bounds]);
 
     const supportSlot = useMemo(() => ({
-        enabled: hasSupportSlot,
+        enabled: hasSupportSlot && slotShape === 'circle',
         length: ovalLength + 1,
         width: ovalWidth + 1,
         mode: supportMode,
         count: supportCount
-    }), [hasSupportSlot, ovalLength, ovalWidth, supportCount, supportMode]);
+    }), [hasSupportSlot, ovalLength, ovalWidth, slotShape, supportCount, supportMode]);
 
     const magnetSlot = useMemo(() => ({
         enabled: hasMagnetSlot,
@@ -98,9 +114,66 @@ function MovementTrayGenerator() {
         // Potentially disable increment button or show a message
     };
 
+    /* Reset all parameters to default */
+    const presetResetDefault = () => {
+        setCircularDiameter(25);
+        setRectWidth(25);
+        setRectHeight(25);
+        setOvalBaseLength(60);
+        setOvalBaseWidth(35);
+        setEdgeHeight(5);
+        setHasMagnetSlot(true);
+        setHasSupportSlot(false);
+        setGap(0);
+        setSupportCount(6);
+        setSupportMode('circle');
+        setSlotShape('circle');
+        setOvalWidth(35);
+        setOvalLength(60);
+        resetMaxSlots();
+    }
+
     const resetMaxSlots = () => {
         setMaxReached(false);
         setMaxSlots(100);
+    }
+
+    /* Set tray to preset for paint holder trays */
+    const handlePresetSelect = (diameter) => {
+        presetResetDefault();
+        setCircularDiameter(diameter);
+        setEdgeHeight(10);
+        setHasMagnetSlot(false);
+        resetMaxSlots();
+    };
+
+    /* Set tray to preset for movement trays */
+    const handleMovementPreset = (diameter) => {
+        presetResetDefault();
+        setCircularDiameter(diameter);
+        setEdgeHeight(5);
+    }
+
+    /* Set tray to preset for movement trays with support slots */
+    const handleSpecialPreset = (diameter, supportMode, slotCount, ovalWidth, ovalLength) => {
+        presetResetDefault();
+        setCircularDiameter(diameter);
+        setEdgeHeight(8);
+        setHasSupportSlot(true);
+        setSupportMode(supportMode);
+        setSupportCount(slotCount);
+
+        if (supportMode) {
+            if (supportMode === 'circle') {
+                setOvalWidth(ovalWidth);
+            }
+            else {
+                setOvalWidth(ovalWidth);
+                setOvalLength(ovalLength);
+            }
+        }
+
+        // resetMaxSlots();
     }
 
     useEffect(() => {
@@ -115,6 +188,8 @@ function MovementTrayGenerator() {
 
 
     const setCameraView = (view) => {
+        if (!bounds || !cameraRef.current || !controlsRef.current) return;
+
         const center = new Vector3();
         bounds.getCenter(center);
 
@@ -122,21 +197,23 @@ function MovementTrayGenerator() {
         bounds.getSize(size);
 
         const maxDim = Math.max(size.x, size.y);
-        const distance = maxDim * 1.4; // adjust zoom factor
+        const distance = Math.max(maxDim * 1.4, 1);
 
         switch (view) {
             case 'top':
-                cameraRef.current.position.set(0, 0, distance);
-                cameraRef.current.lookAt(center);
+                cameraRef.current.position.set(center.x, center.y, center.z + distance);
                 break;
             case 'bottom':
-                cameraRef.current.position.set(0, 0, -distance);
-                cameraRef.current.lookAt(center);
+                cameraRef.current.position.set(center.x, center.y, center.z - distance);
                 break;
             default:
-                break
+                return;
         }
 
+        cameraRef.current.up.set(0, 1, 0);
+        controlsRef.current.target.copy(center);
+        cameraRef.current.lookAt(center);
+        controlsRef.current.update();
         cameraRef.current.updateProjectionMatrix();
     };
 
@@ -149,6 +226,22 @@ function MovementTrayGenerator() {
         switch (name) {
             case 'circularDiameter':
                 setCircularDiameter(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'rectWidth':
+                setRectWidth(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'rectHeight':
+                setRectHeight(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'ovalBaseLength':
+                setOvalBaseLength(parseFloat(value));
+                resetMaxSlots();
+                break;
+            case 'ovalBaseWidth':
+                setOvalBaseWidth(parseFloat(value));
                 resetMaxSlots();
                 break;
             case 'ovalLength':
@@ -183,7 +276,14 @@ function MovementTrayGenerator() {
                 setFormationCols(formationRows);
                 break;
             case 'supportSlot':
+                if (slotShape !== 'circle') break;
                 setHasSupportSlot(!hasSupportSlot);
+                break;
+            case 'slotShape':
+                setSlotShape(value);
+                if (value !== 'circle') {
+                    setHasSupportSlot(false);
+                }
                 break;
             case 'supportMode':
                 setSupportMode(value);
@@ -201,10 +301,14 @@ function MovementTrayGenerator() {
                 setMagnetWidth(parseFloat(value));
                 break;
             case 'formationCols':
-                setFormationCols(parseFloat(value));
+                startTransition(() => {
+                    setFormationCols(parseFloat(value));
+                });
                 break;
             case 'formationRows':
-                setFormationRows(parseFloat(value));
+                startTransition(() => {
+                    setFormationRows(parseFloat(value));
+                });
                 break;
             case 'straySlot':
                 setHasStraySlot(!hasStraySlot);
@@ -236,7 +340,7 @@ function MovementTrayGenerator() {
                     shadow-camera-top={10}
                     shadow-camera-bottom={-10} />
                 <OrbitControls ref={controlsRef} />
-                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={circularDiameter} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={formationRows} cols={formationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} />
+                <GridGen setBounds={setBounds} baseThickness={baseThickness} baseWidth={currentBaseWidth} baseHeight={currentBaseHeight} slotShape={slotShape} edgeThickness={edgeThickness} edgeHeight={edgeHeight} stagger={staggerFormation} triangleFormation={hasTriangleFormation} rows={deferredFormationRows} cols={deferredFormationCols} gap={gap} supportSlot={supportSlot} magnetSlot={magnetSlot} straySlot={hasStraySlot} onMaxReached={handleMaxReached} onBaseMeshReady={handleBaseMeshReady} darkMode={darkMode} hollowBottom={hasHollowBottom} perimeterDebug={hasPerimeterDebug} />
             </Canvas>
         </div>);
     };
@@ -284,16 +388,66 @@ function MovementTrayGenerator() {
                         <Tab id="tab">
                             Support Slots
                         </Tab>
+                        <Tab id="tab">
+                            Presets
+                        </Tab>
                     </TabList>
                     <TabPanel>
                         <h3 className='tabTitle'>Tray Options</h3>
                         <div style={{ marginBottom: 12 }}>
-                            <label style={{ fontWeight: 500 }}>Circular Diameter:
-                                <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
-                                    className="input" />
-                                <label style={{ fontWeight: 500 }}>mm</label>
+                            <label style={{ fontWeight: 500 }}>Base Shape:
+                                <select name="slotShape" value={slotShape} onChange={handleInputChange} className="input">
+                                    <option value={'circle'}>Circle</option>
+                                    <option value={'oval'}>Oval</option>
+                                    <option value={'rectangle'}>Rectangle</option>
+                                </select>
                             </label>
                         </div>
+
+                        {slotShape === 'circle' ? (
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Circular Diameter:
+                                    <input type="number" name="circularDiameter" value={circularDiameter} onChange={handleInputChange} min={10} max={200}
+                                        className="input" />
+                                    <label style={{ fontWeight: 500 }}>mm</label>
+                                </label>
+                            </div>
+                        ) : slotShape === 'oval' ? (
+                            <>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Length:
+                                        <input type="number" name="ovalBaseLength" value={ovalBaseLength} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Oval Width:
+                                        <input type="number" name="ovalBaseWidth" value={ovalBaseWidth} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Rectangle Width:
+                                        <input type="number" name="rectWidth" value={rectWidth} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                                <div style={{ marginBottom: 12 }}>
+                                    <label style={{ fontWeight: 500 }}>Rectangle Depth:
+                                        <input type="number" name="rectHeight" value={rectHeight} onChange={handleInputChange} min={10} max={200}
+                                            className="input" />
+                                        <label style={{ fontWeight: 500 }}>mm</label>
+                                    </label>
+                                </div>
+                            </>
+                        )}
+
                         <div inert={hasSupportSlot} style={{ marginBottom: 12 }}>
                             <div inert={hasTriangleFormation} style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Columns:
@@ -343,6 +497,13 @@ function MovementTrayGenerator() {
                                 <label style={{ color: 'red' }}>Enable just before export if required (may cause perfomance issues)</label>
                             </label>
                         </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ fontWeight: 500 }}>Perimeter Debug Overlay:
+                                <input type="checkbox" name="perimeterDebug" checked={hasPerimeterDebug} value={hasPerimeterDebug} onChange={() => setHasPerimeterDebug(!hasPerimeterDebug)}
+                                    style={{ marginLeft: 8 }} />
+                                <label style={{ color: '#666' }}>Show hull, triangle centers, and connector points for debugging</label>
+                            </label>
+                        </div>
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add Magnet Slots</h3>
@@ -355,7 +516,7 @@ function MovementTrayGenerator() {
                         <div inert={!hasMagnetSlot}>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Magnet Diameter:
-                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={circularDiameter - 2}
+                                    <input type="number" name="magnetWidth" value={magnetWidth} onChange={handleInputChange} min={1} max={maxMagnetWidth}
                                         className="input" />
                                     <label style={{ fontWeight: 500 }}>mm</label>
                                 </label>
@@ -394,12 +555,15 @@ function MovementTrayGenerator() {
                     </TabPanel>
                     <TabPanel>
                         <h3 className='tabTitle'>Add support slot</h3>
+                        {slotShape !== 'circle' && (
+                            <p style={{ color: '#666' }}>Support slots are currently only available for circular base mode.</p>
+                        )}
                         <div style={{ marginBottom: 12 }}>
                             <label style={{ fontWeight: 500 }}>Support Slot:
-                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} className="input" />
+                                <input type="checkbox" name="supportSlot" checked={hasSupportSlot} value={hasSupportSlot} onChange={handleInputChange} disabled={slotShape !== 'circle'} className="input" />
                             </label>
                         </div>
-                        <div inert={!hasSupportSlot} >
+                        <div inert={!hasSupportSlot || slotShape !== 'circle'} >
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ fontWeight: 500 }}>Support Mode:
                                     <select name='supportMode' value={supportMode} onChange={handleInputChange} className="input">
@@ -425,6 +589,48 @@ function MovementTrayGenerator() {
                                         <label style={{ fontWeight: 500 }}>mm</label>
                                     </label>
                                 </div>
+                            </div>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <h3>Presets</h3>
+                        <div>
+                            <div className='reset-controls' >
+                                <button className='button' style={{ width: 'min-content' }} type='button' onClick={() => presetResetDefault()}><RotateCcw style={{ width: '100%' }} /> Reset Defaults</button>
+                            </div>
+                            <h4>Movement Tray Presets</h4>
+                            <h5>Circle</h5>
+                            <button className='button' onClick={() => handleMovementPreset(25.5)}>25mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(28.5)}>28mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(32.5)}>32mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(40.5)}>40mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(50.5)}>50mm</button>
+                            <button className='button' onClick={() => handleMovementPreset(60.5)}>60mm</button>
+                            <h5>Special</h5>
+                            <h6>Games Workshop Compatible</h6>
+                            <button className='button' onClick={() => handleSpecialPreset(25.5, 'oval', 9, 60.5, 36)}>Skitarii</button>
+                            <button className='button' onClick={() => handleSpecialPreset(28.5, 'circle', 9, 32.5)}>Novitiate/Repentia Squad</button>
+                            <button className='button' onClick={() => handleSpecialPreset(29, 'circle', 9, 40.5)}>Guardian Squad</button>
+                            <h4>Paint Storage Presets</h4>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ fontWeight: 500 }}>Paint Brand:
+                                    <select name='paintSize' onChange={(e) => {
+                                        const paintBrands = {
+                                            'vallejo': 25,
+                                            'citadel': 33,
+                                            'ak-interactive': 10,
+                                            'army-painter': 25,
+                                            'scale75': 10
+                                        };
+                                        handlePresetSelect(paintBrands[e.target.value]);
+                                    }} className="input">
+                                        <option value={'vallejo'}>Vallejo Dropper</option>
+                                        <option value={'citadel'}>Citadel Pot</option>
+                                        <option value={'army-painter'}>Army Painter Dropper</option>
+                                        <option value={'ak-interactive'}>AK Interactive Dropper</option>
+                                        <option value={'scale75'}>Scale 75 Dropper</option>
+                                    </select>
+                                </label>
                             </div>
                         </div>
                     </TabPanel>
@@ -460,6 +666,7 @@ function MovementTrayGenerator() {
                     <button className='button' type='button' onClick={() => setCameraView('top')}>Top</button>
                     <button className='button' type='button' onClick={() => setCameraView('bottom')}>Bottom</button>
                 </div>
+
                 {generateVisualization()}
             </div>
         </div>

@@ -4,6 +4,10 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    // Vite bundles all renderer dependencies into dist, and the Electron main
+    // process only uses Node/Electron built-ins. Do not copy node_modules into
+    // the desktop app.
+    ignore: [/[\\/]node_modules(?:[\\/]|$)/],
   },
   rebuildConfig: {},
   makers: [
